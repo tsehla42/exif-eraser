@@ -25,7 +25,6 @@ import androidx.lifecycle.ViewModel
 import com.none.tom.exiferaser.core.extension.isNotNullOrEmpty
 import com.none.tom.exiferaser.core.image.ImageProcessingSummary
 import com.none.tom.exiferaser.imageProcessing.data.ImageProcessingRepository
-import com.none.tom.exiferaser.imageProcessingDetails.ui.ImageProcessingDetailsFragmentArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import org.orbitmvi.orbit.ContainerHost
@@ -48,10 +47,10 @@ class ImageProcessingDetailsViewModel @Inject constructor(
         )
 
     fun handleImageProcessingSummaries(
-        summaries: List<ImageProcessingSummary> = ImageProcessingDetailsFragmentArgs
-            .fromSavedStateHandle(savedStateHandle)
-            .navArgImageProcessingSummaries
-            .toList()
+        summaries: List<ImageProcessingSummary> = savedStateHandle
+            .get<android.os.ParcelableArrayList<ImageProcessingSummary>>("navArgImageProcessingSummaries")
+            ?.toList()
+            ?: emptyList()
     ) = intent {
         reduce {
             state.copy(imageProcessingSummaries = summaries)

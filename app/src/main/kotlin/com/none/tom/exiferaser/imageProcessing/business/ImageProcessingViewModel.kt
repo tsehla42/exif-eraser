@@ -28,7 +28,6 @@ import com.none.tom.exiferaser.core.extension.addOrShift
 import com.none.tom.exiferaser.core.image.ImageProcessingStep
 import com.none.tom.exiferaser.core.util.IMAGE_PROCESSING_REPORT_IMAGES_MAX
 import com.none.tom.exiferaser.imageProcessing.data.ImageProcessingRepository
-import com.none.tom.exiferaser.imageProcessing.ui.ImageProcessingFragmentArgs
 import com.none.tom.exiferaser.main.data.SelectionRepository
 import com.none.tom.exiferaser.settings.data.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -131,9 +130,7 @@ class ImageProcessingViewModel @Inject constructor(
 
     fun readSelection(
         fromIndex: Int,
-        treeUri: Uri = ImageProcessingFragmentArgs
-            .fromSavedStateHandle(savedStateHandle)
-            .navArgImageSavePath
+        treeUri: Uri = Uri.parse(savedStateHandle["navArgImageSavePath"] ?: "")
     ) = intent {
         val protos = selectionRepository.getSelection(fromIndex)
         postSideEffect(

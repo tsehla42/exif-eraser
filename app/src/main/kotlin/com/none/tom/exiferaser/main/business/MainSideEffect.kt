@@ -104,10 +104,10 @@ sealed class MainSideEffect : Parcelable {
         sealed class Camera : ImageSources() {
 
             @Parcelize
-            data object Failure : Put()
+            data object Failure : Camera()
 
             @Parcelize
-            data class Success(val uri: Uri) : Put()
+            data class Success(val uri: Uri) : Camera()
         }
 
         @Parcelize

@@ -2,7 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
         android:name="com.none.tom.exiferaser.ExifEraserApplication"
@@ -18,7 +21,7 @@
         tools:targetApi="tiramisu">
 
         <activity
-            android:name="com.none.tom.exiferaser.ExifEraserActivity"
+            android:name="com.none.tom.exiferaser.MainActivity"
             android:exported="true"
             android:launchMode="singleTask">
 

@@ -1,0 +1,81 @@
+<resources>
+    <string name="app_name">ExifEraser</string>
+
+    <string name="choose_your">Choose your</string>
+    <string name="preferred_image_source">preferred image source</string>
+    <string name="choose_your_preferred_image_source_placeholder" translatable="false">%1$s %2$s</string>
+
+    <string name="image_file">Image file</string>
+    <string name="image_files">Image files</string>
+    <string name="image_directory">Image directory</string>
+    <string name="camera">Camera</string>
+
+    <string name="settings">Settings</string>
+    <string name="help">Help and feedback</string>
+
+    <string name="image_sources_camera_failure">Failed to launch camera</string>
+    <string name="image_sources_put_failure">Failed to save image source configuration</string>
+    <string name="image_sources_put_success">Successfully saved image source configuration</string>
+    <string name="image_sources_save_failure">Failed to save image(s)</string>
+    <string name="clipboard_content_unsupported">Unsupported clipboard content</string>
+    <string name="delete_camera_images_failed">Failed to delete camera images</string>
+    <string name="delete_camera_images_success">Successfully deleted camera images</string>
+
+    <!-- Image Processing -->
+    <string name="processing">Processing</string>
+    <string name="progress_percent" translatable="false">%1$d%%</string>
+    <string name="images_processed_count" translatable="false">%1$d images processed</string>
+    <string name="processing_complete">Processing complete</string>
+    <string name="images_modified_placeholder" translatable="false">%1$d %2$s %3$d %4$s</string>
+    <string name="of">of</string>
+    <string name="images_modified">modified</string>
+    <string name="images_saved_count" translatable="false">%1$d images saved</string>
+    <string name="share">Share</string>
+    <string name="view_details">View details</string>
+    <string name="details">Details</string>
+
+    <!-- Save Path Selection -->
+    <string name="choose_save_path">Choose save path</string>
+    <string name="choose_save_path_description">Select where processed images should be saved</string>
+    <string name="use_default_save_path">Use default path</string>
+    <string name="choose_custom_save_path">Choose custom path</string>
+
+    <!-- Metadata Viewer -->
+    <string name="metadata_viewer_title">Metadata Viewer</string>
+    <string name="metadata_expand_all">Expand all</string>
+    <string name="metadata_collapse_all">Collapse all</string>
+    <string name="metadata_no_data">No metadata found</string>
+    <string name="metadata_error">Failed to read metadata</string>
+    <string name="metadata_long_press_copy">Long press to copy value</string>
+
+    <!-- Settings -->
+    <string name="settings_randomize_file_names">Randomize file names</string>
+    <string name="settings_default_open_path">Default open path</string>
+    <string name="settings_default_save_path">Default save path</string>
+    <string name="settings_legacy_image_selection">Legacy image selection</string>
+    <string name="settings_auto_delete">Auto delete originals</string>
+    <string name="settings_preserve_orientation">Preserve orientation</string>
+    <string name="settings_share_by_default">Share by default</string>
+    <string name="settings_default_display_name_suffix">Default display name suffix</string>
+    <string name="settings_skip_save_path_selection">Skip save path selection</string>
+    <string name="settings_default_night_mode">Default night mode</string>
+    <string name="settings_not_set">Not set</string>
+
+    <!-- Dialogs -->
+    <string name="delete_camera_images">Delete camera images</string>
+    <string name="delete_camera_images_confirm">Are you sure you want to delete cached camera images?</string>
+    <string name="delete">Delete</string>
+    <string name="night_mode">Night mode</string>
+    <string name="default_display_name_suffix">Default display name suffix</string>
+    <string name="suffix">Suffix</string>
+    <string name="suffix_invalid">Suffix empty or contains invalid characters</string>
+    <string name="image_path">Image path</string>
+    <string name="icc_profile">ICC Profile</string>
+    <string name="exif" translatable="false">EXIF</string>
+    <string name="xmp" translatable="false">XMP</string>
+    <string name="extended_xmp" translatable="false">ExtendedXMP</string>
+    <string name="photoshop" translatable="false">Photoshop</string>
+
+    <!-- Navigation -->
+    <string name="navigate_back">Navigate back</string>
+</resources>
