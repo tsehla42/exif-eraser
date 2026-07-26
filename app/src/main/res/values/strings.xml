@@ -1,0 +1,188 @@
+<resources>
+    <string name="app_name">ExifEraser</string>
+
+    <string name="choose_your">Choose your</string>
+    <string name="preferred_image_source">preferred image source</string>
+    <string name="choose_your_preferred_image_source_placeholder" translatable="false">%1$s %2$s</string>
+
+    <string name="image_file">Image file</string>
+    <string name="image_files">Image files</string>
+    <string name="image_directory">Image directory</string>
+    <string name="camera">Camera</string>
+    <string name="inspect_exif">Inspect EXIF</string>
+    <string name="inspect_exif_description">View all metadata tags in an image</string>
+
+    <string name="settings">Settings</string>
+    <string name="help">Help and feedback</string>
+
+    <string name="image_sources_camera_failure">Failed to launch camera</string>
+    <string name="image_sources_put_failure">Failed to save image source configuration</string>
+    <string name="image_sources_put_success">Successfully saved image source configuration</string>
+    <string name="image_sources_save_failure">Failed to save image(s)</string>
+    <string name="clipboard_content_unsupported">Unsupported clipboard content</string>
+    <string name="delete_camera_images_failed">Failed to delete camera images</string>
+    <string name="delete_camera_images_success">Successfully deleted camera images</string>
+
+    <!-- Image Processing -->
+    <string name="processing">Processing</string>
+    <string name="progress_percent" translatable="false">%1$d%%</string>
+    <string name="image_processed">Image processed</string>
+    <string name="images_processed_count" translatable="false">%1$d images processed</string>
+    <string name="processing_complete">Processing complete</string>
+    <string name="images_modified_placeholder" translatable="false">%1$d %2$s %3$d %4$s</string>
+    <string name="of">of</string>
+    <string name="images_modified">modified</string>
+    <string name="image_saved">Image saved</string>
+    <string name="images_saved_count" translatable="false">%1$d images saved</string>
+    <string name="files_already_no_exif">Files already have no EXIF</string>
+    <string name="some_files_already_no_exif">Some files already had no EXIF</string>
+    <string name="share">Share</string>
+    <string name="share_unsupported">Unsupported image content</string>
+    <string name="share_dialog_message">Share all files, or only the ones that were converted?</string>
+    <string name="share_all_files">All files</string>
+    <string name="share_only_converted">Only converted</string>
+    <string name="view_details">View details</string>
+    <string name="delete_files_label">Delete files:</string>
+    <string name="originals_label">Originals</string>
+    <string name="converted_label">Converted</string>
+    <string name="originals_delete_failed">Couldn\'t delete original files — they belong to another app</string>
+    <string name="save_elsewhere">Save elsewhere</string>
+    <string name="view_new_exif">View new EXIF</string>
+    <string name="details">Details</string>
+    <string name="processing_details_title">Processed images</string>
+
+    <!-- Save Path Selection -->
+    <string name="choose_save_path">Choose save path</string>
+    <string name="choose_save_path_description">Select where processed images should be saved</string>
+    <string name="use_default_save_path">Use default path</string>
+    <string name="choose_custom_save_path">Choose custom path</string>
+
+    <!-- Metadata Viewer -->
+    <string name="metadata_viewer_title">Metadata Viewer</string>
+    <string name="metadata_expand_all">Expand all</string>
+    <string name="metadata_collapse_all">Collapse all</string>
+    <string name="metadata_no_data">No metadata found</string>
+    <string name="metadata_error">Failed to read metadata</string>
+    <string name="metadata_long_press_copy">Long press to copy value</string>
+    <string name="remove_metadata">Remove metadata</string>
+    <string name="metadata_toggle_raw">Switch to raw view</string>
+    <string name="metadata_toggle_pretty">Switch to grouped view</string>
+    <string name="pretty">Pretty</string>
+    <string name="raw">Raw</string>
+    <string name="expand">Expand</string>
+    <string name="collapse">Collapse</string>
+    <string name="expand_description">Expand description</string>
+    <string name="collapse_description">Collapse description</string>
+
+    <!-- Settings -->
+    <string name="settings_section_filesystem">Filesystem</string>
+    <string name="settings_section_image">Image</string>
+    <string name="settings_section_file_name">File Name</string>
+    <string name="settings_section_user_interface">UX</string>
+    <string name="settings_use_datetime_name">Use datetime as name</string>
+    <string name="settings_use_datetime_name_summary">Use processing timestamp as filename</string>
+    <string name="settings_randomize_file_names">Randomize file names</string>
+
+    <!-- File name slider -->
+    <string name="file_name_random">Random names</string>
+    <string name="file_name_image_id">Image ID (default)</string>
+    <string name="file_name_conversion_date">Conversion date</string>
+    <string name="file_name_last_modified">Last modified</string>
+    <string name="file_name_slider_description_random">Generates a random UUID v4 filename. UUIDs are 128-bit values formatted as 8-4-4-4-12 hex digits.\nThe most secure option.</string>
+    <string name="file_name_slider_description_image_id">Uses the file picker\u2019s internal ID, not the real filename you see in gallery or file manager. The real filename option is absent \u2014 Android\u2019s storage framework does not expose original filenames to apps.</string>
+    <string name="file_name_slider_description_conversion">Uses the current timestamp when processing: yyyyMMdd_HHmmss_SSS. The SSS is milliseconds \u2014 without it, multiple images processed in the same second would get identical names.</string>
+    <string name="file_name_slider_description_last_modified">Preserves image metadata in the filename. Reads the EXIF DateTimeOriginal or DateTimeDigitized tag. Falls back to file system date, then current date.\nMay leak info.</string>
+    <string name="file_name_example_random">Example: %1$s.jpg</string>
+    <string name="file_name_example_image_id">Example: %1$d.jpg</string>
+    <string name="file_name_example_conversion">Example: %1$s.jpg</string>
+    <string name="file_name_example_last_modified">Example: %1$s.jpg</string>
+    <string name="theme_gradient_light">Light</string>
+    <string name="theme_gradient_dark">Dark</string>
+    <string name="file_name_gradient_private">More private</string>
+    <string name="file_name_gradient_less_private">Less private</string>
+
+    <string name="settings_default_open_path">Default open path</string>
+    <string name="settings_default_save_path">Default save path</string>
+    <string name="settings_legacy_image_selection">Legacy image selection</string>
+    <string name="settings_auto_delete">Auto delete originals</string>
+    <string name="settings_delete_converted">Delete converted files</string>
+    <string name="settings_preserve_orientation">Preserve orientation</string>
+    <string name="settings_share_by_default">Share by default</string>
+    <string name="settings_default_display_name_suffix">Default display name suffix</string>
+    <string name="settings_default_night_mode">Default night mode</string>
+    <string name="settings_not_set">Not set</string>
+
+    <!-- Night mode -->
+    <string name="always">Always</string>
+    <string name="automatically">Automatically</string>
+    <string name="low_batt_only">Low battery only</string>
+    <string name="never">Never</string>
+
+    <!-- Dialogs -->
+    <string name="delete_camera_images">Delete camera images</string>
+    <string name="paste_images">Paste images</string>
+    <string name="image_sources">Image sources</string>
+    <string name="help_short">Help</string>
+    <string name="delete_short">Delete</string>
+    <string name="grid_short">Tools</string>
+    <string name="paste_short">Paste</string>
+    <string name="settings_short">Settings</string>
+    <string name="main_short">Main</string>
+    <string name="delete_camera_images_confirm">Are you sure you want to delete cached camera images?</string>
+    <string name="delete">Delete</string>
+    <string name="night_mode">Night mode</string>
+    <string name="default_display_name_suffix">Default display name suffix</string>
+    <string name="suffix">Suffix</string>
+    <string name="suffix_invalid">Suffix empty or contains invalid characters</string>
+    <string name="image_path">Image path</string>
+    <string name="icc_profile">ICC Profile</string>
+    <string name="exif" translatable="false">EXIF</string>
+    <string name="xmp" translatable="false">XMP</string>
+    <string name="extended_xmp" translatable="false">ExtendedXMP</string>
+    <string name="photoshop" translatable="false">Photoshop</string>
+
+    <!-- Help -->
+    <string name="help_supported_formats">Supported formats</string>
+    <string name="help_supported_formats_summary">JPEG, PNG, WebP, and more</string>
+    <string name="help_translate">Translate</string>
+    <string name="help_translate_summary">Help translate this app</string>
+    <string name="help_repository">Repository</string>
+    <string name="help_repository_summary">github.com/tsehla42/exif-eraser</string>
+    <string name="help_repository_dialog_message">Do you want to open https://github.com/tsehla42/exif-eraser?</string>
+    <string name="help_repository_open">Open</string>
+    <string name="help_version">Version</string>
+    <string name="help_version_summary">v1.0.0</string>
+
+    <!-- Navigation -->
+    <string name="navigate_back">Navigate back</string>
+
+    <!-- Theme -->
+    <string name="theme_section">Theme</string>
+    <string name="theme_mode">Theme mode</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_amoled">AMOLED</string>
+    <string name="theme_system">System default</string>
+    <string name="dynamic_color">Dynamic color</string>
+    <string name="dynamic_color_description">Use Material You colors (Android 12+)</string>
+    <string name="restart_required">Restart required</string>
+    <string name="restart_message">Theme changes will take effect after restarting the app.</string>
+    <string name="restart_later">OK, I\'ll restart later</string>
+    <string name="restart_now">Restart</string>
+
+    <!-- Cache -->
+    <string name="settings_clear_cache">Clear camera cache</string>
+    <string name="clear_cache">Clear camera cache</string>
+    <string name="clear_cache_message">This will delete images taken with the camera in this app. Are you sure?</string>
+    <string name="settings_default_open_path_requires_legacy">Only available with legacy image selection</string>
+    <string name="settings_cache_already_empty">Cache is already empty</string>
+    <string name="clear">Clear</string>
+
+    <!-- Processing Complete -->
+    <string name="ok">OK</string>
+    <string name="open_with">Open with</string>
+    <string name="copy_path">Copy path</string>
+    <string name="share_image">Share</string>
+    <string name="saved_images_count">Saved %1$d images</string>
+
+</resources>

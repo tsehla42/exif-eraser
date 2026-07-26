@@ -1,0 +1,10 @@
+Initial release:
+- Remove EXIF metadata from JPEG, PNG, and WebP images
+- Full metadata viewer with expandable groups
+- Raw/Pretty tag value toggle
+- One-tap EXIF removal from viewer
+- Light, Dark, AMOLED, and System themes
+- Dynamic Colors (Material You) on Android 12+
+- File naming options: UUID, Image ID, timestamp, EXIF date
+- No permissions required (uses SAF)
+- Processing details with thumbnails and context menu

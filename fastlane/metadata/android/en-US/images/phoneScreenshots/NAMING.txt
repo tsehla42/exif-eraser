@@ -1,0 +1,19 @@
+Screenshot Naming Convention
+============================
+
+Name your screenshot files as plain sequential numbers:
+
+  1.png
+  2.png
+  3.png
+  ...
+
+Rules:
+- Format: PNG or JPEG only (.png, .jpg, .jpeg)
+- No prefixes, no zero-padding, no underscores
+- Just the number, then the extension
+- Recommended: 2-5 screenshots
+- Height/width ratio should be at most 2:1
+
+These files are used by F-Droid, IzzyOnDroid, and the Orion Store.
+All three pull from this same directory.

@@ -1,0 +1,14 @@
+Feature Graphic
+===============
+
+Place your feature/promo graphic here as:
+
+  featureGraphic.png
+
+Requirements:
+- Format: PNG
+- Size: 1024x500 pixels (or 512x250)
+- Landscape orientation
+- Shown at top of app description in F-Droid client
+
+Optional but recommended for F-Droid Latest tab.

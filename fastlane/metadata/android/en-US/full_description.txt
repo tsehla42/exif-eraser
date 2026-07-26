@@ -1,0 +1,28 @@
+<p>ExifEraser is a modern, permissionless image metadata erasing application for Android. It strips EXIF, IPTC, XMP, ICC profiles, and other metadata from your images — protecting your privacy before sharing.</p>
+
+<b>Why remove metadata?</b>
+Images often contain hidden data like GPS coordinates, device info, camera settings, and timestamps. ExifEraser removes all of this so you can share photos without leaking personal information.
+
+<b>Supported Formats</b>
+• JPEG — ICC Profile, EXIF, Photoshop Resources, XMP/ExtendedXMP
+• PNG — ICC Profile, EXIF, XMP
+• WebP — ICC Profile, EXIF, XMP
+
+<b>Metadata Viewer</b>
+View complete metadata for any image before or after processing. Metadata is organized into expandable groups (EXIF, IPTC, XMP, ICC, etc.) with a Raw/Pretty toggle to switch between human-readable and raw tag values. Remove metadata directly from the viewer with one tap.
+
+<b>No Permissions Required</b>
+ExifEraser uses Android's Storage Access Framework (SAF) — it never asks for storage or camera permissions. You select files, it processes them. No network access, no tracking.
+
+<b>Themes</b>
+• Light, Dark, and AMOLED (pure black for OLED screens)
+• System theme follows your device setting
+• Dynamic Colors (Material You) on Android 12+
+
+<b>File Naming Options</b>
+Choose how processed files are named: Random UUID, original Image ID, processing timestamp, or EXIF date with fallback chain.
+
+<b>Built With</b>
+Jetpack Compose, Material3, Hilt, metadata-extractor, and exif-interface-extended.
+
+Originally based on Tommy-Geenexus/exif-eraser. Licensed under MIT.

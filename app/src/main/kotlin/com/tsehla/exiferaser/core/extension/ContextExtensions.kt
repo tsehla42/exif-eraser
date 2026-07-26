@@ -1,0 +1,110 @@
+/*
+ * Copyright (c) 2024-2026, Tom Geiselmann (tomgapplicationsdevelopment@gmail.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+ * and associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY,WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+package com.tsehla.exiferaser.core.extension
+
+import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.graphics.drawable.LayerDrawable
+import android.os.Build
+import android.util.TypedValue
+import android.view.Gravity
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.Toolbar
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import com.tsehla.exiferaser.R
+
+fun Activity.resolveThemeAttribute(@AttrRes attrRes: Int) =
+    TypedValue().also { theme.resolveAttribute(attrRes, it, true) }.data
+
+fun Activity.setCutoutForegroundColor(@ColorInt color: Int) {
+    ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { _, windowInsetsCompat ->
+        val insets = windowInsetsCompat.getInsets(WindowInsetsCompat.Type.displayCutout())
+        val drawable = if (insets.left > 0) {
+            LayerDrawable(arrayOf(color.toDrawable())).apply {
+                setLayerGravity(0, Gravity.START)
+                setLayerWidth(0, insets.left)
+            }
+        } else if (insets.right > 0) {
+            LayerDrawable(arrayOf(color.toDrawable())).apply {
+                setLayerGravity(0, Gravity.END)
+                setLayerWidth(0, insets.right)
+            }
+        } else {
+            null
+        }
+        window.decorView.foreground = drawable
+        windowInsetsCompat
+    }
+}
+
+fun Context.defaultNightModes() = mutableMapOf(
+    AppCompatDelegate.MODE_NIGHT_YES to getString(R.string.always),
+    AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM to getString(R.string.automatically),
+    AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY to getString(R.string.low_batt_only),
+    AppCompatDelegate.MODE_NIGHT_NO to getString(R.string.never)
+).apply {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+        remove(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+    }
+}.toMap()
+
+fun Context.defaultNightModeDisplayValue() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+    getString(R.string.automatically)
+} else {
+    getString(R.string.never)
+}
+
+fun Fragment.setToolbarAsActionBar(toolbar: Toolbar, @StringRes title: Int) {
+    val activity = (requireActivity() as AppCompatActivity)
+    activity.setSupportActionBar(toolbar.apply { setTitle(title) })
+    val navController = findNavController()
+    val configuration = AppBarConfiguration.Builder(navController.graph).build()
+    val listener = NavController.OnDestinationChangedListener { _, destination, _ ->
+        val isTopLevelDestination = configuration.isTopLevelDestination(destination)
+        activity.supportActionBar?.setDisplayHomeAsUpEnabled(!isTopLevelDestination)
+    }
+    navController.addOnDestinationChangedListener(listener)
+    val callback = object : FragmentManager.FragmentLifecycleCallbacks() {
+        override fun onFragmentViewDestroyed(fm: FragmentManager, f: Fragment) {
+            navController.removeOnDestinationChangedListener(listener)
+            parentFragmentManager.unregisterFragmentLifecycleCallbacks(this)
+        }
+    }
+    parentFragmentManager.registerFragmentLifecycleCallbacks(callback, false)
+}
+
+fun Context.copyToClipboard(label: String, text: String) {
+    val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    clipboard.setPrimaryClip(ClipData.newPlainText(label, text))
+}
