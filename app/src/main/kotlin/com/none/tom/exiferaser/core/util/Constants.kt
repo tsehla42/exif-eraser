@@ -20,7 +20,7 @@
 
 package com.none.tom.exiferaser.core.util
 
-const val TOP_LEVEL_PACKAGE_NAME = "com.none.tom.exiferaser."
+const val TOP_LEVEL_PACKAGE_NAME = "com.tsehla.exiferaser."
 
 const val KEY_CAMERA_IMAGE_DELETE = TOP_LEVEL_PACKAGE_NAME + "CAM_CAMERA_IMAGE_DELETE"
 const val KEY_DEFAULT_DISPLAY_NAME_SUFFIX = TOP_LEVEL_PACKAGE_NAME + "DEFAULT_DISPLAY_NAME_SUFFIX"

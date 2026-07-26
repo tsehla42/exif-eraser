@@ -55,7 +55,7 @@
 
         <provider
             android:name=".core.provider.CameraFileProvider"
-            android:authorities="com.none.tom.exiferaser.fileprovider"
+            android:authorities="com.tsehla.exiferaser.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
 
