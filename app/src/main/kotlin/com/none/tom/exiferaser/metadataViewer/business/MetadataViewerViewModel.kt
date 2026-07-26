@@ -57,4 +57,8 @@ class MetadataViewerViewModel @Inject constructor(
     fun collapseAll() = intent {
         reduce { state.copy(expandedGroups = emptySet()) }
     }
+
+    fun toggleDisplayMode() = intent {
+        reduce { state.copy(isRawMode = !state.isRawMode) }
+    }
 }

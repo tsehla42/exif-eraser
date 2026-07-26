@@ -33,6 +33,7 @@ class ActivityResultContractTakePicture : ActivityResultContract<Uri?, Uri?>() {
     override fun createIntent(context: Context, input: Uri?): Intent =
         Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             .putExtra(MediaStore.EXTRA_OUTPUT, input)
+            .addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
             .also { uri = input }
 
     override fun parseResult(resultCode: Int, intent: Intent?): Uri? {

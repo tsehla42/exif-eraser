@@ -24,6 +24,7 @@ fun PreferenceItem(
     icon: ImageVector? = null,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
@@ -52,6 +53,10 @@ fun PreferenceItem(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        }
+        if (trailingIcon != null) {
+            Spacer(modifier = Modifier.width(8.dp))
+            trailingIcon()
         }
     }
 }

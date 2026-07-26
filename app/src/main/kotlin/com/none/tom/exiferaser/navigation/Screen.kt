@@ -6,7 +6,9 @@ sealed class Screen(val route: String) {
     data object Main : Screen("main")
     data object Settings : Screen("settings")
     data object Help : Screen("help")
-    data object ImageProcessing : Screen("image_processing")
+    data object ImageProcessing : Screen("image_processing/{navArgImageSavePath}") {
+        fun createRoute(savePath: String = "") = "image_processing/${Uri.encode(savePath)}"
+    }
     data object ImageProcessingDetails : Screen("image_processing_details/{summariesJson}") {
         fun createRoute(summariesJson: String) = "image_processing_details/${Uri.encode(summariesJson)}"
     }

@@ -6,6 +6,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -14,31 +15,35 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material.icons.outlined.ContentPaste
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.GridOn
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.PhotoAlbum
 import androidx.compose.material.icons.outlined.PhotoLibrary
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -61,14 +66,15 @@ private data class ImageSource(
 fun MainScreen(
     onNavigateToSettings: () -> Unit,
     onNavigateToHelp: () -> Unit,
-    onNavigateToProcessing: () -> Unit,
+    onNavigateToSavePathSelection: () -> Unit,
+    onNavigateToProcessing: (String) -> Unit,
     onNavigateToMetadataViewer: (String, String) -> Unit,
     viewModel: MainViewModel = hiltViewModel(),
 ) {
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var showDeleteConfirmation by remember { mutableStateOf(false) }
+    var selectedNavItem by remember { mutableIntStateOf(2) }
 
     val chooseImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
@@ -176,18 +182,18 @@ fun MainScreen(
                 }
 
                 is MainSideEffect.Selection.Image.Success -> {
-                    onNavigateToProcessing()
+                    viewModel.chooseSelectionNavigationRoute(isFromCamera = sideEffect.isFromCamera)
                 }
 
                 MainSideEffect.Selection.ImageDirectory.Success,
                 MainSideEffect.Selection.Images.Success -> {
-                    onNavigateToProcessing()
+                    viewModel.chooseSelectionNavigationRoute()
                 }
 
                 MainSideEffect.Navigate.ToSettings -> onNavigateToSettings()
                 MainSideEffect.Navigate.ToHelp -> onNavigateToHelp()
-                MainSideEffect.Navigate.ToSelectionSavePath -> onNavigateToProcessing()
-                is MainSideEffect.Navigate.ToSelection -> onNavigateToProcessing()
+                MainSideEffect.Navigate.ToSelectionSavePath -> onNavigateToSavePathSelection()
+                is MainSideEffect.Navigate.ToSelection -> onNavigateToProcessing(sideEffect.savePath.toString())
                 MainSideEffect.Navigate.ToDeleteCameraImages -> {
                     showDeleteConfirmation = true
                 }
@@ -277,49 +283,70 @@ fun MainScreen(
                 labelResId = R.string.camera,
                 onClick = { viewModel.launchCamera() },
             ),
-            ImageSource(
-                icon = Icons.Outlined.Search,
-                labelResId = R.string.inspect_exif,
-                onClick = {
-                    inspectExifLauncher.launch(
-                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                    )
-                },
-            ),
         )
     }
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            LargeTopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(
-                            R.string.choose_your_preferred_image_source_placeholder,
-                            stringResource(R.string.choose_your),
-                            stringResource(R.string.preferred_image_source),
-                        ),
-                    )
-                },
-                actions = {
-                    IconButton(onClick = onNavigateToSettings) {
-                        Icon(
-                            imageVector = Icons.Outlined.Settings,
-                            contentDescription = stringResource(R.string.settings),
-                        )
-                    }
-                    IconButton(onClick = onNavigateToHelp) {
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        bottomBar = {
+            NavigationBar {
+                NavigationBarItem(
+                    icon = {
                         Icon(
                             imageVector = Icons.Outlined.HelpOutline,
                             contentDescription = stringResource(R.string.help),
                         )
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-            )
+                    },
+                    label = { Text(stringResource(R.string.help_short)) },
+                    selected = false,
+                    onClick = onNavigateToHelp,
+                )
+                NavigationBarItem(
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Outlined.Delete,
+                            contentDescription = stringResource(R.string.delete_camera_images),
+                        )
+                    },
+                    label = { Text(stringResource(R.string.delete_short)) },
+                    selected = false,
+                    onClick = { showDeleteConfirmation = true },
+                )
+                NavigationBarItem(
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Outlined.GridOn,
+                            contentDescription = stringResource(R.string.image_sources),
+                        )
+                    },
+                    label = { Text(stringResource(R.string.grid_short)) },
+                    selected = selectedNavItem == 2,
+                    onClick = { selectedNavItem = 2 },
+                )
+                NavigationBarItem(
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Outlined.ContentPaste,
+                            contentDescription = stringResource(R.string.paste_images),
+                        )
+                    },
+                    label = { Text(stringResource(R.string.paste_short)) },
+                    selected = false,
+                    onClick = { viewModel.handlePasteImages() },
+                )
+                NavigationBarItem(
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Outlined.Settings,
+                            contentDescription = stringResource(R.string.settings),
+                        )
+                    },
+                    label = { Text(stringResource(R.string.settings_short)) },
+                    selected = false,
+                    onClick = onNavigateToSettings,
+                )
+            }
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -330,22 +357,37 @@ fun MainScreen(
                 LoadingState(modifier = Modifier.fillMaxSize())
             }
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+            Column(
                 modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
             ) {
-                items(
-                    items = imageSources,
-                    key = { it.labelResId },
-                ) { source ->
-                    ImageSourceCard(
-                        icon = source.icon,
-                        label = stringResource(source.labelResId),
-                        onClick = source.onClick,
-                    )
+                Text(
+                    text = stringResource(R.string.choose_your_preferred_image_source_placeholder,
+                        stringResource(R.string.choose_your),
+                        stringResource(R.string.preferred_image_source)),
+                    style = MaterialTheme.typography.headlineSmall,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp),
+                )
+
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.weight(1f),
+                ) {
+                    items(
+                        items = imageSources,
+                        key = { it.labelResId },
+                    ) { source ->
+                        ImageSourceCard(
+                            icon = source.icon,
+                            label = stringResource(source.labelResId),
+                            onClick = source.onClick,
+                        )
+                    }
                 }
             }
         }

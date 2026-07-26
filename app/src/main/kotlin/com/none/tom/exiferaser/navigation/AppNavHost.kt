@@ -25,13 +25,21 @@ fun AppNavHost(navController: NavHostController) {
             MainScreen(
                 onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
                 onNavigateToHelp = { navController.navigate(Screen.Help.route) },
-                onNavigateToProcessing = { navController.navigate(Screen.ImageProcessing.route) },
+                onNavigateToSavePathSelection = { navController.navigate(Screen.SavePathSelection.route) },
+                onNavigateToProcessing = { savePath ->
+                    navController.navigate(Screen.ImageProcessing.createRoute(savePath))
+                },
                 onNavigateToMetadataViewer = { uri, displayName ->
                     navController.navigate(Screen.MetadataViewer.createRoute(uri, displayName))
                 },
             )
         }
-        composable(Screen.ImageProcessing.route) {
+        composable(
+            route = Screen.ImageProcessing.route,
+            arguments = listOf(
+                navArgument("navArgImageSavePath") { type = NavType.StringType; defaultValue = "" },
+            ),
+        ) {
             ProcessingScreen(
                 onNavigateToDetails = { summariesJson ->
                     navController.navigate(Screen.ImageProcessingDetails.createRoute(summariesJson))
@@ -57,7 +65,7 @@ fun AppNavHost(navController: NavHostController) {
             SavePathScreen(
                 onNavigateToSelection = { savePath ->
                     navController.popBackStack()
-                    navController.navigate(Screen.ImageProcessing.route)
+                    navController.navigate(Screen.ImageProcessing.createRoute(savePath.toString()))
                 },
                 onDismiss = { navController.popBackStack() },
             )
@@ -74,7 +82,7 @@ fun AppNavHost(navController: NavHostController) {
             MetadataViewerScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onRemoveMetadata = {
-                    navController.navigate(Screen.ImageProcessing.route)
+                    navController.navigate(Screen.ImageProcessing.createRoute())
                 },
                 uri = Uri.parse(uriString),
                 displayName = displayName,

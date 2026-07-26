@@ -5,18 +5,22 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.UnfoldLess
 import androidx.compose.material.icons.outlined.UnfoldMore
+import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -25,6 +29,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.none.tom.exiferaser.R
@@ -70,6 +76,20 @@ fun MetadataViewerScreen(
                 },
                 actions = {
                     if (state.metadataGroups.isNotEmpty()) {
+                        IconButton(onClick = { viewModel.toggleDisplayMode() }) {
+                            Icon(
+                                imageVector = if (state.isRawMode) {
+                                    Icons.Outlined.ViewList
+                                } else {
+                                    Icons.Outlined.Code
+                                },
+                                contentDescription = if (state.isRawMode) {
+                                    stringResource(R.string.metadata_toggle_pretty)
+                                } else {
+                                    stringResource(R.string.metadata_toggle_raw)
+                                },
+                            )
+                        }
                         IconButton(onClick = {
                             if (state.expandedGroups.size == state.metadataGroups.size) {
                                 viewModel.collapseAll()
@@ -129,6 +149,35 @@ fun MetadataViewerScreen(
                         title = stringResource(R.string.metadata_no_data),
                         modifier = Modifier.fillMaxSize(),
                     )
+                }
+
+                state.isRawMode -> {
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        state.metadataGroups.forEach { group ->
+                            item(key = "header_${group.name}") {
+                                Text(
+                                    text = group.name,
+                                    style = MaterialTheme.typography.titleSmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                                )
+                            }
+                            group.tags.forEach { tag ->
+                                item(key = "${group.name}_${tag.tagName}") {
+                                    Text(
+                                        text = "${tag.tagName}: ${tag.description}",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontFamily = FontFamily.Monospace,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp, vertical = 2.dp),
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
 
                 else -> {

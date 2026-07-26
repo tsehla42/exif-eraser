@@ -12,7 +12,6 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.AdsClick
 import androidx.compose.material.icons.outlined.AutoDelete
 import androidx.compose.material.icons.outlined.DarkMode
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.FolderOpen
@@ -113,6 +112,15 @@ fun SettingsScreen(
             contentPadding = PaddingValues(bottom = 24.dp),
         ) {
             item {
+                Text(
+                    text = stringResource(R.string.settings_section_filesystem),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                )
+            }
+
+            item {
                 PreferenceItem(
                     title = stringResource(R.string.settings_randomize_file_names),
                     icon = Icons.Outlined.AdsClick,
@@ -135,6 +143,15 @@ fun SettingsScreen(
                     subtitle = state.defaultSavePathName.ifBlank { stringResource(R.string.settings_not_set) },
                     icon = Icons.Outlined.Folder,
                     onClick = {},
+                )
+            }
+
+            item {
+                Text(
+                    text = stringResource(R.string.settings_section_image),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                 )
             }
 
@@ -176,6 +193,15 @@ fun SettingsScreen(
                     subtitle = state.defaultDisplayNameSuffix.ifBlank { stringResource(R.string.settings_not_set) },
                     icon = Icons.Outlined.Description,
                     onClick = { viewModel.handleDefaultDisplayNameSuffix() },
+                )
+            }
+
+            item {
+                Text(
+                    text = stringResource(R.string.settings_section_user_interface),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                 )
             }
 

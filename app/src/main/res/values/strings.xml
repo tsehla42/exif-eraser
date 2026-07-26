@@ -50,8 +50,13 @@
     <string name="metadata_error">Failed to read metadata</string>
     <string name="metadata_long_press_copy">Long press to copy value</string>
     <string name="remove_metadata">Remove metadata</string>
+    <string name="metadata_toggle_raw">Switch to raw view</string>
+    <string name="metadata_toggle_pretty">Switch to grouped view</string>
 
     <!-- Settings -->
+    <string name="settings_section_filesystem">Filesystem</string>
+    <string name="settings_section_image">Image</string>
+    <string name="settings_section_user_interface">User interface</string>
     <string name="settings_randomize_file_names">Randomize file names</string>
     <string name="settings_default_open_path">Default open path</string>
     <string name="settings_default_save_path">Default save path</string>
@@ -72,6 +77,13 @@
 
     <!-- Dialogs -->
     <string name="delete_camera_images">Delete camera images</string>
+    <string name="paste_images">Paste images</string>
+    <string name="image_sources">Image sources</string>
+    <string name="help_short">Help</string>
+    <string name="delete_short">Delete</string>
+    <string name="grid_short">Grid</string>
+    <string name="paste_short">Paste</string>
+    <string name="settings_short">Settings</string>
     <string name="delete_camera_images_confirm">Are you sure you want to delete cached camera images?</string>
     <string name="delete">Delete</string>
     <string name="night_mode">Night mode</string>
