@@ -21,10 +21,12 @@
 package com.none.tom.exiferaser.core.extension
 
 import android.net.Uri
+import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 fun Uri.isNotEmpty() = this != Uri.EMPTY
 
+@OptIn(ExperimentalContracts::class)
 fun Uri?.isNotNullOrEmpty(): Boolean {
     contract {
         returns(true) implies (this@isNotNullOrEmpty != null)

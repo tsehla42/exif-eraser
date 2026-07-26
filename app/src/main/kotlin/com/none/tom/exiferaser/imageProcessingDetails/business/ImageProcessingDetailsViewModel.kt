@@ -48,7 +48,7 @@ class ImageProcessingDetailsViewModel @Inject constructor(
 
     fun handleImageProcessingSummaries(
         summaries: List<ImageProcessingSummary> = savedStateHandle
-            .get<android.os.ParcelableArrayList<ImageProcessingSummary>>("navArgImageProcessingSummaries")
+            .get<ArrayList<ImageProcessingSummary>>("navArgImageProcessingSummaries")
             ?.toList()
             ?: emptyList()
     ) = intent {

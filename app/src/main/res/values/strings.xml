@@ -61,6 +61,12 @@
     <string name="settings_default_night_mode">Default night mode</string>
     <string name="settings_not_set">Not set</string>
 
+    <!-- Night mode -->
+    <string name="always">Always</string>
+    <string name="automatically">Automatically</string>
+    <string name="low_batt_only">Low battery only</string>
+    <string name="never">Never</string>
+
     <!-- Dialogs -->
     <string name="delete_camera_images">Delete camera images</string>
     <string name="delete_camera_images_confirm">Are you sure you want to delete cached camera images?</string>
@@ -75,6 +81,16 @@
     <string name="xmp" translatable="false">XMP</string>
     <string name="extended_xmp" translatable="false">ExtendedXMP</string>
     <string name="photoshop" translatable="false">Photoshop</string>
+
+    <!-- Help -->
+    <string name="help_supported_formats">Supported formats</string>
+    <string name="help_supported_formats_summary">JPEG, PNG, WebP, and more</string>
+    <string name="help_translate">Translate</string>
+    <string name="help_translate_summary">Help translate this app</string>
+    <string name="help_feedback">Feedback</string>
+    <string name="help_feedback_summary">Report bugs or request features</string>
+    <string name="help_version">Version</string>
+    <string name="help_version_summary">v1.0.0</string>
 
     <!-- Navigation -->
     <string name="navigate_back">Navigate back</string>

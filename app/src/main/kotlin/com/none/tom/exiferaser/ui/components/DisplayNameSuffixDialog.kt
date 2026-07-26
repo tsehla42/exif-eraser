@@ -23,6 +23,7 @@ fun DisplayNameSuffixDialog(
 ) {
     var suffix by remember { mutableStateOf(currentSuffix) }
     var error by remember { mutableStateOf<String?>(null) }
+    val suffixInvalid = stringResource(R.string.suffix_invalid)
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -35,7 +36,7 @@ fun DisplayNameSuffixDialog(
                 onValueChange = { newValue ->
                     suffix = newValue
                     error = if (newValue.isNotEmpty() && !FileUtilsKt.isValidExtFilename(newValue)) {
-                        stringResource(R.string.suffix_invalid)
+                        suffixInvalid
                     } else {
                         null
                     }
