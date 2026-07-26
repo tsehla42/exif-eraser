@@ -9,3 +9,11 @@
 .cxx
 local.properties
 /app/build
+
+# Docs (whitelist tracked docs)
+docs/*
+!docs/README.md
+!docs/architecture/
+!docs/configuration/
+!docs/features/
+!docs/guides/
