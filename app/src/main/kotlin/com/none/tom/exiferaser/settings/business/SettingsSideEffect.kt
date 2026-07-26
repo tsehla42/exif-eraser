@@ -166,4 +166,22 @@ sealed class SettingsSideEffect : Parcelable {
         @Parcelize
         data object Success : ShareByDefault()
     }
+
+    sealed class Theme : SettingsSideEffect() {
+
+        @Parcelize
+        data object Failure : Theme()
+
+        @Parcelize
+        data object Success : Theme()
+    }
+
+    sealed class DynamicColor : SettingsSideEffect() {
+
+        @Parcelize
+        data object Failure : DynamicColor()
+
+        @Parcelize
+        data object Success : DynamicColor()
+    }
 }

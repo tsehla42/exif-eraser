@@ -15,6 +15,7 @@ material = "1.12.0"
 metadata-extractor = "2.21.0"
 navigation = "2.9.8"
 orbit = "11.0.0"
+phoenix = "3.0.0"
 timber = "5.0.1"
 wire = "6.4.5"
 lifecycle = "2.11.0"
@@ -57,6 +58,7 @@ apache-commons-io = { group = "commons-io", name = "commons-io", version.ref = "
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
 exif-interface = { group = "io.github.tommy-geenexus", name = "exif-interface-extended", version.ref = "exif-interface" }
 metadata-extractor = { group = "com.drewnoakes", name = "metadata-extractor", version.ref = "metadata-extractor" }
+phoenix = { group = "com.jakewharton", name = "process-phoenix", version.ref = "phoenix" }
 orbit-vm = { group = "org.orbit-mvi", name = "orbit-viewmodel", version.ref = "orbit" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 wire-runtime = { group = "com.squareup.wire", name = "wire-runtime", version.ref = "wire" }
@@ -90,6 +92,7 @@ implementation = [
     "navigation-fragment-ktx",
     "navigation-ui-ktx",
     "orbit-vm",
+    "phoenix",
     "timber",
     "wire-runtime",
     "window",

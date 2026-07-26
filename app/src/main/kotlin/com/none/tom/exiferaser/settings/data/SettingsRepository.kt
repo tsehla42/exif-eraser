@@ -48,7 +48,10 @@ import com.none.tom.exiferaser.core.util.SETTINGS_KEY_PRESERVE_ORIENTATION
 import com.none.tom.exiferaser.core.util.SETTINGS_KEY_RANDOMIZE_FILE_NAMES
 import com.none.tom.exiferaser.core.util.SETTINGS_KEY_SAVE_PATH_SELECTION_SKIP
 import com.none.tom.exiferaser.core.util.SETTINGS_KEY_SHARE_BY_DEFAULT
+import com.none.tom.exiferaser.core.util.SETTINGS_KEY_THEME_MODE
+import com.none.tom.exiferaser.core.util.SETTINGS_KEY_DYNAMIC_COLOR
 import com.none.tom.exiferaser.core.util.defaultNightMode
+import com.none.tom.exiferaser.settings.business.ThemeMode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -78,6 +81,8 @@ class SettingsRepository @Inject constructor(
     private val keySavePathSelectionSkip =
         booleanPreferencesKey(SETTINGS_KEY_SAVE_PATH_SELECTION_SKIP)
     private val keyDefaultNightMode = intPreferencesKey(SETTINGS_KEY_DEFAULT_NIGHT_MODE)
+    private val keyThemeMode = intPreferencesKey(SETTINGS_KEY_THEME_MODE)
+    private val keyDynamicColor = booleanPreferencesKey(SETTINGS_KEY_DYNAMIC_COLOR)
 
     suspend fun putDefaultOpenPath(
         newDefaultOpenPath: Uri,
@@ -368,6 +373,40 @@ class SettingsRepository @Inject constructor(
     suspend fun putDefaultNightMode(value: Int): Result<Unit> = withContext(dispatcherIo) {
         coroutineContext.suspendRunCatching {
             dataStore.edit { preferences -> preferences[keyDefaultNightMode] = value }
+            Result.success(Unit)
+        }.getOrElse { exception ->
+            Timber.e(exception)
+            Result.failure(exception)
+        }
+    }
+
+    suspend fun getThemeMode(): ThemeMode = dataStore
+        .data
+        .catch { exception -> Timber.e(exception) }
+        .map { preferences -> ThemeMode.entries.getOrElse(preferences[keyThemeMode] ?: 3) { ThemeMode.SYSTEM } }
+        .firstOrNull()
+        ?: ThemeMode.SYSTEM
+
+    suspend fun putThemeMode(value: ThemeMode): Result<Unit> = withContext(dispatcherIo) {
+        coroutineContext.suspendRunCatching {
+            dataStore.edit { preferences -> preferences[keyThemeMode] = value.ordinal }
+            Result.success(Unit)
+        }.getOrElse { exception ->
+            Timber.e(exception)
+            Result.failure(exception)
+        }
+    }
+
+    suspend fun getDynamicColor(): Boolean = dataStore
+        .data
+        .catch { exception -> Timber.e(exception) }
+        .map { preferences -> preferences[keyDynamicColor] ?: true }
+        .firstOrNull()
+        ?: true
+
+    suspend fun putDynamicColor(value: Boolean): Result<Unit> = withContext(dispatcherIo) {
+        coroutineContext.suspendRunCatching {
+            dataStore.edit { preferences -> preferences[keyDynamicColor] = value }
             Result.success(Unit)
         }.getOrElse { exception ->
             Timber.e(exception)

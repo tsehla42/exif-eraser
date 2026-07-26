@@ -109,4 +109,18 @@
 
     <!-- Navigation -->
     <string name="navigate_back">Navigate back</string>
+
+    <!-- Theme -->
+    <string name="theme_section">Theme</string>
+    <string name="theme_mode">Theme mode</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_amoled">AMOLED</string>
+    <string name="theme_system">System default</string>
+    <string name="dynamic_color">Dynamic color</string>
+    <string name="dynamic_color_description">Use Material You colors (Android 12+)</string>
+    <string name="restart_required">Restart required</string>
+    <string name="restart_message">Theme changes will take effect after restarting the app.</string>
+    <string name="restart_later">OK, I\'ll restart later</string>
+    <string name="restart_now">Restart</string>
 </resources>

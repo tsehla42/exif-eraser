@@ -23,6 +23,13 @@ package com.none.tom.exiferaser.settings.business
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
+enum class ThemeMode {
+    LIGHT,
+    DARK,
+    AMOLED,
+    SYSTEM,
+}
+
 @Parcelize
 data class SettingsState(
     val isRandomizeFileNamesEnabled: Boolean = false,
@@ -34,5 +41,7 @@ data class SettingsState(
     val defaultDisplayNameSuffix: String = "",
     val isLegacyImageSelectionEnabled: Boolean = false,
     val isSkipSavePathSelectionEnabled: Boolean = false,
-    val defaultNightModeName: String = ""
+    val defaultNightModeName: String = "",
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
+    val useDynamicColor: Boolean = true,
 ) : Parcelable

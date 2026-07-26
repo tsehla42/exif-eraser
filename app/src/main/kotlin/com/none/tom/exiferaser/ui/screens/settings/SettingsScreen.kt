@@ -1,11 +1,11 @@
 package com.none.tom.exiferaser.ui.screens.settings
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -16,16 +16,21 @@ import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.Image
+import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,13 +41,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.jakewharton.processphoenix.ProcessPhoenix
 import com.none.tom.exiferaser.R
+import com.none.tom.exiferaser.core.extension.isNotNullOrEmpty
 import com.none.tom.exiferaser.settings.business.SettingsSideEffect
 import com.none.tom.exiferaser.settings.business.SettingsViewModel
+import com.none.tom.exiferaser.settings.business.ThemeMode
 import com.none.tom.exiferaser.ui.components.PreferenceItem
 import com.none.tom.exiferaser.ui.components.SwitchPreferenceItem
 import com.none.tom.exiferaser.ui.components.DisplayNameSuffixDialog
@@ -59,7 +68,26 @@ fun SettingsScreen(
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var showNightModePicker by remember { mutableStateOf(false) }
     var showDisplayNameSuffix by remember { mutableStateOf(false) }
+    var showThemeModePicker by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    var showRestartDialog by remember { mutableStateOf(false) }
     var selectedNightMode by remember { mutableIntStateOf(0) }
+
+    val defaultPathOpenLauncher = rememberLauncherForActivityResult(
+        contract = OpenDocumentTree()
+    ) { uri: Uri? ->
+        if (uri.isNotNullOrEmpty()) {
+            viewModel.storeDefaultPathOpen(uri)
+        }
+    }
+
+    val defaultPathSaveLauncher = rememberLauncherForActivityResult(
+        contract = OpenDocumentTree()
+    ) { uri: Uri? ->
+        if (uri.isNotNullOrEmpty()) {
+            viewModel.storeDefaultPathSave(uri)
+        }
+    }
 
     val nightModeOptions = remember {
         listOf(
@@ -68,6 +96,13 @@ fun SettingsScreen(
             NightModeOption(value = 0, label = "Never"),
         )
     }
+
+    val themeModeOptions = listOf(
+        ThemeMode.SYSTEM to stringResource(R.string.theme_system),
+        ThemeMode.LIGHT to stringResource(R.string.theme_light),
+        ThemeMode.DARK to stringResource(R.string.theme_dark),
+        ThemeMode.AMOLED to stringResource(R.string.theme_amoled),
+    )
 
     LaunchedEffect(Unit) {
         viewModel.container.sideEffectFlow.collect { sideEffect ->
@@ -79,6 +114,27 @@ fun SettingsScreen(
                 is SettingsSideEffect.Navigate.ToDefaultNightMode -> {
                     selectedNightMode = sideEffect.defaultNightMode
                     showNightModePicker = true
+                }
+
+                is SettingsSideEffect.DefaultOpenPath.Select.Success -> {
+                    defaultPathOpenLauncher.launch(sideEffect.uri)
+                }
+
+                SettingsSideEffect.DefaultOpenPath.Select.Failure -> {
+                    defaultPathOpenLauncher.launch(Uri.EMPTY)
+                }
+
+                is SettingsSideEffect.DefaultSavePath.Select.Success -> {
+                    defaultPathSaveLauncher.launch(sideEffect.uri)
+                }
+
+                SettingsSideEffect.DefaultSavePath.Select.Failure -> {
+                    defaultPathSaveLauncher.launch(Uri.EMPTY)
+                }
+
+                is SettingsSideEffect.Theme.Success,
+                is SettingsSideEffect.DynamicColor.Success -> {
+                    showRestartDialog = true
                 }
 
                 else -> {}
@@ -133,7 +189,7 @@ fun SettingsScreen(
                     title = stringResource(R.string.settings_default_open_path),
                     subtitle = state.defaultOpenPathName.ifBlank { stringResource(R.string.settings_not_set) },
                     icon = Icons.Outlined.FolderOpen,
-                    onClick = {},
+                    onClick = { viewModel.handleDefaultPathOpen() },
                 )
             }
 
@@ -142,7 +198,7 @@ fun SettingsScreen(
                     title = stringResource(R.string.settings_default_save_path),
                     subtitle = state.defaultSavePathName.ifBlank { stringResource(R.string.settings_not_set) },
                     icon = Icons.Outlined.Folder,
-                    onClick = {},
+                    onClick = { viewModel.handleDefaultPathSave() },
                 )
             }
 
@@ -224,6 +280,38 @@ fun SettingsScreen(
                     onClick = { viewModel.handleDefaultNightMode() },
                 )
             }
+
+            item {
+                Text(
+                    text = stringResource(R.string.theme_section),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                )
+            }
+
+            item {
+                val currentThemeLabel = themeModeOptions
+                    .firstOrNull { it.first == state.themeMode }
+                    ?.second
+                    .orEmpty()
+                PreferenceItem(
+                    title = stringResource(R.string.theme_mode),
+                    subtitle = currentThemeLabel,
+                    icon = Icons.Outlined.Palette,
+                    onClick = { showThemeModePicker = true },
+                )
+            }
+
+            item {
+                SwitchPreferenceItem(
+                    title = stringResource(R.string.dynamic_color),
+                    subtitle = stringResource(R.string.dynamic_color_description),
+                    icon = Icons.Outlined.Palette,
+                    checked = state.useDynamicColor,
+                    onCheckedChange = { viewModel.storeDynamicColor(it) },
+                )
+            }
         }
     }
 
@@ -254,4 +342,92 @@ fun SettingsScreen(
             },
         )
     }
+
+    if (showThemeModePicker) {
+        ThemeModePickerDialog(
+            options = themeModeOptions,
+            selectedMode = state.themeMode,
+            onSelect = { mode ->
+                showThemeModePicker = false
+                viewModel.storeThemeMode(mode)
+            },
+            onDismiss = {
+                showThemeModePicker = false
+            },
+        )
+    }
+
+    if (showRestartDialog) {
+        RestartDialog(
+            onRestart = {
+                showRestartDialog = false
+                ProcessPhoenix.triggerRebirth(context)
+            },
+            onDismiss = {
+                showRestartDialog = false
+            },
+        )
+    }
+}
+
+@Composable
+private fun ThemeModePickerDialog(
+    options: List<Pair<ThemeMode, String>>,
+    selectedMode: ThemeMode,
+    onSelect: (ThemeMode) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(text = stringResource(R.string.theme_mode))
+        },
+        text = {
+            options.forEachIndexed { index, (mode, label) ->
+                RadioButton(
+                    selected = mode == selectedMode,
+                    onClick = { onSelect(mode) },
+                )
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+                if (index < options.lastIndex) {
+                    HorizontalDivider()
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(android.R.string.cancel))
+            }
+        },
+    )
+}
+
+@Composable
+private fun RestartDialog(
+    onRestart: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(text = stringResource(R.string.restart_required))
+        },
+        text = {
+            Text(text = stringResource(R.string.restart_message))
+        },
+        confirmButton = {
+            TextButton(onClick = onRestart) {
+                Text(text = stringResource(R.string.restart_now))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(R.string.restart_later))
+            }
+        },
+    )
 }

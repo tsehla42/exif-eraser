@@ -275,4 +275,28 @@ class SettingsViewModel @Inject constructor(
             postSideEffect(SettingsSideEffect.DefaultNightMode.Failure)
         }
     }
+
+    fun storeThemeMode(mode: ThemeMode) = intent {
+        val result = settingsRepository.putThemeMode(mode)
+        if (result.isSuccess) {
+            reduce {
+                state.copy(themeMode = mode)
+            }
+            postSideEffect(SettingsSideEffect.Theme.Success)
+        } else {
+            postSideEffect(SettingsSideEffect.Theme.Failure)
+        }
+    }
+
+    fun storeDynamicColor(enabled: Boolean) = intent {
+        val result = settingsRepository.putDynamicColor(enabled)
+        if (result.isSuccess) {
+            reduce {
+                state.copy(useDynamicColor = enabled)
+            }
+            postSideEffect(SettingsSideEffect.DynamicColor.Success)
+        } else {
+            postSideEffect(SettingsSideEffect.DynamicColor.Failure)
+        }
+    }
 }
