@@ -3,9 +3,13 @@ package com.none.tom.exiferaser.ui.screens.settings
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -22,7 +26,6 @@ import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
@@ -39,6 +42,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -68,7 +72,6 @@ fun SettingsScreen(
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var showNightModePicker by remember { mutableStateOf(false) }
     var showDisplayNameSuffix by remember { mutableStateOf(false) }
-    var showThemeModePicker by remember { mutableStateOf(false) }
     val context = LocalContext.current
     var showRestartDialog by remember { mutableStateOf(false) }
     var selectedNightMode by remember { mutableIntStateOf(0) }
@@ -130,11 +133,6 @@ fun SettingsScreen(
 
                 SettingsSideEffect.DefaultSavePath.Select.Failure -> {
                     defaultPathSaveLauncher.launch(Uri.EMPTY)
-                }
-
-                is SettingsSideEffect.Theme.Success,
-                is SettingsSideEffect.DynamicColor.Success -> {
-                    showRestartDialog = true
                 }
 
                 else -> {}
@@ -291,16 +289,31 @@ fun SettingsScreen(
             }
 
             item {
-                val currentThemeLabel = themeModeOptions
-                    .firstOrNull { it.first == state.themeMode }
-                    ?.second
-                    .orEmpty()
-                PreferenceItem(
-                    title = stringResource(R.string.theme_mode),
-                    subtitle = currentThemeLabel,
-                    icon = Icons.Outlined.Palette,
-                    onClick = { showThemeModePicker = true },
-                )
+                themeModeOptions.forEach { (mode, label) ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clickable {
+                                viewModel.storeThemeMode(mode)
+                                showRestartDialog = true
+                            }
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        RadioButton(
+                            selected = state.themeMode == mode,
+                            onClick = {
+                                viewModel.storeThemeMode(mode)
+                                showRestartDialog = true
+                            },
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(
+                            text = label,
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    }
+                }
             }
 
             item {
@@ -309,7 +322,10 @@ fun SettingsScreen(
                     subtitle = stringResource(R.string.dynamic_color_description),
                     icon = Icons.Outlined.Palette,
                     checked = state.useDynamicColor,
-                    onCheckedChange = { viewModel.storeDynamicColor(it) },
+                    onCheckedChange = {
+                        viewModel.storeDynamicColor(it)
+                        showRestartDialog = true
+                    },
                 )
             }
         }
@@ -343,20 +359,6 @@ fun SettingsScreen(
         )
     }
 
-    if (showThemeModePicker) {
-        ThemeModePickerDialog(
-            options = themeModeOptions,
-            selectedMode = state.themeMode,
-            onSelect = { mode ->
-                showThemeModePicker = false
-                viewModel.storeThemeMode(mode)
-            },
-            onDismiss = {
-                showThemeModePicker = false
-            },
-        )
-    }
-
     if (showRestartDialog) {
         RestartDialog(
             onRestart = {
@@ -368,42 +370,6 @@ fun SettingsScreen(
             },
         )
     }
-}
-
-@Composable
-private fun ThemeModePickerDialog(
-    options: List<Pair<ThemeMode, String>>,
-    selectedMode: ThemeMode,
-    onSelect: (ThemeMode) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(text = stringResource(R.string.theme_mode))
-        },
-        text = {
-            options.forEachIndexed { index, (mode, label) ->
-                RadioButton(
-                    selected = mode == selectedMode,
-                    onClick = { onSelect(mode) },
-                )
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-                if (index < options.lastIndex) {
-                    HorizontalDivider()
-                }
-            }
-        },
-        confirmButton = {},
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = stringResource(android.R.string.cancel))
-            }
-        },
-    )
 }
 
 @Composable

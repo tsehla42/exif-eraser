@@ -20,6 +20,7 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.GridOn
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.Image
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.PhotoAlbum
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Settings
@@ -264,9 +265,11 @@ fun MainScreen(
     val imageSources = remember(state.imageSources) {
         listOf(
             ImageSource(
-                icon = Icons.Outlined.Image,
-                labelResId = R.string.image_file,
-                onClick = { viewModel.chooseImage() },
+                icon = Icons.Outlined.Search,
+                labelResId = R.string.inspect_exif,
+                onClick = { inspectExifLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                ) },
             ),
             ImageSource(
                 icon = Icons.Outlined.PhotoLibrary,
