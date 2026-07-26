@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.ContentPaste
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.GridOn
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.Image
@@ -43,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -266,6 +266,16 @@ fun MainScreen(
     val imageSources = remember(state.imageSources) {
         listOf(
             ImageSource(
+                icon = Icons.Outlined.CameraAlt,
+                labelResId = R.string.camera,
+                onClick = { viewModel.launchCamera() },
+            ),
+            ImageSource(
+                icon = Icons.Outlined.PhotoAlbum,
+                labelResId = R.string.image_directory,
+                onClick = { viewModel.chooseImageDirectory() },
+            ),
+            ImageSource(
                 icon = Icons.Outlined.Search,
                 labelResId = R.string.inspect_exif,
                 onClick = { inspectExifLauncher.launch(
@@ -277,23 +287,15 @@ fun MainScreen(
                 labelResId = R.string.image_files,
                 onClick = { viewModel.chooseImages() },
             ),
-            ImageSource(
-                icon = Icons.Outlined.PhotoAlbum,
-                labelResId = R.string.image_directory,
-                onClick = { viewModel.chooseImageDirectory() },
-            ),
-            ImageSource(
-                icon = Icons.Outlined.CameraAlt,
-                labelResId = R.string.camera,
-                onClick = { viewModel.launchCamera() },
-            ),
         )
     }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = if (MaterialTheme.colorScheme.background == Color.Black) Color.Black else MaterialTheme.colorScheme.surfaceContainer,
+            ) {
                 NavigationBarItem(
                     icon = {
                         Icon(
@@ -304,17 +306,6 @@ fun MainScreen(
                     label = { Text(stringResource(R.string.help_short)) },
                     selected = false,
                     onClick = onNavigateToHelp,
-                )
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Outlined.Delete,
-                            contentDescription = stringResource(R.string.delete_camera_images),
-                        )
-                    },
-                    label = { Text(stringResource(R.string.delete_short)) },
-                    selected = false,
-                    onClick = { showDeleteConfirmation = true },
                 )
                 NavigationBarItem(
                     icon = {
@@ -365,7 +356,7 @@ fun MainScreen(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Spacer(modifier = Modifier.weight(0.35f))
+                Spacer(modifier = Modifier.weight(0.45f))
                 Text(
                     text = stringResource(R.string.choose_your_preferred_image_source_placeholder,
                         stringResource(R.string.choose_your),

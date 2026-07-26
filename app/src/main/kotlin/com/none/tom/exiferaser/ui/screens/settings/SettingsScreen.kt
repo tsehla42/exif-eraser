@@ -15,7 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.AdsClick
 import androidx.compose.material.icons.outlined.AutoDelete
-import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.FolderOpen
@@ -24,7 +23,6 @@ import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material.icons.outlined.Share
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,17 +31,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -58,8 +55,6 @@ import com.none.tom.exiferaser.settings.business.ThemeMode
 import com.none.tom.exiferaser.ui.components.PreferenceItem
 import com.none.tom.exiferaser.ui.components.SwitchPreferenceItem
 import com.none.tom.exiferaser.ui.components.DisplayNameSuffixDialog
-import com.none.tom.exiferaser.ui.components.NightModeOption
-import com.none.tom.exiferaser.ui.components.NightModePickerDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,10 +64,8 @@ fun SettingsScreen(
 ) {
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    var showNightModePicker by remember { mutableStateOf(false) }
     var showDisplayNameSuffix by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    var selectedNightMode by remember { mutableIntStateOf(0) }
 
     val defaultPathOpenLauncher = rememberLauncherForActivityResult(
         contract = OpenDocumentTree()
@@ -90,14 +83,6 @@ fun SettingsScreen(
         }
     }
 
-    val nightModeOptions = remember {
-        listOf(
-            NightModeOption(value = 2, label = "System default"),
-            NightModeOption(value = 1, label = "Always"),
-            NightModeOption(value = 0, label = "Never"),
-        )
-    }
-
     val themeModeOptions = listOf(
         ThemeMode.SYSTEM to stringResource(R.string.theme_system),
         ThemeMode.LIGHT to stringResource(R.string.theme_light),
@@ -110,11 +95,6 @@ fun SettingsScreen(
             when (sideEffect) {
                 is SettingsSideEffect.Navigate.ToDefaultDisplayNameSuffix -> {
                     showDisplayNameSuffix = true
-                }
-
-                is SettingsSideEffect.Navigate.ToDefaultNightMode -> {
-                    selectedNightMode = sideEffect.defaultNightMode
-                    showNightModePicker = true
                 }
 
                 is SettingsSideEffect.DefaultOpenPath.Select.Success -> {
@@ -141,6 +121,7 @@ fun SettingsScreen(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
+            val isAmoled = MaterialTheme.colorScheme.background == Color.Black
             LargeTopAppBar(
                 title = {
                     Text(text = stringResource(R.string.settings))
@@ -153,6 +134,10 @@ fun SettingsScreen(
                         )
                     }
                 },
+                colors = TopAppBarDefaults.largeTopAppBarColors(
+                    containerColor = if (isAmoled) Color.Black else MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = if (isAmoled) Color.Black else MaterialTheme.colorScheme.surfaceContainer,
+                ),
                 scrollBehavior = scrollBehavior,
             )
         },
@@ -208,10 +193,11 @@ fun SettingsScreen(
             }
 
             item {
-                PreferenceItem(
+                SwitchPreferenceItem(
                     title = stringResource(R.string.settings_legacy_image_selection),
                     icon = Icons.Outlined.PhotoLibrary,
-                    onClick = {},
+                    checked = state.isLegacyImageSelectionEnabled,
+                    onCheckedChange = { viewModel.storeLegacyImageSelection(it) },
                 )
             }
 
@@ -224,18 +210,20 @@ fun SettingsScreen(
             }
 
             item {
-                PreferenceItem(
+                SwitchPreferenceItem(
                     title = stringResource(R.string.settings_preserve_orientation),
                     icon = Icons.Outlined.Image,
-                    onClick = {},
+                    checked = state.isPreserveOrientationEnabled,
+                    onCheckedChange = { viewModel.storePreserveOrientation(it) },
                 )
             }
 
             item {
-                PreferenceItem(
+                SwitchPreferenceItem(
                     title = stringResource(R.string.settings_share_by_default),
                     icon = Icons.Outlined.Share,
-                    onClick = {},
+                    checked = state.isShareByDefaultEnabled,
+                    onCheckedChange = { viewModel.storeShareByDefault(it) },
                 )
             }
 
@@ -266,15 +254,6 @@ fun SettingsScreen(
                         onCheckedChange = { viewModel.storeSavePathSelectionSkip(it) },
                     )
                 }
-            }
-
-            item {
-                PreferenceItem(
-                    title = stringResource(R.string.settings_default_night_mode),
-                    subtitle = state.defaultNightModeName.ifBlank { stringResource(R.string.settings_not_set) },
-                    icon = Icons.Outlined.DarkMode,
-                    onClick = { viewModel.handleDefaultNightMode() },
-                )
             }
 
             item {
@@ -324,21 +303,6 @@ fun SettingsScreen(
                 )
             }
         }
-    }
-
-    if (showNightModePicker) {
-        NightModePickerDialog(
-            options = nightModeOptions,
-            selectedValue = selectedNightMode,
-            onSelect = { selectedNightMode = it },
-            onConfirm = {
-                showNightModePicker = false
-                viewModel.storeDefaultNightMode(selectedNightMode)
-            },
-            onDismiss = {
-                showNightModePicker = false
-            },
-        )
     }
 
     if (showDisplayNameSuffix) {

@@ -2,10 +2,15 @@ package com.none.tom.exiferaser
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.view.WindowCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -43,6 +48,14 @@ class MainActivity : ComponentActivity() {
                 useDynamicColor = useDynamicColor,
             ) {
                 val navController = rememberNavController()
+                val isAmoled = themeMode == ThemeMode.AMOLED
+                SideEffect {
+                    val window = this@MainActivity.window
+                    val barColor = if (isAmoled) Color.Black else Color.Transparent
+                    window.navigationBarColor = barColor.toArgb()
+                    window.statusBarColor = barColor.toArgb()
+                    WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightNavigationBars = !isAmoled
+                }
                 AppNavHost(navController = navController)
             }
         }

@@ -56,7 +56,7 @@
     <!-- Settings -->
     <string name="settings_section_filesystem">Filesystem</string>
     <string name="settings_section_image">Image</string>
-    <string name="settings_section_user_interface">User interface</string>
+    <string name="settings_section_user_interface">UX</string>
     <string name="settings_randomize_file_names">Randomize file names</string>
     <string name="settings_default_open_path">Default open path</string>
     <string name="settings_default_save_path">Default save path</string>
