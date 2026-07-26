@@ -15,7 +15,7 @@ android {
         applicationId = "com.none.tom.exiferaser"
         minSdk = 28
         targetSdk = 37
-        versionCode = 1
+        versionCode = 45
         versionName = "1.0.0"
     }
 
