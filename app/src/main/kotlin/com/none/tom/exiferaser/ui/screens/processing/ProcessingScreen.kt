@@ -1,5 +1,6 @@
 package com.none.tom.exiferaser.ui.screens.processing
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,13 +29,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.none.tom.exiferaser.R
 import com.none.tom.exiferaser.core.image.ImageProcessingStep
+import com.none.tom.exiferaser.core.provider.CameraFileProvider
 import com.none.tom.exiferaser.imageProcessing.business.ImageProcessingSideEffect
 import com.none.tom.exiferaser.imageProcessing.business.ImageProcessingViewModel
 
@@ -47,6 +51,7 @@ fun ProcessingScreen(
 ) {
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
     val isFinished = state.imageImageProcessingStep is ImageProcessingStep.FinishedBulk
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.container.sideEffectFlow.collect { sideEffect ->
@@ -77,7 +82,12 @@ fun ProcessingScreen(
                     onNavigateToDetails(json)
                 }
                 is ImageProcessingSideEffect.ShareImages -> {
-                    onShareImages(sideEffect.imageUris)
+                    val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+                        type = "image/*"
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(sideEffect.imageUris))
+                    }
+                    context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.share)))
                 }
             }
         }

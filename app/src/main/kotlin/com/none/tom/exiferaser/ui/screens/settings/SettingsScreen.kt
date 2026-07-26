@@ -50,7 +50,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jakewharton.processphoenix.ProcessPhoenix
 import com.none.tom.exiferaser.R
 import com.none.tom.exiferaser.core.extension.isNotNullOrEmpty
 import com.none.tom.exiferaser.settings.business.SettingsSideEffect
@@ -73,7 +72,6 @@ fun SettingsScreen(
     var showNightModePicker by remember { mutableStateOf(false) }
     var showDisplayNameSuffix by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    var showRestartDialog by remember { mutableStateOf(false) }
     var selectedNightMode by remember { mutableIntStateOf(0) }
 
     val defaultPathOpenLauncher = rememberLauncherForActivityResult(
@@ -295,16 +293,14 @@ fun SettingsScreen(
                             .fillMaxSize()
                             .clickable {
                                 viewModel.storeThemeMode(mode)
-                                showRestartDialog = true
                             }
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                            .padding(horizontal = 16.dp, vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         RadioButton(
                             selected = state.themeMode == mode,
                             onClick = {
                                 viewModel.storeThemeMode(mode)
-                                showRestartDialog = true
                             },
                         )
                         Spacer(modifier = Modifier.width(16.dp))
@@ -324,7 +320,6 @@ fun SettingsScreen(
                     checked = state.useDynamicColor,
                     onCheckedChange = {
                         viewModel.storeDynamicColor(it)
-                        showRestartDialog = true
                     },
                 )
             }
@@ -358,42 +353,4 @@ fun SettingsScreen(
             },
         )
     }
-
-    if (showRestartDialog) {
-        RestartDialog(
-            onRestart = {
-                showRestartDialog = false
-                ProcessPhoenix.triggerRebirth(context)
-            },
-            onDismiss = {
-                showRestartDialog = false
-            },
-        )
-    }
-}
-
-@Composable
-private fun RestartDialog(
-    onRestart: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(text = stringResource(R.string.restart_required))
-        },
-        text = {
-            Text(text = stringResource(R.string.restart_message))
-        },
-        confirmButton = {
-            TextButton(onClick = onRestart) {
-                Text(text = stringResource(R.string.restart_now))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = stringResource(R.string.restart_later))
-            }
-        },
-    )
 }

@@ -55,6 +55,8 @@ class SettingsViewModel @Inject constructor(
         val isLegacyImageSelectionEnabled = settingsRepository.isLegacyImageSelectionEnabled()
         val isSkipSavePathSelectionEnabled = settingsRepository.isSkipSavePathSelectionEnabled()
         val defaultNightModeName = settingsRepository.getDefaultNightModeName()
+        val themeMode = settingsRepository.getThemeMode()
+        val useDynamicColor = settingsRepository.getDynamicColor()
         reduce {
             state.copy(
                 isRandomizeFileNamesEnabled = isRandomizeFileNamesEnabled,
@@ -66,7 +68,9 @@ class SettingsViewModel @Inject constructor(
                 defaultDisplayNameSuffix = defaultDisplayNameSuffix,
                 isLegacyImageSelectionEnabled = isLegacyImageSelectionEnabled,
                 isSkipSavePathSelectionEnabled = isSkipSavePathSelectionEnabled,
-                defaultNightModeName = defaultNightModeName
+                defaultNightModeName = defaultNightModeName,
+                themeMode = themeMode,
+                useDynamicColor = useDynamicColor,
             )
         }
     }
