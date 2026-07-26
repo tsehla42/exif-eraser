@@ -9,6 +9,8 @@
     <string name="image_files">Image files</string>
     <string name="image_directory">Image directory</string>
     <string name="camera">Camera</string>
+    <string name="inspect_exif">Inspect EXIF</string>
+    <string name="inspect_exif_description">View all metadata tags in an image</string>
 
     <string name="settings">Settings</string>
     <string name="help">Help and feedback</string>
@@ -47,6 +49,7 @@
     <string name="metadata_no_data">No metadata found</string>
     <string name="metadata_error">Failed to read metadata</string>
     <string name="metadata_long_press_copy">Long press to copy value</string>
+    <string name="remove_metadata">Remove metadata</string>
 
     <!-- Settings -->
     <string name="settings_randomize_file_names">Randomize file names</string>

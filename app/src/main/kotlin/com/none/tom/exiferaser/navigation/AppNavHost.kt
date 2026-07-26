@@ -26,22 +26,31 @@ fun AppNavHost(navController: NavHostController) {
                 onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
                 onNavigateToHelp = { navController.navigate(Screen.Help.route) },
                 onNavigateToProcessing = { navController.navigate(Screen.ImageProcessing.route) },
-                onNavigateToMetadataViewer = { navController.navigate(Screen.MetadataViewer.route) },
+                onNavigateToMetadataViewer = { uri, displayName ->
+                    navController.navigate(Screen.MetadataViewer.createRoute(uri, displayName))
+                },
             )
         }
         composable(Screen.ImageProcessing.route) {
             ProcessingScreen(
-                onNavigateToDetails = {
-                    navController.navigate(Screen.ImageProcessingDetails.route)
+                onNavigateToDetails = { summariesJson ->
+                    navController.navigate(Screen.ImageProcessingDetails.createRoute(summariesJson))
                 },
                 onShareImages = { uris ->
                     // Share intent handled externally
                 },
             )
         }
-        composable(Screen.ImageProcessingDetails.route) {
+        composable(
+            route = Screen.ImageProcessingDetails.route,
+            arguments = listOf(
+                navArgument("summariesJson") { type = NavType.StringType },
+            ),
+        ) { backStackEntry ->
+            val summariesJson = backStackEntry.arguments?.getString("summariesJson") ?: "[]"
             ProcessingDetailsScreen(
                 onNavigateBack = { navController.popBackStack() },
+                summariesJson = summariesJson,
             )
         }
         composable(Screen.SavePathSelection.route) {
@@ -64,6 +73,9 @@ fun AppNavHost(navController: NavHostController) {
             val displayName = backStackEntry.arguments?.getString("displayName") ?: ""
             MetadataViewerScreen(
                 onNavigateBack = { navController.popBackStack() },
+                onRemoveMetadata = {
+                    navController.navigate(Screen.ImageProcessing.route)
+                },
                 uri = Uri.parse(uriString),
                 displayName = displayName,
             )

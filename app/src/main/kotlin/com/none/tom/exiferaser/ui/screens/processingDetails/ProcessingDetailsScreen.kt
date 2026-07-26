@@ -36,10 +36,37 @@ private const val MIME_TYPE_IMAGE = "image/*"
 @Composable
 fun ProcessingDetailsScreen(
     onNavigateBack: () -> Unit,
+    summariesJson: String = "[]",
     viewModel: ImageProcessingDetailsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        val summaries = try {
+            val jsonArray = org.json.JSONArray(summariesJson)
+            (0 until jsonArray.length()).map { i ->
+                val obj = jsonArray.getJSONObject(i)
+                com.none.tom.exiferaser.core.image.ImageProcessingSummary(
+                    displayName = obj.optString("displayName", ""),
+                    extension = obj.optString("extension", ""),
+                    mimeType = obj.optString("mimeType", ""),
+                    uri = android.net.Uri.parse(obj.optString("uri", "")),
+                    isImageSaved = obj.optBoolean("isImageSaved", false),
+                    imageMetadataSnapshot = com.none.tom.exiferaser.core.image.ImageMetadataSnapshot(
+                        isIccProfileContained = obj.optBoolean("isIccProfileContained", false),
+                        isExifContained = obj.optBoolean("isExifContained", false),
+                        isPhotoshopImageResourcesContained = obj.optBoolean("isPhotoshopImageResourcesContained", false),
+                        isXmpContained = obj.optBoolean("isXmpContained", false),
+                        isExtendedXmpContained = obj.optBoolean("isExtendedXmpContained", false),
+                    ),
+                )
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+        viewModel.handleImageProcessingSummaries(summaries)
+    }
 
     LaunchedEffect(Unit) {
         viewModel.container.sideEffectFlow.collect { sideEffect ->

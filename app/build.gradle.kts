@@ -12,7 +12,7 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.none.tom.exiferaser"
+        applicationId = "com.tsehla.exiferaser"
         minSdk = 28
         targetSdk = 37
         versionCode = 45

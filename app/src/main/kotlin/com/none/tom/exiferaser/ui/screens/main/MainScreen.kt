@@ -18,6 +18,7 @@ import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.PhotoAlbum
 import androidx.compose.material.icons.outlined.PhotoLibrary
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -61,7 +62,7 @@ fun MainScreen(
     onNavigateToSettings: () -> Unit,
     onNavigateToHelp: () -> Unit,
     onNavigateToProcessing: () -> Unit,
-    onNavigateToMetadataViewer: () -> Unit,
+    onNavigateToMetadataViewer: (String, String) -> Unit,
     viewModel: MainViewModel = hiltViewModel(),
 ) {
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
@@ -103,6 +104,14 @@ fun MainScreen(
         contract = ActivityResultContractTakePicture()
     ) { result ->
         viewModel.putImageSelection(uri = result, isFromCamera = true)
+    }
+
+    val inspectExifLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { result ->
+        if (result != null) {
+            onNavigateToMetadataViewer(result.toString(), result.lastPathSegment ?: "")
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -267,6 +276,15 @@ fun MainScreen(
                 icon = Icons.Outlined.CameraAlt,
                 labelResId = R.string.camera,
                 onClick = { viewModel.launchCamera() },
+            ),
+            ImageSource(
+                icon = Icons.Outlined.Search,
+                labelResId = R.string.inspect_exif,
+                onClick = {
+                    inspectExifLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                },
             ),
         )
     }

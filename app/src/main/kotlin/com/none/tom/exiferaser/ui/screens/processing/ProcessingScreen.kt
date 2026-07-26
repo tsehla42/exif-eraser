@@ -21,6 +21,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,7 +41,7 @@ import com.none.tom.exiferaser.imageProcessing.business.ImageProcessingViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProcessingScreen(
-    onNavigateToDetails: () -> Unit,
+    onNavigateToDetails: (String) -> Unit,
     onShareImages: (List<android.net.Uri>) -> Unit,
     viewModel: ImageProcessingViewModel = hiltViewModel(),
 ) {
@@ -57,7 +58,23 @@ fun ProcessingScreen(
                     viewModel.handleUnsupportedSelection()
                 }
                 is ImageProcessingSideEffect.Navigate.ToImageProcessingDetails -> {
-                    onNavigateToDetails()
+                    val json = org.json.JSONArray(
+                        sideEffect.imageProcessingSummaries.map { summary ->
+                            org.json.JSONObject().apply {
+                                put("displayName", summary.displayName)
+                                put("extension", summary.extension)
+                                put("mimeType", summary.mimeType)
+                                put("isImageSaved", summary.isImageSaved)
+                                put("uri", summary.uri.toString())
+                                put("isIccProfileContained", summary.imageMetadataSnapshot.isIccProfileContained)
+                                put("isExifContained", summary.imageMetadataSnapshot.isExifContained)
+                                put("isPhotoshopImageResourcesContained", summary.imageMetadataSnapshot.isPhotoshopImageResourcesContained)
+                                put("isXmpContained", summary.imageMetadataSnapshot.isXmpContained)
+                                put("isExtendedXmpContained", summary.imageMetadataSnapshot.isExtendedXmpContained)
+                            }
+                        }
+                    ).toString()
+                    onNavigateToDetails(json)
                 }
                 is ImageProcessingSideEffect.ShareImages -> {
                     onShareImages(sideEffect.imageUris)
@@ -96,7 +113,7 @@ fun ProcessingScreen(
                     imagesWithMetadataCount = state.imagesWithMetadataCount,
                     imagesProcessedCount = state.imagesProcessedCount,
                     imagesSavedCount = state.imagesSavedCount,
-                    hasSummaries = state.imageProcessingSummaries.isNotEmpty(),
+                    summaries = state.imageProcessingSummaries,
                     onDetailsClick = onNavigateToDetails,
                 )
             } else {
@@ -138,8 +155,8 @@ private fun FinishedContent(
     imagesWithMetadataCount: Int,
     imagesProcessedCount: Int,
     imagesSavedCount: Int,
-    hasSummaries: Boolean,
-    onDetailsClick: () -> Unit,
+    summaries: List<com.none.tom.exiferaser.core.image.ImageProcessingSummary>,
+    onDetailsClick: (String) -> Unit,
 ) {
     Icon(
         imageVector = Icons.Outlined.CheckCircle,
@@ -174,13 +191,31 @@ private fun FinishedContent(
             textAlign = TextAlign.Center,
         )
     }
-    if (hasSummaries) {
+    if (summaries.isNotEmpty()) {
         Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = stringResource(R.string.view_details),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(8.dp),
-        )
+        TextButton(onClick = {
+            val json = org.json.JSONArray(
+                summaries.map { summary ->
+                    org.json.JSONObject().apply {
+                        put("displayName", summary.displayName)
+                        put("extension", summary.extension)
+                        put("mimeType", summary.mimeType)
+                        put("isImageSaved", summary.isImageSaved)
+                        put("uri", summary.uri.toString())
+                        put("isIccProfileContained", summary.imageMetadataSnapshot.isIccProfileContained)
+                        put("isExifContained", summary.imageMetadataSnapshot.isExifContained)
+                        put("isPhotoshopImageResourcesContained", summary.imageMetadataSnapshot.isPhotoshopImageResourcesContained)
+                        put("isXmpContained", summary.imageMetadataSnapshot.isXmpContained)
+                        put("isExtendedXmpContained", summary.imageMetadataSnapshot.isExtendedXmpContained)
+                    }
+                }
+            ).toString()
+            onDetailsClick(json)
+        }) {
+            Text(
+                text = stringResource(R.string.view_details),
+                style = MaterialTheme.typography.labelLarge,
+            )
+        }
     }
 }
