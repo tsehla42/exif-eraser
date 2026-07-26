@@ -121,21 +121,23 @@ class ImageProcessingRepository @Inject constructor(
                     formattedDisplayName = if (isRandomizeFileNamesEnabled) {
                         UUID.randomUUID().toString()
                     } else {
-                        displayName
-                            .plus(
-                                if (sourceUri.authority == CameraFileProvider.AUTHORITY) {
-                                    CameraFileProvider.SUFFIX
-                                } else {
-                                    ""
-                                }
-                            )
-                            .plus(
-                                if (FileUtilsKt.isValidExtFilename(displayNameSuffix)) {
-                                    displayNameSuffix
-                                } else {
-                                    ""
-                                }
-                            )
+                        FileUtilsKt.buildValidExtFilename(
+                            displayName
+                                .plus(
+                                    if (sourceUri.authority == CameraFileProvider.AUTHORITY) {
+                                        CameraFileProvider.SUFFIX
+                                    } else {
+                                        ""
+                                    }
+                                )
+                                .plus(
+                                    if (FileUtilsKt.isValidExtFilename(displayNameSuffix)) {
+                                        displayNameSuffix
+                                    } else {
+                                        ""
+                                    }
+                                )
+                        )
                     }
                     sinkUri = createImage(
                         uri = sourceUri,

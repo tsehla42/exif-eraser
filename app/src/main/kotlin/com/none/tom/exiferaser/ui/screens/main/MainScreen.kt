@@ -1,5 +1,6 @@
 package com.none.tom.exiferaser.ui.screens.main
 
+import android.Manifest
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -114,6 +115,17 @@ fun MainScreen(
         viewModel.putImageSelection(uri = result, isFromCamera = true)
     }
 
+    var pendingCameraUri by remember { mutableStateOf<Uri?>(null) }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted && pendingCameraUri != null) {
+            launchCameraLauncher.launch(pendingCameraUri)
+        }
+        pendingCameraUri = null
+    }
+
     val inspectExifLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { result ->
@@ -154,7 +166,8 @@ fun MainScreen(
                 }
 
                 is MainSideEffect.ImageSources.Camera.Success -> {
-                    launchCameraLauncher.launch(sideEffect.uri)
+                    pendingCameraUri = sideEffect.uri
+                    cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
                 }
 
                 MainSideEffect.ImageSources.Camera.Failure -> {
@@ -310,17 +323,6 @@ fun MainScreen(
                 NavigationBarItem(
                     icon = {
                         Icon(
-                            imageVector = Icons.Outlined.GridOn,
-                            contentDescription = stringResource(R.string.image_sources),
-                        )
-                    },
-                    label = { Text(stringResource(R.string.grid_short)) },
-                    selected = selectedNavItem == 2,
-                    onClick = { selectedNavItem = 2 },
-                )
-                NavigationBarItem(
-                    icon = {
-                        Icon(
                             imageVector = Icons.Outlined.ContentPaste,
                             contentDescription = stringResource(R.string.paste_images),
                         )
@@ -328,6 +330,17 @@ fun MainScreen(
                     label = { Text(stringResource(R.string.paste_short)) },
                     selected = false,
                     onClick = { viewModel.handlePasteImages() },
+                )
+                NavigationBarItem(
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Outlined.GridOn,
+                            contentDescription = stringResource(R.string.image_sources),
+                        )
+                    },
+                    label = { Text(stringResource(R.string.grid_short)) },
+                    selected = selectedNavItem == 2,
+                    onClick = { selectedNavItem = 2 },
                 )
                 NavigationBarItem(
                     icon = {

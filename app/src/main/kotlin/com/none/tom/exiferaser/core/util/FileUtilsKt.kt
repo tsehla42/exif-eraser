@@ -37,7 +37,7 @@ object FileUtilsKt {
         else -> true
     }
 
-    private fun buildValidExtFilename(name: String): String {
+    fun buildValidExtFilename(name: String): String {
         if (TextUtils.isEmpty(name) || "." == name || ".." == name) {
             return "(invalid)"
         }

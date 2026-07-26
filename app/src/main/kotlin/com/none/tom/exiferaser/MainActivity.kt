@@ -48,13 +48,25 @@ class MainActivity : ComponentActivity() {
                 useDynamicColor = useDynamicColor,
             ) {
                 val navController = rememberNavController()
-                val isAmoled = themeMode == ThemeMode.AMOLED
                 SideEffect {
                     val window = this@MainActivity.window
-                    val barColor = if (isAmoled) Color.Black else Color.Transparent
+                    val isDark = when (themeMode) {
+                        ThemeMode.LIGHT -> false
+                        ThemeMode.DARK, ThemeMode.AMOLED -> true
+                        ThemeMode.SYSTEM -> {
+                            resources.configuration.uiMode and
+                                android.content.res.Configuration.UI_MODE_NIGHT_MASK ==
+                                android.content.res.Configuration.UI_MODE_NIGHT_YES
+                        }
+                    }
+                    val barColor = when {
+                        themeMode == ThemeMode.AMOLED -> Color.Black
+                        isDark -> Color(0xFF1C1B1F)
+                        else -> Color.White
+                    }
                     window.navigationBarColor = barColor.toArgb()
                     window.statusBarColor = barColor.toArgb()
-                    WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightNavigationBars = !isAmoled
+                    WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightNavigationBars = !isDark
                 }
                 AppNavHost(navController = navController)
             }
