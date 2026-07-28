@@ -47,8 +47,8 @@ fun AppNavHost(navController: NavHostController) {
             ),
         ) {
             ProcessingScreen(
-                onNavigateToDetails = { summariesJson ->
-                    navController.navigate(Screen.ImageProcessingDetails.createRoute(summariesJson))
+                onNavigateToMetadataViewer = { uri, displayName ->
+                    navController.navigate(Screen.MetadataViewer.createRoute(uri, displayName))
                 },
                 onShareImages = { uris ->
                     // Share intent handled externally

@@ -3,6 +3,7 @@ package com.none.tom.exiferaser.ui.screens.main
 import android.Manifest
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import java.io.File
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -79,6 +80,7 @@ fun MainScreen(
     var showDeleteConfirmation by remember { mutableStateOf(false) }
     var selectedNavItem by remember { mutableIntStateOf(2) }
     var isLauncherActive by remember { mutableStateOf(false) }
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     val chooseImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
@@ -125,22 +127,29 @@ fun MainScreen(
         }
     }
 
+    var pendingCameraUri by remember { mutableStateOf<Uri?>(null) }
+    var activeCameraUri by remember { mutableStateOf<Uri?>(null) }
+
     val launchCameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContractTakePicture()
     ) { result ->
         isLauncherActive = false
         if (result != null) {
             viewModel.putImageSelection(uri = result, isFromCamera = true)
+        } else {
+            activeCameraUri?.let { uri ->
+                try { context.contentResolver.delete(uri, null, null) } catch (_: Exception) {}
+            }
+            activeCameraUri = null
         }
     }
-
-    var pendingCameraUri by remember { mutableStateOf<Uri?>(null) }
 
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         isLauncherActive = false
         if (isGranted && pendingCameraUri != null) {
+            activeCameraUri = pendingCameraUri
             launchCameraLauncher.launch(pendingCameraUri)
         }
         pendingCameraUri = null

@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -45,7 +46,7 @@ import com.none.tom.exiferaser.imageProcessing.business.ImageProcessingViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProcessingScreen(
-    onNavigateToDetails: (String) -> Unit,
+    onNavigateToMetadataViewer: (String, String) -> Unit,
     onShareImages: (List<android.net.Uri>) -> Unit,
     viewModel: ImageProcessingViewModel = hiltViewModel(),
 ) {
@@ -63,23 +64,13 @@ fun ProcessingScreen(
                     viewModel.handleUnsupportedSelection()
                 }
                 is ImageProcessingSideEffect.Navigate.ToImageProcessingDetails -> {
-                    val json = org.json.JSONArray(
-                        sideEffect.imageProcessingSummaries.map { summary ->
-                            org.json.JSONObject().apply {
-                                put("displayName", summary.displayName)
-                                put("extension", summary.extension)
-                                put("mimeType", summary.mimeType)
-                                put("isImageSaved", summary.isImageSaved)
-                                put("uri", summary.uri.toString())
-                                put("isIccProfileContained", summary.imageMetadataSnapshot.isIccProfileContained)
-                                put("isExifContained", summary.imageMetadataSnapshot.isExifContained)
-                                put("isPhotoshopImageResourcesContained", summary.imageMetadataSnapshot.isPhotoshopImageResourcesContained)
-                                put("isXmpContained", summary.imageMetadataSnapshot.isXmpContained)
-                                put("isExtendedXmpContained", summary.imageMetadataSnapshot.isExtendedXmpContained)
-                            }
-                        }
-                    ).toString()
-                    onNavigateToDetails(json)
+                    val firstSummary = sideEffect.imageProcessingSummaries.firstOrNull()
+                    if (firstSummary != null) {
+                        onNavigateToMetadataViewer(
+                            firstSummary.uri.toString(),
+                            firstSummary.displayName
+                        )
+                    }
                 }
                 is ImageProcessingSideEffect.ShareImages -> {
                     val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
@@ -114,7 +105,7 @@ fun ProcessingScreen(
                     imagesProcessedCount = state.imagesProcessedCount,
                     imagesSavedCount = state.imagesSavedCount,
                     summaries = state.imageProcessingSummaries,
-                    onDetailsClick = onNavigateToDetails,
+                    onMetadataViewerClick = onNavigateToMetadataViewer,
                     onShareClick = { viewModel.shareImages() },
                 )
             } else {
@@ -144,7 +135,11 @@ private fun ProgressContent(
     )
     Spacer(modifier = Modifier.height(16.dp))
     Text(
-        text = stringResource(R.string.images_processed_count, imagesProcessedCount),
+        text = if (imagesProcessedCount == 1) {
+            stringResource(R.string.image_processed)
+        } else {
+            stringResource(R.string.images_processed_count, imagesProcessedCount)
+        },
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,
@@ -157,7 +152,7 @@ private fun FinishedContent(
     imagesProcessedCount: Int,
     imagesSavedCount: Int,
     summaries: List<com.none.tom.exiferaser.core.image.ImageProcessingSummary>,
-    onDetailsClick: (String) -> Unit,
+    onMetadataViewerClick: (String, String) -> Unit,
     onShareClick: () -> Unit,
 ) {
     Icon(
@@ -187,35 +182,42 @@ private fun FinishedContent(
     if (imagesSavedCount > 0) {
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = stringResource(R.string.images_saved_count, imagesSavedCount),
+            text = if (imagesSavedCount == 1) {
+                stringResource(R.string.image_saved)
+            } else {
+                stringResource(R.string.images_saved_count, imagesSavedCount)
+            },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
+        if (summaries.isNotEmpty()) {
+            val savedPath = summaries.first().uri.path
+            if (!savedPath.isNullOrBlank()) {
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = savedPath,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+            }
+        }
     }
     if (summaries.isNotEmpty()) {
         Spacer(modifier = Modifier.height(24.dp))
         TextButton(onClick = {
-            val json = org.json.JSONArray(
-                summaries.map { summary ->
-                    org.json.JSONObject().apply {
-                        put("displayName", summary.displayName)
-                        put("extension", summary.extension)
-                        put("mimeType", summary.mimeType)
-                        put("isImageSaved", summary.isImageSaved)
-                        put("uri", summary.uri.toString())
-                        put("isIccProfileContained", summary.imageMetadataSnapshot.isIccProfileContained)
-                        put("isExifContained", summary.imageMetadataSnapshot.isExifContained)
-                        put("isPhotoshopImageResourcesContained", summary.imageMetadataSnapshot.isPhotoshopImageResourcesContained)
-                        put("isXmpContained", summary.imageMetadataSnapshot.isXmpContained)
-                        put("isExtendedXmpContained", summary.imageMetadataSnapshot.isExtendedXmpContained)
-                    }
-                }
-            ).toString()
-            onDetailsClick(json)
+            val firstSummary = summaries.first()
+            onMetadataViewerClick(
+                firstSummary.uri.toString(),
+                firstSummary.displayName
+            )
         }) {
             Text(
-                text = stringResource(R.string.view_details),
+                text = stringResource(R.string.view_new_exif),
                 style = MaterialTheme.typography.labelLarge,
             )
         }

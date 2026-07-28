@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.AdsClick
+import androidx.compose.material.icons.outlined.Shuffle
 import androidx.compose.material.icons.outlined.AutoDelete
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.DeleteSweep
@@ -42,6 +42,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +51,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.none.tom.exiferaser.R
@@ -72,6 +74,7 @@ fun SettingsScreen(
     var showDisplayNameSuffix by remember { mutableStateOf(false) }
     var showClearCacheConfirmation by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
     fun getCacheSize(): String {
@@ -83,6 +86,8 @@ fun SettingsScreen(
             else -> "${size / (1024 * 1024)} MB"
         }
     }
+
+    var cacheSize by remember { mutableStateOf(getCacheSize()) }
 
     val defaultPathOpenLauncher = rememberLauncherForActivityResult(
         contract = OpenDocumentTree()
@@ -176,10 +181,11 @@ fun SettingsScreen(
             }
 
             item {
-                PreferenceItem(
+                SwitchPreferenceItem(
                     title = stringResource(R.string.settings_randomize_file_names),
-                    icon = Icons.Outlined.AdsClick,
-                    onClick = {},
+                    icon = Icons.Outlined.Shuffle,
+                    checked = state.isRandomizeFileNamesEnabled,
+                    onCheckedChange = { viewModel.storeRandomizeFileNames(it) },
                 )
             }
 
@@ -204,7 +210,7 @@ fun SettingsScreen(
             item {
                 PreferenceItem(
                     title = stringResource(R.string.settings_clear_cache),
-                    subtitle = getCacheSize(),
+                    subtitle = cacheSize,
                     icon = Icons.Outlined.DeleteSweep,
                     onClick = { showClearCacheConfirmation = true },
                 )
@@ -356,6 +362,8 @@ fun SettingsScreen(
                     showClearCacheConfirmation = false
                     context.cacheDir.deleteRecursively()
                     context.cacheDir.mkdirs()
+                    cacheSize = getCacheSize()
+                    scope.launch { snackbarHostState.showSnackbar("Cache cleared") }
                 }) {
                     Text(stringResource(android.R.string.ok))
                 }

@@ -37,11 +37,10 @@ class ActivityResultContractTakePicture : ActivityResultContract<Uri?, Uri?>() {
             .also { uri = input }
 
     override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
-        val extras = intent?.extras
-        return if (extras != null && !extras.isEmpty) {
-            null
-        } else {
+        return if (resultCode == android.app.Activity.RESULT_OK) {
             uri
+        } else {
+            null
         }
     }
 }

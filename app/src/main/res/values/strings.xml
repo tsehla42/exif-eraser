@@ -26,14 +26,17 @@
     <!-- Image Processing -->
     <string name="processing">Processing</string>
     <string name="progress_percent" translatable="false">%1$d%%</string>
+    <string name="image_processed">Image processed</string>
     <string name="images_processed_count" translatable="false">%1$d images processed</string>
     <string name="processing_complete">Processing complete</string>
     <string name="images_modified_placeholder" translatable="false">%1$d %2$s %3$d %4$s</string>
     <string name="of">of</string>
     <string name="images_modified">modified</string>
+    <string name="image_saved">Image saved</string>
     <string name="images_saved_count" translatable="false">%1$d images saved</string>
     <string name="share">Share</string>
     <string name="view_details">View details</string>
+    <string name="view_new_exif">View new EXIF</string>
     <string name="details">Details</string>
 
     <!-- Save Path Selection -->
