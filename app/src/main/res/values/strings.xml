@@ -38,6 +38,7 @@
     <string name="view_details">View details</string>
     <string name="view_new_exif">View new EXIF</string>
     <string name="details">Details</string>
+    <string name="processing_details_title">Processed images</string>
 
     <!-- Save Path Selection -->
     <string name="choose_save_path">Choose save path</string>

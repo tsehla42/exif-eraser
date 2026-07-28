@@ -85,7 +85,7 @@ fun MetadataViewerScreen(
                     }
                 },
                 actions = {
-                    if (state.metadataGroups.isNotEmpty() && !state.isRawMode) {
+                    if (state.metadataGroups.isNotEmpty()) {
                         IconButton(onClick = { viewModel.toggleDisplayMode() }) {
                             Icon(
                                 imageVector = if (state.isRawMode) {
@@ -100,6 +100,8 @@ fun MetadataViewerScreen(
                                 },
                             )
                         }
+                    }
+                    if (state.metadataGroups.isNotEmpty() && !state.isRawMode) {
                         IconButton(onClick = {
                             if (state.expandedGroups.size == state.metadataGroups.size) {
                                 viewModel.collapseAll()

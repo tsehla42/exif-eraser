@@ -50,6 +50,9 @@ fun AppNavHost(navController: NavHostController) {
                 onNavigateToMetadataViewer = { uri, displayName ->
                     navController.navigate(Screen.MetadataViewer.createRoute(uri, displayName))
                 },
+                onNavigateToProcessingDetails = { summariesJson ->
+                    navController.navigate(Screen.ImageProcessingDetails.createRoute(summariesJson))
+                },
                 onShareImages = { uris ->
                     // Share intent handled externally
                 },
@@ -64,6 +67,9 @@ fun AppNavHost(navController: NavHostController) {
             val summariesJson = backStackEntry.arguments?.getString("summariesJson") ?: "[]"
             ProcessingDetailsScreen(
                 onNavigateBack = { navController.popBackStack() },
+                onNavigateToMetadataViewer = { uri, displayName ->
+                    navController.navigate(Screen.MetadataViewer.createRoute(uri, displayName))
+                },
                 summariesJson = summariesJson,
             )
         }

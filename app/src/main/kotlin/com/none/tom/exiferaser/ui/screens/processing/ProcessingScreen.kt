@@ -39,6 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.none.tom.exiferaser.R
 import com.none.tom.exiferaser.core.image.ImageProcessingStep
+import com.none.tom.exiferaser.core.image.ImageProcessingSummary
 import com.none.tom.exiferaser.core.provider.CameraFileProvider
 import com.none.tom.exiferaser.imageProcessing.business.ImageProcessingSideEffect
 import com.none.tom.exiferaser.imageProcessing.business.ImageProcessingViewModel
@@ -47,6 +48,7 @@ import com.none.tom.exiferaser.imageProcessing.business.ImageProcessingViewModel
 @Composable
 fun ProcessingScreen(
     onNavigateToMetadataViewer: (String, String) -> Unit,
+    onNavigateToProcessingDetails: (String) -> Unit,
     onShareImages: (List<android.net.Uri>) -> Unit,
     viewModel: ImageProcessingViewModel = hiltViewModel(),
 ) {
@@ -64,13 +66,9 @@ fun ProcessingScreen(
                     viewModel.handleUnsupportedSelection()
                 }
                 is ImageProcessingSideEffect.Navigate.ToImageProcessingDetails -> {
-                    val firstSummary = sideEffect.imageProcessingSummaries.firstOrNull()
-                    if (firstSummary != null) {
-                        onNavigateToMetadataViewer(
-                            firstSummary.uri.toString(),
-                            firstSummary.displayName
-                        )
-                    }
+                    onNavigateToProcessingDetails(
+                        serializeSummaries(sideEffect.imageProcessingSummaries.toList())
+                    )
                 }
                 is ImageProcessingSideEffect.ShareImages -> {
                     val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
@@ -106,6 +104,9 @@ fun ProcessingScreen(
                     imagesSavedCount = state.imagesSavedCount,
                     summaries = state.imageProcessingSummaries,
                     onMetadataViewerClick = onNavigateToMetadataViewer,
+                    onNavigateToProcessingDetails = { summaries ->
+                        onNavigateToProcessingDetails(serializeSummaries(summaries))
+                    },
                     onShareClick = { viewModel.shareImages() },
                 )
             } else {
@@ -151,8 +152,9 @@ private fun FinishedContent(
     imagesWithMetadataCount: Int,
     imagesProcessedCount: Int,
     imagesSavedCount: Int,
-    summaries: List<com.none.tom.exiferaser.core.image.ImageProcessingSummary>,
+    summaries: List<ImageProcessingSummary>,
     onMetadataViewerClick: (String, String) -> Unit,
+    onNavigateToProcessingDetails: (List<ImageProcessingSummary>) -> Unit,
     onShareClick: () -> Unit,
 ) {
     Icon(
@@ -209,17 +211,23 @@ private fun FinishedContent(
     }
     if (summaries.isNotEmpty()) {
         Spacer(modifier = Modifier.height(24.dp))
-        TextButton(onClick = {
-            val firstSummary = summaries.first()
-            onMetadataViewerClick(
-                firstSummary.uri.toString(),
-                firstSummary.displayName
-            )
-        }) {
-            Text(
-                text = stringResource(R.string.view_new_exif),
-                style = MaterialTheme.typography.labelLarge,
-            )
+        if (summaries.size == 1) {
+            TextButton(onClick = {
+                val summary = summaries.first()
+                onMetadataViewerClick(summary.uri.toString(), summary.displayName)
+            }) {
+                Text(
+                    text = stringResource(R.string.view_new_exif),
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
+        } else {
+            TextButton(onClick = { onNavigateToProcessingDetails(summaries) }) {
+                Text(
+                    text = stringResource(R.string.view_details),
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
         }
         if (imagesSavedCount > 0) {
             Spacer(modifier = Modifier.height(8.dp))
@@ -233,4 +241,23 @@ private fun FinishedContent(
             }
         }
     }
+}
+
+private fun serializeSummaries(summaries: List<ImageProcessingSummary>): String {
+    val jsonArray = org.json.JSONArray()
+    summaries.forEach { summary ->
+        jsonArray.put(org.json.JSONObject().apply {
+            put("displayName", summary.displayName)
+            put("extension", summary.extension)
+            put("mimeType", summary.mimeType)
+            put("uri", summary.uri.toString())
+            put("isImageSaved", summary.isImageSaved)
+            put("isIccProfileContained", summary.imageMetadataSnapshot.isIccProfileContained)
+            put("isExifContained", summary.imageMetadataSnapshot.isExifContained)
+            put("isPhotoshopImageResourcesContained", summary.imageMetadataSnapshot.isPhotoshopImageResourcesContained)
+            put("isXmpContained", summary.imageMetadataSnapshot.isXmpContained)
+            put("isExtendedXmpContained", summary.imageMetadataSnapshot.isExtendedXmpContained)
+        })
+    }
+    return jsonArray.toString()
 }
