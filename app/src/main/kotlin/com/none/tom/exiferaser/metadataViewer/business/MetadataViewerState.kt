@@ -11,7 +11,7 @@ data class MetadataViewerState(
     val imageUri: Uri = Uri.EMPTY,
     val metadataGroups: List<MetadataGroup> = emptyList(),
     val expandedGroups: Set<String> = emptySet(),
-    val isRawMode: Boolean = false,
+    val isRawMode: Boolean = true,
     val isLoading: Boolean = true,
     val error: String? = null,
 ) : Parcelable

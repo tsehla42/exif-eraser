@@ -59,6 +59,12 @@ class MetadataViewerViewModel @Inject constructor(
     }
 
     fun toggleDisplayMode() = intent {
-        reduce { state.copy(isRawMode = !state.isRawMode) }
+        val newRawMode = !state.isRawMode
+        if (newRawMode) {
+            reduce { state.copy(isRawMode = true, expandedGroups = emptySet()) }
+        } else {
+            val allGroups = state.metadataGroups.map { it.name }.toSet()
+            reduce { state.copy(isRawMode = false, expandedGroups = allGroups) }
+        }
     }
 }

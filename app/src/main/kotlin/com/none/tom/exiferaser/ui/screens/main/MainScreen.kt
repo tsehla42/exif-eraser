@@ -78,41 +78,60 @@ fun MainScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     var showDeleteConfirmation by remember { mutableStateOf(false) }
     var selectedNavItem by remember { mutableIntStateOf(2) }
+    var isLauncherActive by remember { mutableStateOf(false) }
 
     val chooseImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { result ->
-        viewModel.putImageSelection(uri = result)
+        isLauncherActive = false
+        if (result != null) {
+            viewModel.putImageSelection(uri = result)
+        }
     }
 
     val chooseImageLegacyLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { result ->
-        viewModel.putImageSelection(uri = result)
+        isLauncherActive = false
+        if (result != null) {
+            viewModel.putImageSelection(uri = result)
+        }
     }
 
     val chooseImagesLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia()
     ) { result ->
-        viewModel.putImagesSelection(uris = result)
+        isLauncherActive = false
+        if (result.isNotEmpty()) {
+            viewModel.putImagesSelection(uris = result)
+        }
     }
 
     val chooseImagesLegacyLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenMultipleDocuments()
     ) { result ->
-        viewModel.putImagesSelection(uris = result)
+        isLauncherActive = false
+        if (result.isNotEmpty()) {
+            viewModel.putImagesSelection(uris = result)
+        }
     }
 
     val chooseImageDirectoryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree()
     ) { result ->
-        viewModel.putImageDirectorySelection(uri = result)
+        isLauncherActive = false
+        if (result != null) {
+            viewModel.putImageDirectorySelection(uri = result)
+        }
     }
 
     val launchCameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContractTakePicture()
     ) { result ->
-        viewModel.putImageSelection(uri = result, isFromCamera = true)
+        isLauncherActive = false
+        if (result != null) {
+            viewModel.putImageSelection(uri = result, isFromCamera = true)
+        }
     }
 
     var pendingCameraUri by remember { mutableStateOf<Uri?>(null) }
@@ -120,6 +139,7 @@ fun MainScreen(
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
+        isLauncherActive = false
         if (isGranted && pendingCameraUri != null) {
             launchCameraLauncher.launch(pendingCameraUri)
         }
@@ -129,6 +149,7 @@ fun MainScreen(
     val inspectExifLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { result ->
+        isLauncherActive = false
         if (result != null) {
             onNavigateToMetadataViewer(result.toString(), result.lastPathSegment ?: "")
         }
@@ -138,36 +159,51 @@ fun MainScreen(
         viewModel.container.sideEffectFlow.collect { sideEffect ->
             when (sideEffect) {
                 is MainSideEffect.ImageSources.Image -> {
-                    if (sideEffect.isLegacyImageSelectionEnabled) {
-                        chooseImageLegacyLauncher.launch(sideEffect.supportedMimeTypes)
-                    } else {
-                        chooseImageLauncher.launch(
-                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                        )
+                    if (!isLauncherActive) {
+                        isLauncherActive = true
+                        if (sideEffect.isLegacyImageSelectionEnabled) {
+                            chooseImageLegacyLauncher.launch(sideEffect.supportedMimeTypes)
+                        } else {
+                            chooseImageLauncher.launch(
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
+                        }
                     }
                 }
 
                 is MainSideEffect.ImageSources.Images -> {
-                    if (sideEffect.isLegacyImageSelectionEnabled) {
-                        chooseImagesLegacyLauncher.launch(sideEffect.supportedMimeTypes)
-                    } else {
-                        chooseImagesLauncher.launch(
-                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                        )
+                    if (!isLauncherActive) {
+                        isLauncherActive = true
+                        if (sideEffect.isLegacyImageSelectionEnabled) {
+                            chooseImagesLegacyLauncher.launch(sideEffect.supportedMimeTypes)
+                        } else {
+                            chooseImagesLauncher.launch(
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
+                        }
                     }
                 }
 
                 is MainSideEffect.ImageSources.ImageDirectory.Success -> {
-                    chooseImageDirectoryLauncher.launch(sideEffect.uri)
+                    if (!isLauncherActive) {
+                        isLauncherActive = true
+                        chooseImageDirectoryLauncher.launch(sideEffect.uri)
+                    }
                 }
 
                 MainSideEffect.ImageSources.ImageDirectory.Failure -> {
-                    chooseImageDirectoryLauncher.launch(Uri.EMPTY)
+                    if (!isLauncherActive) {
+                        isLauncherActive = true
+                        chooseImageDirectoryLauncher.launch(Uri.EMPTY)
+                    }
                 }
 
                 is MainSideEffect.ImageSources.Camera.Success -> {
-                    pendingCameraUri = sideEffect.uri
-                    cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                    if (!isLauncherActive) {
+                        isLauncherActive = true
+                        pendingCameraUri = sideEffect.uri
+                        cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                    }
                 }
 
                 MainSideEffect.ImageSources.Camera.Failure -> {
@@ -291,9 +327,14 @@ fun MainScreen(
             ImageSource(
                 icon = Icons.Outlined.Search,
                 labelResId = R.string.inspect_exif,
-                onClick = { inspectExifLauncher.launch(
-                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                ) },
+                onClick = {
+                    if (!isLauncherActive) {
+                        isLauncherActive = true
+                        inspectExifLauncher.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+                    }
+                },
             ),
             ImageSource(
                 icon = Icons.Outlined.PhotoLibrary,
@@ -369,7 +410,7 @@ fun MainScreen(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Spacer(modifier = Modifier.weight(0.45f))
+                Spacer(modifier = Modifier.weight(0.55f))
                 Text(
                     text = stringResource(R.string.choose_your_preferred_image_source_placeholder,
                         stringResource(R.string.choose_your),

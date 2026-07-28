@@ -12,7 +12,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Code
+import androidx.compose.material.icons.outlined.ContentPaste
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.GridOn
+import androidx.compose.material.icons.outlined.HelpOutline
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.UnfoldLess
 import androidx.compose.material.icons.outlined.UnfoldMore
 import androidx.compose.material.icons.outlined.ViewList
@@ -21,6 +25,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -28,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -45,6 +52,9 @@ import com.none.tom.exiferaser.ui.components.MetadataTagItem
 @Composable
 fun MetadataViewerScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToMain: () -> Unit,
+    onNavigateToHelp: () -> Unit,
+    onNavigateToSettings: () -> Unit,
     onRemoveMetadata: (Uri) -> Unit,
     uri: Uri,
     displayName: String,
@@ -75,7 +85,7 @@ fun MetadataViewerScreen(
                     }
                 },
                 actions = {
-                    if (state.metadataGroups.isNotEmpty()) {
+                    if (state.metadataGroups.isNotEmpty() && !state.isRawMode) {
                         IconButton(onClick = { viewModel.toggleDisplayMode() }) {
                             Icon(
                                 imageVector = if (state.isRawMode) {
@@ -124,6 +134,56 @@ fun MetadataViewerScreen(
                         contentDescription = stringResource(R.string.remove_metadata),
                     )
                 }
+            }
+        },
+        bottomBar = {
+            NavigationBar(
+                containerColor = if (MaterialTheme.colorScheme.background == Color.Black) Color.Black else MaterialTheme.colorScheme.surfaceContainer,
+            ) {
+                NavigationBarItem(
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Outlined.HelpOutline,
+                            contentDescription = stringResource(R.string.help),
+                        )
+                    },
+                    label = { Text(stringResource(R.string.help_short)) },
+                    selected = false,
+                    onClick = onNavigateToHelp,
+                )
+                NavigationBarItem(
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Outlined.ContentPaste,
+                            contentDescription = stringResource(R.string.paste_images),
+                        )
+                    },
+                    label = { Text(stringResource(R.string.paste_short)) },
+                    selected = false,
+                    onClick = { /* paste */ },
+                )
+                NavigationBarItem(
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Outlined.GridOn,
+                            contentDescription = stringResource(R.string.image_sources),
+                        )
+                    },
+                    label = { Text(stringResource(R.string.grid_short)) },
+                    selected = false,
+                    onClick = onNavigateToMain,
+                )
+                NavigationBarItem(
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Outlined.Settings,
+                            contentDescription = stringResource(R.string.settings),
+                        )
+                    },
+                    label = { Text(stringResource(R.string.settings_short)) },
+                    selected = false,
+                    onClick = onNavigateToSettings,
+                )
             }
         },
     ) { innerPadding ->

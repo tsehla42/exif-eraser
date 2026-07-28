@@ -87,6 +87,9 @@ fun AppNavHost(navController: NavHostController) {
             val displayName = backStackEntry.arguments?.getString("displayName") ?: ""
             MetadataViewerScreen(
                 onNavigateBack = { navController.popBackStack() },
+                onNavigateToMain = { navController.navigate(Screen.Main.route) },
+                onNavigateToHelp = { navController.navigate(Screen.Help.route) },
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
                 onRemoveMetadata = {
                     navController.navigate(Screen.ImageProcessing.createRoute())
                 },

@@ -17,9 +17,9 @@ import androidx.compose.material.icons.outlined.Error
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -97,16 +97,6 @@ fun ProcessingScreen(
         topBar = {
             TopAppBar(
                 title = { Text(text = stringResource(R.string.processing)) },
-                actions = {
-                    if (isFinished && state.imagesSavedCount > 0) {
-                        IconButton(onClick = { viewModel.shareImages() }) {
-                            Icon(
-                                imageVector = Icons.Outlined.Share,
-                                contentDescription = stringResource(R.string.share),
-                            )
-                        }
-                    }
-                },
             )
         },
     ) { innerPadding ->
@@ -125,6 +115,7 @@ fun ProcessingScreen(
                     imagesSavedCount = state.imagesSavedCount,
                     summaries = state.imageProcessingSummaries,
                     onDetailsClick = onNavigateToDetails,
+                    onShareClick = { viewModel.shareImages() },
                 )
             } else {
                 ProgressContent(
@@ -167,6 +158,7 @@ private fun FinishedContent(
     imagesSavedCount: Int,
     summaries: List<com.none.tom.exiferaser.core.image.ImageProcessingSummary>,
     onDetailsClick: (String) -> Unit,
+    onShareClick: () -> Unit,
 ) {
     Icon(
         imageVector = Icons.Outlined.CheckCircle,
@@ -226,6 +218,17 @@ private fun FinishedContent(
                 text = stringResource(R.string.view_details),
                 style = MaterialTheme.typography.labelLarge,
             )
+        }
+        if (imagesSavedCount > 0) {
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedButton(onClick = onShareClick) {
+                Icon(
+                    imageVector = Icons.Outlined.Share,
+                    contentDescription = stringResource(R.string.share),
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(text = stringResource(R.string.share))
+            }
         }
     }
 }
