@@ -123,4 +123,9 @@
     <string name="restart_message">Theme changes will take effect after restarting the app.</string>
     <string name="restart_later">OK, I\'ll restart later</string>
     <string name="restart_now">Restart</string>
+
+    <!-- Cache -->
+    <string name="settings_clear_cache">Clear cache</string>
+    <string name="clear_cache">Clear cache</string>
+    <string name="clear_cache_message">This will delete all cached images. Are you sure?</string>
 </resources>

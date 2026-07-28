@@ -16,6 +16,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.AdsClick
 import androidx.compose.material.icons.outlined.AutoDelete
 import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.DeleteSweep
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.Image
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,7 +32,10 @@ import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -65,7 +70,19 @@ fun SettingsScreen(
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var showDisplayNameSuffix by remember { mutableStateOf(false) }
+    var showClearCacheConfirmation by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+
+    fun getCacheSize(): String {
+        val cacheDir = context.cacheDir
+        val size = cacheDir.walkTopDown().filter { it.isFile }.sumOf { it.length() }
+        return when {
+            size < 1024 -> "$size B"
+            size < 1024 * 1024 -> "${size / 1024} KB"
+            else -> "${size / (1024 * 1024)} MB"
+        }
+    }
 
     val defaultPathOpenLauncher = rememberLauncherForActivityResult(
         contract = OpenDocumentTree()
@@ -120,6 +137,7 @@ fun SettingsScreen(
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             val isAmoled = MaterialTheme.colorScheme.background == Color.Black
             LargeTopAppBar(
@@ -184,6 +202,15 @@ fun SettingsScreen(
             }
 
             item {
+                PreferenceItem(
+                    title = stringResource(R.string.settings_clear_cache),
+                    subtitle = getCacheSize(),
+                    icon = Icons.Outlined.DeleteSweep,
+                    onClick = { showClearCacheConfirmation = true },
+                )
+            }
+
+            item {
                 Text(
                     text = stringResource(R.string.settings_section_image),
                     style = MaterialTheme.typography.titleSmall,
@@ -202,10 +229,11 @@ fun SettingsScreen(
             }
 
             item {
-                PreferenceItem(
+                SwitchPreferenceItem(
                     title = stringResource(R.string.settings_auto_delete),
                     icon = Icons.Outlined.AutoDelete,
-                    onClick = {},
+                    checked = state.isAutoDeleteEnabled,
+                    onCheckedChange = { viewModel.storeAutoDelete(it) },
                 )
             }
 
@@ -314,6 +342,28 @@ fun SettingsScreen(
             },
             onDismiss = {
                 showDisplayNameSuffix = false
+            },
+        )
+    }
+
+    if (showClearCacheConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showClearCacheConfirmation = false },
+            title = { Text(stringResource(R.string.clear_cache)) },
+            text = { Text(stringResource(R.string.clear_cache_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showClearCacheConfirmation = false
+                    context.cacheDir.deleteRecursively()
+                    context.cacheDir.mkdirs()
+                }) {
+                    Text(stringResource(android.R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearCacheConfirmation = false }) {
+                    Text(stringResource(android.R.string.cancel))
+                }
             },
         )
     }

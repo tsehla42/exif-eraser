@@ -109,7 +109,12 @@ class MainViewModel @Inject constructor(
 
     fun chooseSelectionNavigationRoute(isFromCamera: Boolean = false) = intent {
         if (isFromCamera) {
-            postSideEffect(MainSideEffect.Navigate.ToSelection(savePath = Uri.EMPTY))
+            val result = settingsRepository.getPrivilegedDefaultSavePath()
+            if (result.isSuccess) {
+                postSideEffect(MainSideEffect.Navigate.ToSelection(savePath = result.getOrThrow()))
+            } else {
+                postSideEffect(MainSideEffect.Navigate.ToSelectionSavePath)
+            }
             return@intent
         }
         if (settingsRepository.isSkipSavePathSelectionEnabled()) {
