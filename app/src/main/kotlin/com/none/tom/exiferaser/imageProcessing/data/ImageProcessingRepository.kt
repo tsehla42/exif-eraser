@@ -65,7 +65,8 @@ class ImageProcessingRepository @Inject constructor(
         displayNameSuffix: String,
         isAutoDeleteEnabled: Boolean,
         isPreserveOrientationEnabled: Boolean,
-        isRandomizeFileNamesEnabled: Boolean
+        isRandomizeFileNamesEnabled: Boolean,
+        isUseOriginalNameEnabled: Boolean
     ): Flow<ImageProcessingStep> = flow {
         protos.forEachIndexed { index, proto ->
             emit(
@@ -76,6 +77,7 @@ class ImageProcessingRepository @Inject constructor(
                     isAutoDeleteEnabled = isAutoDeleteEnabled,
                     isPreserveOrientationEnabled = isPreserveOrientationEnabled,
                     isRandomizeFileNamesEnabled = isRandomizeFileNamesEnabled,
+                    isUseOriginalNameEnabled = isUseOriginalNameEnabled,
                     progress = ImageProcessingProgress.calculate(
                         index = index,
                         count = protos.size
@@ -95,6 +97,7 @@ class ImageProcessingRepository @Inject constructor(
         isAutoDeleteEnabled: Boolean,
         isPreserveOrientationEnabled: Boolean,
         isRandomizeFileNamesEnabled: Boolean,
+        isUseOriginalNameEnabled: Boolean,
         progress: ImageProcessingProgress
     ): ImageProcessingStep.FinishedSingle {
         var sourceUri = Uri.EMPTY
@@ -117,8 +120,10 @@ class ImageProcessingRepository @Inject constructor(
                 )
                 val (exifInterfaceExtended, scanResult) = scanImage(sourceUri).getOrThrow()
                 imageMetadataSnapshot = scanResult
-                if (scanResult.isMetadataContained() || isRandomizeFileNamesEnabled) {
-                    formattedDisplayName = if (isRandomizeFileNamesEnabled) {
+                if (scanResult.isMetadataContained() || isRandomizeFileNamesEnabled || isUseOriginalNameEnabled) {
+                    formattedDisplayName = if (isUseOriginalNameEnabled) {
+                        FileUtilsKt.buildValidExtFilename(displayName)
+                    } else if (isRandomizeFileNamesEnabled) {
                         UUID.randomUUID().toString()
                     } else {
                         FileUtilsKt.buildValidExtFilename(

@@ -181,6 +181,20 @@ private fun FinishedContent(
         style = MaterialTheme.typography.bodyLarge,
         textAlign = TextAlign.Center,
     )
+    val alreadyNoExifCount = imagesProcessedCount - imagesWithMetadataCount
+    if (alreadyNoExifCount > 0) {
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = if (imagesWithMetadataCount == 0) {
+                stringResource(R.string.files_already_no_exif)
+            } else {
+                stringResource(R.string.some_files_already_no_exif)
+            },
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+            textAlign = TextAlign.Center,
+        )
+    }
     if (imagesSavedCount > 0) {
         Spacer(modifier = Modifier.height(4.dp))
         Text(

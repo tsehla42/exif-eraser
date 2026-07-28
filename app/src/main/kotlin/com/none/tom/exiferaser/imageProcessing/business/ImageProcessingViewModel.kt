@@ -69,7 +69,8 @@ class ImageProcessingViewModel @Inject constructor(
             displayNameSuffix = settingsRepository.getDefaultDisplayNameSuffix(),
             isAutoDeleteEnabled = settingsRepository.isAutoDeleteEnabled(),
             isPreserveOrientationEnabled = settingsRepository.isPreserveOrientationEnabled(),
-            isRandomizeFileNamesEnabled = settingsRepository.isRandomizeFileNamesEnabled()
+            isRandomizeFileNamesEnabled = settingsRepository.isRandomizeFileNamesEnabled(),
+            isUseOriginalNameEnabled = settingsRepository.isUseOriginalNameEnabled()
         ).collect { result ->
             reduce {
                 when (result) {

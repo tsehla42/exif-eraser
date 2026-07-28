@@ -34,6 +34,8 @@
     <string name="images_modified">modified</string>
     <string name="image_saved">Image saved</string>
     <string name="images_saved_count" translatable="false">%1$d images saved</string>
+    <string name="files_already_no_exif">Files already have no EXIF</string>
+    <string name="some_files_already_no_exif">Some files already had no EXIF</string>
     <string name="share">Share</string>
     <string name="view_details">View details</string>
     <string name="view_new_exif">View new EXIF</string>
@@ -56,11 +58,16 @@
     <string name="remove_metadata">Remove metadata</string>
     <string name="metadata_toggle_raw">Switch to raw view</string>
     <string name="metadata_toggle_pretty">Switch to grouped view</string>
+    <string name="pretty">Pretty</string>
+    <string name="raw">Raw</string>
+    <string name="expand">Expand</string>
+    <string name="collapse">Collapse</string>
 
     <!-- Settings -->
     <string name="settings_section_filesystem">Filesystem</string>
     <string name="settings_section_image">Image</string>
     <string name="settings_section_user_interface">UX</string>
+    <string name="settings_use_original_name">Use original file name</string>
     <string name="settings_randomize_file_names">Randomize file names</string>
     <string name="settings_default_open_path">Default open path</string>
     <string name="settings_default_save_path">Default save path</string>

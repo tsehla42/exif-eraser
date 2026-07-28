@@ -184,4 +184,13 @@ sealed class SettingsSideEffect : Parcelable {
         @Parcelize
         data object Success : DynamicColor()
     }
+
+    sealed class UseOriginalName : SettingsSideEffect() {
+
+        @Parcelize
+        data object Failure : UseOriginalName()
+
+        @Parcelize
+        data object Success : UseOriginalName()
+    }
 }

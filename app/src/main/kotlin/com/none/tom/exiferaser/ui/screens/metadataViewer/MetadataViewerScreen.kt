@@ -3,7 +3,10 @@ package com.none.tom.exiferaser.ui.screens.metadataViewer
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -33,6 +36,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -84,46 +88,6 @@ fun MetadataViewerScreen(
                         )
                     }
                 },
-                actions = {
-                    if (state.metadataGroups.isNotEmpty()) {
-                        IconButton(onClick = { viewModel.toggleDisplayMode() }) {
-                            Icon(
-                                imageVector = if (state.isRawMode) {
-                                    Icons.Outlined.ViewList
-                                } else {
-                                    Icons.Outlined.Code
-                                },
-                                contentDescription = if (state.isRawMode) {
-                                    stringResource(R.string.metadata_toggle_pretty)
-                                } else {
-                                    stringResource(R.string.metadata_toggle_raw)
-                                },
-                            )
-                        }
-                    }
-                    if (state.metadataGroups.isNotEmpty() && !state.isRawMode) {
-                        IconButton(onClick = {
-                            if (state.expandedGroups.size == state.metadataGroups.size) {
-                                viewModel.collapseAll()
-                            } else {
-                                viewModel.expandAll()
-                            }
-                        }) {
-                            Icon(
-                                imageVector = if (state.expandedGroups.size == state.metadataGroups.size) {
-                                    Icons.Outlined.UnfoldLess
-                                } else {
-                                    Icons.Outlined.UnfoldMore
-                                },
-                                contentDescription = if (state.expandedGroups.size == state.metadataGroups.size) {
-                                    stringResource(R.string.metadata_collapse_all)
-                                } else {
-                                    stringResource(R.string.metadata_expand_all)
-                                },
-                            )
-                        }
-                    }
-                },
             )
         },
         floatingActionButton = {
@@ -139,53 +103,138 @@ fun MetadataViewerScreen(
             }
         },
         bottomBar = {
-            NavigationBar(
-                containerColor = if (MaterialTheme.colorScheme.background == Color.Black) Color.Black else MaterialTheme.colorScheme.surfaceContainer,
-            ) {
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Outlined.HelpOutline,
-                            contentDescription = stringResource(R.string.help),
-                        )
-                    },
-                    label = { Text(stringResource(R.string.help_short)) },
-                    selected = false,
-                    onClick = onNavigateToHelp,
-                )
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Outlined.ContentPaste,
-                            contentDescription = stringResource(R.string.paste_images),
-                        )
-                    },
-                    label = { Text(stringResource(R.string.paste_short)) },
-                    selected = false,
-                    onClick = { /* paste */ },
-                )
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Outlined.GridOn,
-                            contentDescription = stringResource(R.string.image_sources),
-                        )
-                    },
-                    label = { Text(stringResource(R.string.grid_short)) },
-                    selected = false,
-                    onClick = onNavigateToMain,
-                )
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Outlined.Settings,
-                            contentDescription = stringResource(R.string.settings),
-                        )
-                    },
-                    label = { Text(stringResource(R.string.settings_short)) },
-                    selected = false,
-                    onClick = onNavigateToSettings,
-                )
+            Column {
+                if (state.metadataGroups.isNotEmpty() && !state.isLoading) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .clickable {
+                                    if (state.isRawMode) viewModel.toggleDisplayMode()
+                                }
+                                .padding(8.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.ViewList,
+                                contentDescription = stringResource(R.string.metadata_toggle_pretty),
+                                tint = if (!state.isRawMode) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Text(
+                                text = stringResource(R.string.pretty),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = if (!state.isRawMode) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .clickable {
+                                    if (!state.isRawMode) viewModel.toggleDisplayMode()
+                                }
+                                .padding(8.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Code,
+                                contentDescription = stringResource(R.string.metadata_toggle_raw),
+                                tint = if (state.isRawMode) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Text(
+                                text = stringResource(R.string.raw),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = if (state.isRawMode) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        if (!state.isRawMode) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier
+                                    .clickable { viewModel.expandAll() }
+                                    .padding(8.dp),
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.UnfoldMore,
+                                    contentDescription = stringResource(R.string.metadata_expand_all),
+                                )
+                                Text(
+                                    text = stringResource(R.string.expand),
+                                    style = MaterialTheme.typography.labelSmall,
+                                )
+                            }
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier
+                                    .clickable { viewModel.collapseAll() }
+                                    .padding(8.dp),
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.UnfoldLess,
+                                    contentDescription = stringResource(R.string.metadata_collapse_all),
+                                )
+                                Text(
+                                    text = stringResource(R.string.collapse),
+                                    style = MaterialTheme.typography.labelSmall,
+                                )
+                            }
+                        }
+                    }
+                }
+                NavigationBar(
+                    containerColor = if (MaterialTheme.colorScheme.background == Color.Black) Color.Black else MaterialTheme.colorScheme.surfaceContainer,
+                ) {
+                    NavigationBarItem(
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Outlined.HelpOutline,
+                                contentDescription = stringResource(R.string.help),
+                            )
+                        },
+                        label = { Text(stringResource(R.string.help_short)) },
+                        selected = false,
+                        onClick = onNavigateToHelp,
+                    )
+                    NavigationBarItem(
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Outlined.ContentPaste,
+                                contentDescription = stringResource(R.string.paste_images),
+                            )
+                        },
+                        label = { Text(stringResource(R.string.paste_short)) },
+                        selected = false,
+                        onClick = { /* paste */ },
+                    )
+                    NavigationBarItem(
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Outlined.GridOn,
+                                contentDescription = stringResource(R.string.image_sources),
+                            )
+                        },
+                        label = { Text(stringResource(R.string.grid_short)) },
+                        selected = false,
+                        onClick = onNavigateToMain,
+                    )
+                    NavigationBarItem(
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Outlined.Settings,
+                                contentDescription = stringResource(R.string.settings),
+                            )
+                        },
+                        label = { Text(stringResource(R.string.settings_short)) },
+                        selected = false,
+                        onClick = onNavigateToSettings,
+                    )
+                }
             }
         },
     ) { innerPadding ->
