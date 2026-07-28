@@ -154,33 +154,23 @@ fun MetadataViewerScreen(
                             )
                         }
                         if (!state.isRawMode) {
+                            val allExpanded = state.expandedGroups.size == state.metadataGroups.size
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier
-                                    .clickable { viewModel.expandAll() }
+                                    .clickable {
+                                        if (allExpanded) viewModel.collapseAll() else viewModel.expandAll()
+                                    }
                                     .padding(8.dp),
                             ) {
                                 Icon(
-                                    imageVector = Icons.Outlined.UnfoldMore,
-                                    contentDescription = stringResource(R.string.metadata_expand_all),
+                                    imageVector = if (allExpanded) Icons.Outlined.UnfoldLess else Icons.Outlined.UnfoldMore,
+                                    contentDescription = stringResource(
+                                        if (allExpanded) R.string.metadata_collapse_all else R.string.metadata_expand_all
+                                    ),
                                 )
                                 Text(
-                                    text = stringResource(R.string.expand),
-                                    style = MaterialTheme.typography.labelSmall,
-                                )
-                            }
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier
-                                    .clickable { viewModel.collapseAll() }
-                                    .padding(8.dp),
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.UnfoldLess,
-                                    contentDescription = stringResource(R.string.metadata_collapse_all),
-                                )
-                                Text(
-                                    text = stringResource(R.string.collapse),
+                                    text = stringResource(if (allExpanded) R.string.collapse else R.string.expand),
                                     style = MaterialTheme.typography.labelSmall,
                                 )
                             }
