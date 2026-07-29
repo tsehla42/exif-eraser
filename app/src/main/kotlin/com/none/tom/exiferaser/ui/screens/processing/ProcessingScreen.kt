@@ -195,14 +195,14 @@ private fun FinishedContent(
         )
     }
     if (summaries.isNotEmpty()) {
-        Spacer(modifier = Modifier.height(50.dp))
+        Spacer(modifier = Modifier.height(40.dp))
         TextButton(onClick = { onNavigateToProcessingDetails(summaries) }) {
             Text(
                 text = stringResource(R.string.view_details),
                 style = MaterialTheme.typography.labelLarge,
             )
         }
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(40.dp))
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {

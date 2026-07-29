@@ -15,9 +15,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,7 +43,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -150,7 +156,13 @@ fun ProcessingDetailsScreen(
                 ProcessingResultItemSimple(
                     summary = summary,
                     onViewExif = { onNavigateToMetadataViewer(summary.uri.toString(), summary.displayName) },
-                    onOpenFileLocation = { viewModel.handleViewImage(index) },
+                    onOpenWith = {
+                        val openIntent = Intent(Intent.ACTION_VIEW).apply {
+                            setDataAndTypeAndNormalize(summary.uri, MIME_TYPE_IMAGE)
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        context.startActivity(Intent.createChooser(openIntent, context.getString(R.string.open_with)))
+                    },
                     onCopyPath = { viewModel.handleCopyPath(index) },
                     onShare = { viewModel.handleShareImage(index) },
                 )
@@ -159,15 +171,18 @@ fun ProcessingDetailsScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProcessingResultItemSimple(
     summary: ImageProcessingSummary,
     onViewExif: () -> Unit,
-    onOpenFileLocation: () -> Unit,
+    onOpenWith: () -> Unit,
     onCopyPath: () -> Unit,
     onShare: () -> Unit,
 ) {
     var showMenu by remember { mutableStateOf(false) }
+    val menuShape = RoundedCornerShape(16.dp)
+    val menuContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh
 
     Column {
         Row(
@@ -197,23 +212,48 @@ private fun ProcessingResultItemSimple(
         DropdownMenu(
             expanded = showMenu,
             onDismissRequest = { showMenu = false },
+            offset = DpOffset(x = (-16).dp, y = 0.dp),
+            shape = menuShape,
+            containerColor = menuContainerColor,
+            properties = PopupProperties(focusable = true),
         ) {
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.view_new_exif)) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.Visibility,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                    )
+                },
                 onClick = {
                     showMenu = false
                     onViewExif()
                 },
             )
             DropdownMenuItem(
-                text = { Text(stringResource(R.string.open_file_location)) },
+                text = { Text(stringResource(R.string.open_with)) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.OpenInNew,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                    )
+                },
                 onClick = {
                     showMenu = false
-                    onOpenFileLocation()
+                    onOpenWith()
                 },
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.copy_path)) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.ContentCopy,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                    )
+                },
                 onClick = {
                     showMenu = false
                     onCopyPath()
@@ -225,6 +265,7 @@ private fun ProcessingResultItemSimple(
                     Icon(
                         imageVector = Icons.Outlined.Share,
                         contentDescription = null,
+                        modifier = Modifier.size(20.dp),
                     )
                 },
                 onClick = {

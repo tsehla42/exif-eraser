@@ -142,7 +142,7 @@
 
     <!-- Processing Complete -->
     <string name="ok">OK</string>
-    <string name="open_file_location">Open file location</string>
+    <string name="open_with">Open with</string>
     <string name="copy_path">Copy path</string>
     <string name="share_image">Share</string>
 
