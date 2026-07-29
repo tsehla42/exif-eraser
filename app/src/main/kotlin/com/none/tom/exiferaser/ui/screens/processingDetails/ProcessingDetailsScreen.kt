@@ -1,5 +1,7 @@
 package com.none.tom.exiferaser.ui.screens.processingDetails
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.clickable
@@ -10,34 +12,40 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.none.tom.exiferaser.R
 import com.none.tom.exiferaser.core.image.ImageProcessingSummary
 import com.none.tom.exiferaser.imageProcessingDetails.business.ImageProcessingDetailsSideEffect
 import com.none.tom.exiferaser.imageProcessingDetails.business.ImageProcessingDetailsViewModel
-import com.none.tom.exiferaser.ui.components.ProcessingResultItem
 
 private const val MIME_TYPE_IMAGE = "image/*"
 
@@ -88,27 +96,24 @@ fun ProcessingDetailsScreen(
                     }
                     context.startActivity(intent)
                 }
-                ImageProcessingDetailsSideEffect.ImageSaved.Unsupported -> {
-                    // Could show a toast/snackbar in the future
-                }
-                is ImageProcessingDetailsSideEffect.Navigate.ToImageModifiedDetails -> {
-                    // Could navigate to a details dialog in the future
-                }
-                is ImageProcessingDetailsSideEffect.Navigate.ToImageSavedDetails -> {
-                    // Could show path details in the future
-                }
                 is ImageProcessingDetailsSideEffect.ShareImage -> {
                     val shareIntent = Intent(Intent.ACTION_SEND).apply {
                         type = MIME_TYPE_IMAGE
                         putExtra(Intent.EXTRA_STREAM, sideEffect.imageUri)
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     }
-                    context.startActivity(Intent.createChooser(shareIntent, null))
+                    context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.share)))
                 }
                 is ImageProcessingDetailsSideEffect.CopyPath -> {
-                    val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-                    val clip = android.content.ClipData.newPlainText("image_path", sideEffect.path)
+                    val clipboard = context.getSystemService(ClipboardManager::class.java)
+                    val clip = ClipData.newPlainText("image path", sideEffect.path)
                     clipboard.setPrimaryClip(clip)
+                }
+                ImageProcessingDetailsSideEffect.ImageSaved.Unsupported -> {
+                }
+                is ImageProcessingDetailsSideEffect.Navigate.ToImageModifiedDetails -> {
+                }
+                is ImageProcessingDetailsSideEffect.Navigate.ToImageSavedDetails -> {
                 }
             }
         }
@@ -132,10 +137,14 @@ fun ProcessingDetailsScreen(
                 items = state.imageProcessingSummaries,
                 key = { "${it.displayName}_${it.extension}" },
             ) { summary ->
-                ProcessingResultItemWithExif(
+                val index = state.imageProcessingSummaries.indexOf(summary)
+                ProcessingResultItemSimple(
                     summary = summary,
-                    onViewImage = { viewModel.handleViewImage(state.imageProcessingSummaries.indexOf(summary)) },
+                    onClick = { viewModel.handleViewImage(index) },
                     onViewExif = { onNavigateToMetadataViewer(summary.uri.toString(), summary.displayName) },
+                    onOpenFileLocation = { viewModel.handleViewImage(index) },
+                    onCopyPath = { viewModel.handleCopyPath(index) },
+                    onShare = { viewModel.handleShareImage(index) },
                 )
             }
         }
@@ -143,24 +152,78 @@ fun ProcessingDetailsScreen(
 }
 
 @Composable
-private fun ProcessingResultItemWithExif(
+private fun ProcessingResultItemSimple(
     summary: ImageProcessingSummary,
-    onViewImage: () -> Unit,
+    onClick: () -> Unit,
     onViewExif: () -> Unit,
+    onOpenFileLocation: () -> Unit,
+    onCopyPath: () -> Unit,
+    onShare: () -> Unit,
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        ProcessingResultItem(
-            summary = summary,
-            onClick = onViewImage,
-            modifier = Modifier.weight(1f),
-        )
-        IconButton(onClick = onViewExif) {
-            Icon(
-                imageVector = Icons.Outlined.Visibility,
-                contentDescription = stringResource(R.string.view_new_exif),
+    var showMenu by remember { mutableStateOf(false) }
+
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { showMenu = true },
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            AsyncImage(
+                model = summary.uri,
+                contentDescription = summary.displayName,
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(MaterialTheme.shapes.small),
+                contentScale = ContentScale.Crop,
+            )
+            Text(
+                text = summary.uri.path ?: summary.displayName,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
+        }
+
+        DropdownMenu(
+            expanded = showMenu,
+            onDismissRequest = { showMenu = false },
+        ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.view_new_exif)) },
+                onClick = {
+                    showMenu = false
+                    onViewExif()
+                },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.open_file_location)) },
+                onClick = {
+                    showMenu = false
+                    onOpenFileLocation()
+                },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.copy_path)) },
+                onClick = {
+                    showMenu = false
+                    onCopyPath()
+                },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.share_image)) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.Share,
+                        contentDescription = null,
+                    )
+                },
+                onClick = {
+                    showMenu = false
+                    onShare()
+                },
             )
         }
     }
