@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -123,6 +124,14 @@ fun ProcessingDetailsScreen(
         topBar = {
             TopAppBar(
                 title = { Text(text = stringResource(R.string.processing_details_title)) },
+                navigationIcon = {
+                    androidx.compose.material3.IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.navigate_back),
+                        )
+                    }
+                },
             )
         },
     ) { innerPadding ->
@@ -140,7 +149,6 @@ fun ProcessingDetailsScreen(
                 val index = state.imageProcessingSummaries.indexOf(summary)
                 ProcessingResultItemSimple(
                     summary = summary,
-                    onClick = { viewModel.handleViewImage(index) },
                     onViewExif = { onNavigateToMetadataViewer(summary.uri.toString(), summary.displayName) },
                     onOpenFileLocation = { viewModel.handleViewImage(index) },
                     onCopyPath = { viewModel.handleCopyPath(index) },
@@ -154,7 +162,6 @@ fun ProcessingDetailsScreen(
 @Composable
 private fun ProcessingResultItemSimple(
     summary: ImageProcessingSummary,
-    onClick: () -> Unit,
     onViewExif: () -> Unit,
     onOpenFileLocation: () -> Unit,
     onCopyPath: () -> Unit,

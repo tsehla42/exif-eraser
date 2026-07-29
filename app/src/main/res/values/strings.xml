@@ -142,9 +142,8 @@
 
     <!-- Processing Complete -->
     <string name="ok">OK</string>
-    <string name="view_new_exif_short">View EXIF</string>
     <string name="open_file_location">Open file location</string>
     <string name="copy_path">Copy path</string>
     <string name="share_image">Share</string>
-    <string name="path_copied">Path copied to clipboard</string>
+
 </resources>
