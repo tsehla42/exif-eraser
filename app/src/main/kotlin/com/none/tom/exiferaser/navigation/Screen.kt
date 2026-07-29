@@ -12,9 +12,9 @@ sealed class Screen(val route: String) {
     data object ImageProcessingDetails : Screen("image_processing_details/{summariesJson}") {
         fun createRoute(summariesJson: String) = "image_processing_details/${Uri.encode(summariesJson)}"
     }
-    data object MetadataViewer : Screen("metadata_viewer/{uri}/{displayName}") {
-        fun createRoute(uri: String, displayName: String): String {
-            return "metadata_viewer/${Uri.encode(uri)}/${Uri.encode(displayName)}"
+    data object MetadataViewer : Screen("metadata_viewer/{uri}/{displayName}/{hideDelete}") {
+        fun createRoute(uri: String, displayName: String, hideDelete: Boolean = false): String {
+            return "metadata_viewer/${Uri.encode(uri)}/${Uri.encode(displayName)}/${hideDelete}"
         }
     }
     data object SavePathSelection : Screen("save_path_selection")

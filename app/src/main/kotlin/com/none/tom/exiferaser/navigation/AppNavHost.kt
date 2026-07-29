@@ -70,8 +70,9 @@ fun AppNavHost(navController: NavHostController) {
             val summariesJson = backStackEntry.arguments?.getString("summariesJson") ?: "[]"
             ProcessingDetailsScreen(
                 onNavigateBack = { navController.popBackStack() },
+                onNavigateToMain = { navController.navigate(Screen.Main.route) },
                 onNavigateToMetadataViewer = { uri, displayName ->
-                    navController.navigate(Screen.MetadataViewer.createRoute(uri, displayName))
+                    navController.navigate(Screen.MetadataViewer.createRoute(uri, displayName, hideDelete = true))
                 },
                 summariesJson = summariesJson,
             )
@@ -90,10 +91,12 @@ fun AppNavHost(navController: NavHostController) {
             arguments = listOf(
                 navArgument("uri") { type = NavType.StringType },
                 navArgument("displayName") { type = NavType.StringType },
+                navArgument("hideDelete") { type = NavType.BoolType; defaultValue = false },
             ),
         ) { backStackEntry ->
             val uriString = backStackEntry.arguments?.getString("uri") ?: ""
             val displayName = backStackEntry.arguments?.getString("displayName") ?: ""
+            val hideDelete = backStackEntry.arguments?.getBoolean("hideDelete") ?: false
             MetadataViewerScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToMain = { navController.navigate(Screen.Main.route) },
@@ -104,6 +107,7 @@ fun AppNavHost(navController: NavHostController) {
                 },
                 uri = Uri.parse(uriString),
                 displayName = displayName,
+                hideDeleteButton = hideDelete,
             )
         }
         composable(Screen.Settings.route) {

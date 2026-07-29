@@ -62,6 +62,7 @@ fun MetadataViewerScreen(
     onRemoveMetadata: (Uri) -> Unit,
     uri: Uri,
     displayName: String,
+    hideDeleteButton: Boolean = false,
     viewModel: MetadataViewerViewModel = hiltViewModel(),
 ) {
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
@@ -91,7 +92,7 @@ fun MetadataViewerScreen(
             )
         },
         floatingActionButton = {
-            if (state.metadataGroups.isNotEmpty() && !state.isLoading) {
+            if (state.metadataGroups.isNotEmpty() && !state.isLoading && !hideDeleteButton) {
                 FloatingActionButton(
                     onClick = { onRemoveMetadata(uri) },
                 ) {
