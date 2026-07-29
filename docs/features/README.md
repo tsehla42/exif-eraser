@@ -18,3 +18,6 @@
 | Custom Suffix | Append suffix to output filenames | `settings/data/SettingsRepository.kt` |
 | Save Path Skip | Skip path selection with default | `settings/data/SettingsRepository.kt` |
 | Legacy Image Selection | Fallback image picker on older devices | `settings/data/SettingsRepository.kt` |
+| Use Original Name | Keep original filename (disables suffix and randomize) | `settings/data/SettingsRepository.kt` |
+| Clear Cache | Clear cached images with size display | `ui/screens/settings/SettingsScreen.kt` |
+| Processing Details | View list of processed files with thumbnails | `ui/screens/processingDetails/ProcessingDetailsScreen.kt` |

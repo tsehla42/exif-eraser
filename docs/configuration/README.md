@@ -60,7 +60,6 @@
 - `orbit-viewmodel:11.0.0`
 - `wire-runtime:6.4.5`
 - `timber:5.0.1`
-- `process-phoenix:3.0.0`
 - `commons-io:2.22.0`
 - `material:1.12.0` (Material Components)
 - `kotlinx-coroutines-android:1.11.0`

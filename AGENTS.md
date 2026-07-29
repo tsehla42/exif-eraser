@@ -53,7 +53,14 @@ exif-eraser/
 │   ├── navigation/                 # Navigation graph and Screen routes
 │   └── ui/                         # Compose UI
 │       ├── components/             # Reusable composables (dialogs, cards, metadata items)
-│       ├── screens/                # Screen composables (main, processing, settings, etc.)
+│       ├── screens/                # Screen composables
+│       │   ├── main/               # Main screen
+│       │   ├── processing/         # Processing screen with no-EXIF labels
+│       │   ├── processingDetails/  # File list with thumbnails + View EXIF button
+│       │   ├── metadataViewer/     # Bottom control bar (Pretty, Raw, Expand/Collapse)
+│       │   ├── settings/           # Settings with use original name toggle
+│       │   ├── savePath/           # Save path selection
+│       │   └── help/               # Help screen
 │       └── theme/                  # Color, Theme, Typography
 ├── build.gradle.kts                # Root build (plugin declarations)
 ├── app/build.gradle.kts            # App module build config
@@ -72,7 +79,7 @@ exif-eraser/
 | `core/serializer` | Wire | Protobuf serializers for `ImageSources` and `Selection` |
 | `main/business` | main/data, settings, core/image | `MainViewModel` - handles image source selection, clipboard paste, camera, shortcuts |
 | `main/data` | core | `MainRepository` (clip, camera, file ops), `SelectionRepository` (protobuf), `ImageSourcesRepository` |
-| `imageProcessing/data` | core/image, exif-interface | `ImageProcessingRepository` - scans images, removes metadata, saves results |
+| `imageProcessing/data` | core/image, exif-interface | `ImageProcessingRepository` - scans images, removes metadata, saves results. Accepts `isUseOriginalNameEnabled` parameter to control filename behavior |
 | `imageProcessing/business` | imageProcessing/data, main/data, settings | `ImageProcessingViewModel` - orchestrates bulk EXIF removal with progress |
 | `metadataViewer/data` | metadata-extractor | `MetadataViewerRepository` - reads all metadata via `ImageMetadataReader` |
 | `metadataViewer/business` | metadataViewer/data | `MetadataViewerViewModel` - loads metadata, toggles expand/collapse, raw/pretty mode |
@@ -80,7 +87,7 @@ exif-eraser/
 | `settings/business` | settings/data | `SettingsViewModel` - manages settings UI state |
 | `navigation` | all screens | `AppNavHost` - Navigation Compose graph, `Screen` sealed class |
 | `ui/theme` | Material3 | `ExifEraserTheme` - Light/Dark/AMOLED themes with dynamic color |
-| `ui/screens` | all ViewModels | Compose screens: Main, Processing, ProcessingDetails, SavePath, MetadataViewer, Settings, Help |
+| `ui/screens` | all ViewModels | Compose screens: Main, Processing, ProcessingDetails (file list with thumbnails + View EXIF), SavePath, MetadataViewer, Settings, Help |
 | `ui/components` | nothing | Reusable composables: dialogs, cards, metadata items, loading/empty/error states |
 
 ## Data Flow
@@ -90,12 +97,15 @@ exif-eraser/
 1. User selects images via MainScreen (pick single/multiple, directory, camera, or paste)
 2. Images stored in protobuf via `SelectionRepository`
 3. User navigates to save path selection (or skips if default configured)
-4. `ImageProcessingViewModel` reads selection, calls `ImageProcessingRepository.removeMetadata()`
+4. `ImageProcessingViewModel` reads selection, calls `ImageProcessingRepository.removeMetadata(isUseOriginalNameEnabled)`
 5. Repository scans each image with `ExifInterfaceExtended`, builds `ImageMetadataSnapshot`
 6. Creates new document in save directory, writes metadata-stripped image
-7. Optionally deletes original (auto-delete setting)
-8. Emits `ImageProcessingStep.FinishedSingle` per image with summary
-9. User can view details or share processed images
+7. **Filename logic:** If `isUseOriginalNameEnabled` is true, uses original filename; otherwise applies suffix/randomize based on settings
+8. Optionally deletes original (auto-delete setting)
+9. Emits `ImageProcessingStep.FinishedSingle` per image with summary
+10. **No-EXIF handling:** When no metadata found, displays "Files already have no EXIF" (0 modified) or "Some files already had no EXIF" (partial cases)
+11. Single file processed: shows "View new EXIF" button; multiple files: shows "View details" button for ProcessingDetailsScreen
+12. User can view details or share processed images
 
 ### Metadata Viewer Flow
 
@@ -104,7 +114,15 @@ exif-eraser/
 3. `MetadataViewerViewModel.loadMetadata()` calls `MetadataViewerRepository.readMetadata()`
 4. Repository uses `ImageMetadataReader.readMetadata()` (metadata-extractor library)
 5. Returns list of `MetadataGroup` (directories) with `MetadataTag` entries
-6. UI displays groups in expandable sections with raw/pretty toggle
+6. UI displays groups in expandable sections with bottom control bar (Pretty, Raw, Expand/Collapse buttons above navigation bar)
+
+### Camera Flow
+
+1. User takes photo via camera on MainScreen
+2. Camera uses default save path from settings (falls back to save path picker if not set)
+3. Photo saved with timestamp-based filename
+4. User returns to app (back press goes back quietly, no false "processing complete" message)
+5. Photo added to selection for processing
 
 ## Key Design Decisions
 
@@ -117,12 +135,15 @@ exif-eraser/
 - **Edge-to-edge** - System bars handled in `MainActivity`, AMOLED gets black bars
 - **Material3 themes** - Light, Dark, AMOLED (pure black), System (follows OS)
 - **Dynamic colors** - Material You support on Android 12+, togglable in settings
+- **Use original name** - Toggle in settings controls filename behavior: when enabled, suffix and randomize are disabled
+- **Bottom control bar** - MetadataViewerScreen uses labeled buttons (Pretty, Raw, Expand/Collapse) above navigation bar
+- **No-EXIF labels** - ProcessingScreen displays "Files already have no EXIF" (0 modified) or "Some files already had no EXIF" (partial)
 
 ## Common Tasks
 
 **Add a new image format:** Edit `core/image/ImageFormat.kt` to add data class, update `supportedImageFormats` list, update MIME type filter in `core/util/Constants.kt`.
 
-**Add a new setting:** Add key constant in `core/util/Constants.kt`, add DataStore read/write in `SettingsRepository`, add state field in `SettingsState`, add UI in `SettingsScreen`.
+**Add a new setting:** Add key constant in `core/util/Constants.kt`, add DataStore read/write in `SettingsRepository`, add state field in `SettingsState`, add UI in `SettingsScreen`. For toggle-dependent settings (like "Use original name"), update `SettingsViewModel` to handle disabling related options when the parent toggle is enabled.
 
 **Add a new screen:** Create `business/` package with ViewModel/State/SideEffect, create screen composable in `ui/screens/`, add `Screen` sealed class entry, register in `AppNavHost`.
 

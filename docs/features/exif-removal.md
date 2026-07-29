@@ -54,6 +54,7 @@ If metadata is found (or randomize filenames is enabled):
 ### 5. Filename Formatting
 
 Output filenames are determined by:
+- `isUseOriginalNameEnabled` → keep original filename (skip suffix and randomize)
 - `isRandomizeFileNamesEnabled` → UUID filename
 - Otherwise: original name + camera suffix (if from camera) + display name suffix
 
@@ -87,6 +88,7 @@ Defined in `core/image/ImageFormat.kt`:
 | Randomize File Names | false | UUID-based output filenames |
 | Share by Default | false | Auto-share processed images |
 | Display Name Suffix | "" | Append suffix to output filenames |
+| Use Original Name | false | Keep original filename (disables suffix and randomize) |
 | Skip Save Path Selection | false | Use default save path directly |
 
 ## Progress Tracking
@@ -100,3 +102,14 @@ Processing emits `ImageProcessingStep.FinishedSingle` per image with:
 - `imagesWithMetadataCount` - Had metadata
 - `imagesSavedCount` - Successfully saved
 - `progress` - Current progress percentage
+
+## Processing Results
+
+After processing completes:
+
+- **Single file**: "View new EXIF" button opens metadata viewer
+- **Multiple files**: "View details" button opens file list with thumbnails
+- Each file entry has a "View EXIF" icon to open metadata viewer
+- When images have no EXIF: "Files already have no EXIF" label
+- When some images have no EXIF: "Some files already had no EXIF" label
+- Save path displayed under "X images saved"

@@ -48,6 +48,16 @@ data class MetadataTag(
 
 Toggle via `MetadataViewerViewModel.toggleDisplayMode()`.
 
+### Bottom Control Bar
+
+The metadata viewer has a bottom control bar above the navigation bar with labeled buttons:
+
+- **Pretty** - Switch to grouped view (expandable sections)
+- **Raw** - Switch to raw monospace view
+- **Expand/Collapse** - Single toggle button that expands or collapses all groups
+
+The toggle buttons show the current mode with primary color highlighting. Expand/Collapse only appears in pretty mode.
+
 ## Key Classes
 
 | Class | Location | Responsibility |
