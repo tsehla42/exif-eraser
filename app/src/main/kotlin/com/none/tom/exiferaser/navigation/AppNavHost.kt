@@ -56,6 +56,9 @@ fun AppNavHost(navController: NavHostController) {
                 onShareImages = { uris ->
                     // Share intent handled externally
                 },
+                onClose = {
+                    navController.popBackStack(Screen.Main.route, false)
+                },
             )
         }
         composable(

@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.Error
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,6 +48,7 @@ fun ProcessingScreen(
     onNavigateToMetadataViewer: (String, String) -> Unit,
     onNavigateToProcessingDetails: (String) -> Unit,
     onShareImages: (List<android.net.Uri>) -> Unit,
+    onClose: () -> Unit,
     viewModel: ImageProcessingViewModel = hiltViewModel(),
 ) {
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
@@ -108,6 +107,7 @@ fun ProcessingScreen(
                         onNavigateToProcessingDetails(serializeSummaries(summaries))
                     },
                     onShareClick = { viewModel.shareImages() },
+                    onClose = onClose,
                 )
             } else {
                 ProgressContent(
@@ -156,6 +156,7 @@ private fun FinishedContent(
     onMetadataViewerClick: (String, String) -> Unit,
     onNavigateToProcessingDetails: (List<ImageProcessingSummary>) -> Unit,
     onShareClick: () -> Unit,
+    onClose: () -> Unit,
 ) {
     Icon(
         imageVector = Icons.Outlined.CheckCircle,
@@ -195,63 +196,30 @@ private fun FinishedContent(
             textAlign = TextAlign.Center,
         )
     }
-    if (imagesSavedCount > 0) {
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = if (imagesSavedCount == 1) {
-                stringResource(R.string.image_saved)
-            } else {
-                stringResource(R.string.images_saved_count, imagesSavedCount)
-            },
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
-        if (summaries.isNotEmpty()) {
-            val savedPath = summaries.first().uri.path
-            if (!savedPath.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = savedPath,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    textAlign = TextAlign.Center,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                )
-            }
-        }
-    }
     if (summaries.isNotEmpty()) {
-        Spacer(modifier = Modifier.height(24.dp))
-        if (summaries.size == 1) {
-            TextButton(onClick = {
-                val summary = summaries.first()
-                onMetadataViewerClick(summary.uri.toString(), summary.displayName)
-            }) {
-                Text(
-                    text = stringResource(R.string.view_new_exif),
-                    style = MaterialTheme.typography.labelLarge,
-                )
-            }
-        } else {
-            TextButton(onClick = { onNavigateToProcessingDetails(summaries) }) {
-                Text(
-                    text = stringResource(R.string.view_details),
-                    style = MaterialTheme.typography.labelLarge,
-                )
-            }
+        Spacer(modifier = Modifier.height(50.dp))
+        TextButton(onClick = { onNavigateToProcessingDetails(summaries) }) {
+            Text(
+                text = stringResource(R.string.view_details),
+                style = MaterialTheme.typography.labelLarge,
+            )
         }
-        if (imagesSavedCount > 0) {
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedButton(onClick = onShareClick) {
-                Icon(
-                    imageVector = Icons.Outlined.Share,
-                    contentDescription = stringResource(R.string.share),
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(text = stringResource(R.string.share))
+        Spacer(modifier = Modifier.height(24.dp))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            if (imagesSavedCount > 0) {
+                OutlinedButton(onClick = onShareClick) {
+                    Icon(
+                        imageVector = Icons.Outlined.Share,
+                        contentDescription = stringResource(R.string.share),
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(text = stringResource(R.string.share))
+                }
+            }
+            OutlinedButton(onClick = onClose) {
+                Text(text = stringResource(R.string.ok))
             }
         }
     }
