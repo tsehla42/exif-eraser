@@ -49,4 +49,10 @@ sealed class ImageProcessingDetailsSideEffect : Parcelable {
 
     @Parcelize
     data class ViewImage(val imageUri: Uri) : ImageProcessingDetailsSideEffect()
+
+    @Parcelize
+    data class ShareImage(val imageUri: Uri) : ImageProcessingDetailsSideEffect()
+
+    @Parcelize
+    data class CopyPath(val path: String) : ImageProcessingDetailsSideEffect()
 }

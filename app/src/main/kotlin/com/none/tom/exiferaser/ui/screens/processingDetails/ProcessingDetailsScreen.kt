@@ -97,6 +97,19 @@ fun ProcessingDetailsScreen(
                 is ImageProcessingDetailsSideEffect.Navigate.ToImageSavedDetails -> {
                     // Could show path details in the future
                 }
+                is ImageProcessingDetailsSideEffect.ShareImage -> {
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = MIME_TYPE_IMAGE
+                        putExtra(Intent.EXTRA_STREAM, sideEffect.imageUri)
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+                    context.startActivity(Intent.createChooser(shareIntent, null))
+                }
+                is ImageProcessingDetailsSideEffect.CopyPath -> {
+                    val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                    val clip = android.content.ClipData.newPlainText("image_path", sideEffect.path)
+                    clipboard.setPrimaryClip(clip)
+                }
             }
         }
     }
