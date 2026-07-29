@@ -41,9 +41,6 @@ class ImageProcessingDetailsViewModel @Inject constructor(
         container<ImageProcessingDetailsState, ImageProcessingDetailsSideEffect>(
             savedStateHandle = savedStateHandle,
             initialState = ImageProcessingDetailsState(),
-            onCreate = {
-                handleImageProcessingSummaries()
-            }
         )
 
     fun handleImageProcessingSummaries(
