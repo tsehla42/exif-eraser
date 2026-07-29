@@ -93,4 +93,18 @@ class ImageProcessingDetailsViewModel @Inject constructor(
             postSideEffect(ImageProcessingDetailsSideEffect.ViewImage(uri))
         }
     }
+
+    fun handleShareImage(position: Int) = intent {
+        val uri = state.imageProcessingSummaries.getOrNull(position)?.uri
+        if (uri.isNotNullOrEmpty()) {
+            postSideEffect(ImageProcessingDetailsSideEffect.ShareImage(uri))
+        }
+    }
+
+    fun handleCopyPath(position: Int) = intent {
+        val path = state.imageProcessingSummaries.getOrNull(position)?.uri?.path
+        if (!path.isNullOrBlank()) {
+            postSideEffect(ImageProcessingDetailsSideEffect.CopyPath(path))
+        }
+    }
 }
