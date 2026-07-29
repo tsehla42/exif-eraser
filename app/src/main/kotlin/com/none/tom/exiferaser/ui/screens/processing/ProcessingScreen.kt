@@ -102,7 +102,6 @@ fun ProcessingScreen(
                     imagesProcessedCount = state.imagesProcessedCount,
                     imagesSavedCount = state.imagesSavedCount,
                     summaries = state.imageProcessingSummaries,
-                    onMetadataViewerClick = onNavigateToMetadataViewer,
                     onNavigateToProcessingDetails = { summaries ->
                         onNavigateToProcessingDetails(serializeSummaries(summaries))
                     },
@@ -153,7 +152,6 @@ private fun FinishedContent(
     imagesProcessedCount: Int,
     imagesSavedCount: Int,
     summaries: List<ImageProcessingSummary>,
-    onMetadataViewerClick: (String, String) -> Unit,
     onNavigateToProcessingDetails: (List<ImageProcessingSummary>) -> Unit,
     onShareClick: () -> Unit,
     onClose: () -> Unit,
