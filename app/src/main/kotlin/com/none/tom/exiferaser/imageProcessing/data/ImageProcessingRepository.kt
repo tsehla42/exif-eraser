@@ -33,6 +33,7 @@ import com.none.tom.exiferaser.core.di.DispatcherIo
 import com.none.tom.exiferaser.core.extension.getDisplayName
 import com.none.tom.exiferaser.core.extension.isNotNullOrEmpty
 import com.none.tom.exiferaser.core.extension.suspendRunCatching
+import com.none.tom.exiferaser.core.image.FileNameMode
 import com.none.tom.exiferaser.core.image.ImageMetadataSnapshot
 import com.none.tom.exiferaser.core.image.ImageProcessingProgress
 import com.none.tom.exiferaser.core.image.ImageProcessingStep
@@ -68,8 +69,7 @@ class ImageProcessingRepository @Inject constructor(
         displayNameSuffix: String,
         isAutoDeleteEnabled: Boolean,
         isPreserveOrientationEnabled: Boolean,
-        isRandomizeFileNamesEnabled: Boolean,
-        isUseDateTimeNameEnabled: Boolean
+        fileNameMode: FileNameMode
     ): Flow<ImageProcessingStep> = flow {
         protos.forEachIndexed { index, proto ->
             emit(
@@ -79,8 +79,7 @@ class ImageProcessingRepository @Inject constructor(
                     displayNameSuffix = displayNameSuffix,
                     isAutoDeleteEnabled = isAutoDeleteEnabled,
                     isPreserveOrientationEnabled = isPreserveOrientationEnabled,
-                    isRandomizeFileNamesEnabled = isRandomizeFileNamesEnabled,
-                    isUseDateTimeNameEnabled = isUseDateTimeNameEnabled,
+                    fileNameMode = fileNameMode,
                     progress = ImageProcessingProgress.calculate(
                         index = index,
                         count = protos.size
@@ -99,8 +98,7 @@ class ImageProcessingRepository @Inject constructor(
         displayNameSuffix: String,
         isAutoDeleteEnabled: Boolean,
         isPreserveOrientationEnabled: Boolean,
-        isRandomizeFileNamesEnabled: Boolean,
-        isUseDateTimeNameEnabled: Boolean,
+        fileNameMode: FileNameMode,
         progress: ImageProcessingProgress
     ): ImageProcessingStep.FinishedSingle {
         var sourceUri = Uri.EMPTY
@@ -124,35 +122,47 @@ class ImageProcessingRepository @Inject constructor(
                 val (exifInterfaceExtended, scanResult) = scanImage(sourceUri).getOrThrow()
                 imageMetadataSnapshot = scanResult
                 val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS")
-                Timber.d("Processing image: $displayName, isUseDateTimeNameEnabled: $isUseDateTimeNameEnabled, isRandomizeFileNamesEnabled: $isRandomizeFileNamesEnabled, hasMetadata: ${scanResult.isMetadataContained()}")
-                if (scanResult.isMetadataContained() || isRandomizeFileNamesEnabled || isUseDateTimeNameEnabled) {
-                    formattedDisplayName = if (isUseDateTimeNameEnabled) {
-                        LocalDateTime.now().format(dateTimeFormatter)
-                    } else if (isRandomizeFileNamesEnabled) {
-                        val randomName = UUID.randomUUID().toString()
-                        if (FileUtilsKt.isValidExtFilename(displayNameSuffix)) {
-                            FileUtilsKt.buildValidExtFilename(randomName.plus(displayNameSuffix))
-                        } else {
-                            randomName
+                Timber.d("Processing image: $displayName, fileNameMode: $fileNameMode, hasMetadata: ${scanResult.isMetadataContained()}")
+                if (scanResult.isMetadataContained() || fileNameMode != FileNameMode.IMAGE_ID) {
+                    formattedDisplayName = when (fileNameMode) {
+                        FileNameMode.CONVERSION_DATE -> {
+                            LocalDateTime.now().format(dateTimeFormatter)
                         }
-                    } else {
-                        FileUtilsKt.buildValidExtFilename(
-                            displayName
-                                .plus(
-                                    if (sourceUri.authority == CameraFileProvider.AUTHORITY) {
-                                        CameraFileProvider.SUFFIX
-                                    } else {
-                                        ""
-                                    }
-                                )
-                                .plus(
-                                    if (FileUtilsKt.isValidExtFilename(displayNameSuffix)) {
-                                        displayNameSuffix
-                                    } else {
-                                        ""
-                                    }
-                                )
-                        )
+                        FileNameMode.RANDOM -> {
+                            val randomName = UUID.randomUUID().toString()
+                            if (FileUtilsKt.isValidExtFilename(displayNameSuffix)) {
+                                FileUtilsKt.buildValidExtFilename(randomName.plus(displayNameSuffix))
+                            } else {
+                                randomName
+                            }
+                        }
+                        FileNameMode.LAST_MODIFIED -> {
+                            val lastModified = getLastModifiedDate(exifInterfaceExtended)
+                            if (lastModified != null) {
+                                lastModified.format(dateTimeFormatter)
+                            } else {
+                                LocalDateTime.now().format(dateTimeFormatter)
+                            }
+                        }
+                        FileNameMode.IMAGE_ID -> {
+                            FileUtilsKt.buildValidExtFilename(
+                                displayName
+                                    .plus(
+                                        if (sourceUri.authority == CameraFileProvider.AUTHORITY) {
+                                            CameraFileProvider.SUFFIX
+                                        } else {
+                                            ""
+                                        }
+                                    )
+                                    .plus(
+                                        if (FileUtilsKt.isValidExtFilename(displayNameSuffix)) {
+                                            displayNameSuffix
+                                        } else {
+                                            ""
+                                        }
+                                    )
+                            )
+                        }
                     }
                     sinkUri = createImage(
                         uri = sourceUri,
@@ -208,6 +218,31 @@ class ImageProcessingRepository @Inject constructor(
             Timber.e(exception)
             Result.failure(exception)
         }
+    }
+
+    private fun getLastModifiedDate(
+        exifInterfaceExtended: ExifInterfaceExtended
+    ): LocalDateTime? {
+        // Try DateTimeOriginal first
+        val dateTimeOriginal = exifInterfaceExtended.getAttribute(
+            ExifInterfaceExtended.TAG_DATETIME_ORIGINAL
+        )
+        if (!dateTimeOriginal.isNullOrBlank()) {
+            try {
+                return LocalDateTime.parse(dateTimeOriginal, DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss"))
+            } catch (_: Exception) { }
+        }
+        // Try DateTimeDigitized
+        val dateTimeDigitized = exifInterfaceExtended.getAttribute(
+            ExifInterfaceExtended.TAG_DATETIME_DIGITIZED
+        )
+        if (!dateTimeDigitized.isNullOrBlank()) {
+            try {
+                return LocalDateTime.parse(dateTimeDigitized, DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss"))
+            } catch (_: Exception) { }
+        }
+        // No date found in EXIF — return null (caller falls back to current date)
+        return null
     }
 
     private suspend fun createImage(
