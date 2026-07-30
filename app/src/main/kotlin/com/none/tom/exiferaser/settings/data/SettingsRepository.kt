@@ -38,6 +38,7 @@ import com.none.tom.exiferaser.core.extension.defaultNightModes
 import com.none.tom.exiferaser.core.extension.isNotEmpty
 import com.none.tom.exiferaser.core.extension.isNotNullOrEmpty
 import com.none.tom.exiferaser.core.extension.suspendRunCatching
+import com.none.tom.exiferaser.core.image.FileNameMode
 import com.none.tom.exiferaser.core.util.SETTINGS_KEY_AUTO_DELETE
 import com.none.tom.exiferaser.core.util.SETTINGS_KEY_DEFAULT_DISPLAY_NAME_SUFFIX
 import com.none.tom.exiferaser.core.util.SETTINGS_KEY_DEFAULT_NIGHT_MODE
@@ -50,6 +51,7 @@ import com.none.tom.exiferaser.core.util.SETTINGS_KEY_SAVE_PATH_SELECTION_SKIP
 import com.none.tom.exiferaser.core.util.SETTINGS_KEY_SHARE_BY_DEFAULT
 import com.none.tom.exiferaser.core.util.SETTINGS_KEY_THEME_MODE
 import com.none.tom.exiferaser.core.util.SETTINGS_KEY_DYNAMIC_COLOR
+import com.none.tom.exiferaser.core.util.SETTINGS_KEY_FILE_NAME_MODE
 import com.none.tom.exiferaser.core.util.SETTINGS_KEY_USE_DATETIME_NAME
 import com.none.tom.exiferaser.core.util.defaultNightMode
 import com.none.tom.exiferaser.settings.business.ThemeMode
@@ -85,6 +87,7 @@ class SettingsRepository @Inject constructor(
     private val keyThemeMode = intPreferencesKey(SETTINGS_KEY_THEME_MODE)
     private val keyDynamicColor = booleanPreferencesKey(SETTINGS_KEY_DYNAMIC_COLOR)
     private val keyUseDateTimeName = booleanPreferencesKey(SETTINGS_KEY_USE_DATETIME_NAME)
+    private val keyFileNameMode = intPreferencesKey(SETTINGS_KEY_FILE_NAME_MODE)
 
     suspend fun putDefaultOpenPath(
         newDefaultOpenPath: Uri,
@@ -434,6 +437,38 @@ class SettingsRepository @Inject constructor(
     suspend fun putUseDateTimeName(value: Boolean): Result<Unit> = withContext(dispatcherIo) {
         coroutineContext.suspendRunCatching {
             dataStore.edit { preferences -> preferences[keyUseDateTimeName] = value }
+            Result.success(Unit)
+        }.getOrElse { exception ->
+            Timber.e(exception)
+            Result.failure(exception)
+        }
+    }
+
+    suspend fun getFileNameMode(): FileNameMode = dataStore
+        .data
+        .catch { exception -> Timber.e(exception) }
+        .map { preferences ->
+            val stored = preferences[keyFileNameMode]
+            if (stored != null) {
+                FileNameMode.entries.getOrElse(stored) { FileNameMode.IMAGE_ID }
+            } else {
+                val randomize = preferences[booleanPreferencesKey(SETTINGS_KEY_RANDOMIZE_FILE_NAMES)] ?: false
+                val useDatetime = preferences[booleanPreferencesKey(SETTINGS_KEY_USE_DATETIME_NAME)] ?: false
+                when {
+                    randomize -> FileNameMode.RANDOM
+                    useDatetime -> FileNameMode.CONVERSION_DATE
+                    else -> FileNameMode.IMAGE_ID
+                }
+            }
+        }
+        .firstOrNull()
+        ?: FileNameMode.IMAGE_ID
+
+    suspend fun putFileNameMode(value: FileNameMode): Result<Unit> = withContext(dispatcherIo) {
+        coroutineContext.suspendRunCatching {
+            dataStore.edit { preferences ->
+                preferences[keyFileNameMode] = value.ordinal
+            }
             Result.success(Unit)
         }.getOrElse { exception ->
             Timber.e(exception)
