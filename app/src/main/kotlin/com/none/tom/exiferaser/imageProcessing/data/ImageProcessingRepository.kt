@@ -124,7 +124,12 @@ class ImageProcessingRepository @Inject constructor(
                     formattedDisplayName = if (isUseOriginalNameEnabled) {
                         FileUtilsKt.buildValidExtFilename(displayName)
                     } else if (isRandomizeFileNamesEnabled) {
-                        UUID.randomUUID().toString()
+                        val randomName = UUID.randomUUID().toString()
+                        if (FileUtilsKt.isValidExtFilename(displayNameSuffix)) {
+                            FileUtilsKt.buildValidExtFilename(randomName.plus(displayNameSuffix))
+                        } else {
+                            randomName
+                        }
                     } else {
                         FileUtilsKt.buildValidExtFilename(
                             displayName
