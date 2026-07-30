@@ -238,15 +238,6 @@ fun SettingsScreen(
 
             item {
                 SwitchPreferenceItem(
-                    title = stringResource(R.string.settings_share_by_default),
-                    icon = Icons.Outlined.Share,
-                    checked = state.isShareByDefaultEnabled,
-                    onCheckedChange = { viewModel.storeShareByDefault(it) },
-                )
-            }
-
-            item {
-                SwitchPreferenceItem(
                     title = stringResource(R.string.settings_auto_delete),
                     icon = Icons.Outlined.AutoDelete,
                     checked = state.isAutoDeleteEnabled,
@@ -305,6 +296,15 @@ fun SettingsScreen(
                         onCheckedChange = { viewModel.storeSavePathSelectionSkip(it) },
                     )
                 }
+            }
+
+            item {
+                SwitchPreferenceItem(
+                    title = stringResource(R.string.settings_share_by_default),
+                    icon = Icons.Outlined.Share,
+                    checked = state.isShareByDefaultEnabled,
+                    onCheckedChange = { viewModel.storeShareByDefault(it) },
+                )
             }
 
             item {
