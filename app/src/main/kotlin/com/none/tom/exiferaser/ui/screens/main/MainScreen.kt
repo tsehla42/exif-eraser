@@ -32,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -55,9 +56,11 @@ import com.none.tom.exiferaser.R
 import com.none.tom.exiferaser.core.contract.ActivityResultContractTakePicture
 import com.none.tom.exiferaser.main.business.MainSideEffect
 import com.none.tom.exiferaser.main.business.MainViewModel
+import com.none.tom.exiferaser.settings.business.ThemeMode
 import com.none.tom.exiferaser.ui.components.DeleteConfirmationDialog
 import com.none.tom.exiferaser.ui.components.ImageSourceCard
 import com.none.tom.exiferaser.ui.components.LoadingState
+import com.none.tom.exiferaser.ui.theme.LocalThemeMode
 
 private data class ImageSource(
     val icon: ImageVector,
@@ -77,6 +80,7 @@ fun MainScreen(
 ) {
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val currentThemeMode = LocalThemeMode.current
     var showDeleteConfirmation by remember { mutableStateOf(false) }
     var selectedNavItem by remember { mutableIntStateOf(2) }
     var isLauncherActive by remember { mutableStateOf(false) }
@@ -354,7 +358,24 @@ fun MainScreen(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = { data ->
+                    Snackbar(
+                        snackbarData = data,
+                        containerColor = when (currentThemeMode) {
+                            ThemeMode.AMOLED -> Color(0xFF333333)
+                            else -> MaterialTheme.colorScheme.inverseSurface
+                        },
+                        contentColor = when (currentThemeMode) {
+                            ThemeMode.AMOLED -> Color.White
+                            else -> MaterialTheme.colorScheme.inverseOnSurface
+                        },
+                    )
+                },
+            )
+        },
         bottomBar = {
             NavigationBar(
                 containerColor = if (MaterialTheme.colorScheme.background == Color.Black) Color.Black else MaterialTheme.colorScheme.surfaceContainer,
