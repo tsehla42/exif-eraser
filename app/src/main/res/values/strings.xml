@@ -149,5 +149,6 @@
     <string name="open_with">Open with</string>
     <string name="copy_path">Copy path</string>
     <string name="share_image">Share</string>
+    <string name="open_folder">Open folder</string>
 
 </resources>

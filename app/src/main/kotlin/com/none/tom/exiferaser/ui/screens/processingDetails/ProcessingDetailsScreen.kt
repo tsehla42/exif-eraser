@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
 import android.net.Uri
+import android.provider.DocumentsContract
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Visibility
@@ -119,6 +121,13 @@ fun ProcessingDetailsScreen(
                     val clip = ClipData.newPlainText("image path", sideEffect.path)
                     clipboard.setPrimaryClip(clip)
                 }
+                is ImageProcessingDetailsSideEffect.OpenFolder -> {
+                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                        setDataAndType(sideEffect.folderUri, DocumentsContract.Document.MIME_TYPE_DIR)
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+                    context.startActivity(intent)
+                }
                 ImageProcessingDetailsSideEffect.ImageSaved.Unsupported -> {
                 }
                 is ImageProcessingDetailsSideEffect.Navigate.ToImageModifiedDetails -> {
@@ -183,6 +192,7 @@ fun ProcessingDetailsScreen(
                         },
                         onCopyPath = { viewModel.handleCopyPath(index) },
                         onShare = { viewModel.handleShareImage(index) },
+                        onOpenFolder = { viewModel.handleOpenFolder(index) },
                     )
                 }
             }
@@ -208,6 +218,7 @@ private fun ProcessingResultItemSimple(
     onOpenWith: () -> Unit,
     onCopyPath: () -> Unit,
     onShare: () -> Unit,
+    onOpenFolder: () -> Unit,
 ) {
     var showMenu by remember { mutableStateOf(false) }
     val menuShape = RoundedCornerShape(16.dp)
@@ -298,6 +309,20 @@ private fun ProcessingResultItemSimple(
                 onClick = {
                     showMenu = false
                     onShare()
+                },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.open_folder)) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.FolderOpen,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                    )
+                },
+                onClick = {
+                    showMenu = false
+                    onOpenFolder()
                 },
             )
         }

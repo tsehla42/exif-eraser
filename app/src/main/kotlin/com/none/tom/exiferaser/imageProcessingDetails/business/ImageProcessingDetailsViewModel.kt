@@ -20,6 +20,7 @@
 
 package com.none.tom.exiferaser.imageProcessingDetails.business
 
+import android.provider.DocumentsContract
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.none.tom.exiferaser.core.extension.isNotNullOrEmpty
@@ -103,5 +104,16 @@ class ImageProcessingDetailsViewModel @Inject constructor(
         if (!path.isNullOrBlank()) {
             postSideEffect(ImageProcessingDetailsSideEffect.CopyPath(path))
         }
+    }
+
+    fun handleOpenFolder(position: Int) = intent {
+        val summary = state.imageProcessingSummaries.getOrNull(position) ?: return@intent
+        val path = summary.uri.path ?: return@intent
+        val treeDocumentId = path.substringBeforeLast('/')
+        val folderUri = DocumentsContract.buildDocumentUri(
+            summary.uri.authority,
+            treeDocumentId.ifEmpty { path }
+        )
+        postSideEffect(ImageProcessingDetailsSideEffect.OpenFolder(folderUri))
     }
 }

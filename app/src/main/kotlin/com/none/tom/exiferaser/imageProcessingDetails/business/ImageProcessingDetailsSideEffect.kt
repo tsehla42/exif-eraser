@@ -55,4 +55,7 @@ sealed class ImageProcessingDetailsSideEffect : Parcelable {
 
     @Parcelize
     data class CopyPath(val path: String) : ImageProcessingDetailsSideEffect()
+
+    @Parcelize
+    data class OpenFolder(val folderUri: Uri) : ImageProcessingDetailsSideEffect()
 }
