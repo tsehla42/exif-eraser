@@ -3,17 +3,12 @@ package com.none.tom.exiferaser.ui.screens.settings
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Shuffle
 import androidx.compose.material.icons.outlined.AutoDelete
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.DeleteSweep
@@ -23,7 +18,6 @@ import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Save
-import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,7 +25,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -45,11 +38,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -57,9 +50,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.none.tom.exiferaser.R
 import com.none.tom.exiferaser.core.extension.isNotNullOrEmpty
+import com.none.tom.exiferaser.core.image.FileNameMode
 import com.none.tom.exiferaser.settings.business.SettingsSideEffect
 import com.none.tom.exiferaser.settings.business.SettingsViewModel
 import com.none.tom.exiferaser.settings.business.ThemeMode
+import com.none.tom.exiferaser.ui.components.DiscreteSliderPreference
 import com.none.tom.exiferaser.ui.components.PreferenceItem
 import com.none.tom.exiferaser.ui.components.SwitchPreferenceItem
 import com.none.tom.exiferaser.ui.components.DisplayNameSuffixDialog
@@ -106,11 +101,31 @@ fun SettingsScreen(
         }
     }
 
-    val themeModeOptions = listOf(
-        ThemeMode.SYSTEM to stringResource(R.string.theme_system),
-        ThemeMode.LIGHT to stringResource(R.string.theme_light),
-        ThemeMode.DARK to stringResource(R.string.theme_dark),
-        ThemeMode.AMOLED to stringResource(R.string.theme_amoled),
+    val themeSliderPositions = listOf(
+        ThemeMode.LIGHT,
+        ThemeMode.SYSTEM,
+        ThemeMode.DARK,
+        ThemeMode.AMOLED,
+    )
+    val themePositionLabels = listOf(
+        stringResource(R.string.theme_light),
+        stringResource(R.string.theme_system),
+        stringResource(R.string.theme_dark),
+        stringResource(R.string.theme_amoled),
+    )
+    val themeCurrentPosition = themeSliderPositions.indexOf(state.themeMode).coerceAtLeast(0)
+
+    val fileNameSliderLabels = listOf(
+        stringResource(R.string.file_name_random),
+        stringResource(R.string.file_name_image_id),
+        stringResource(R.string.file_name_conversion_date),
+        stringResource(R.string.file_name_last_modified),
+    )
+    val fileNameSliderDescriptions = listOf(
+        stringResource(R.string.file_name_slider_description_random),
+        stringResource(R.string.file_name_slider_description_image_id),
+        stringResource(R.string.file_name_slider_description_conversion),
+        stringResource(R.string.file_name_slider_description_last_modified),
     )
 
     LaunchedEffect(Unit) {
@@ -227,21 +242,17 @@ fun SettingsScreen(
             }
 
             item {
-                SwitchPreferenceItem(
-                    title = stringResource(R.string.settings_randomize_file_names),
-                    icon = Icons.Outlined.Shuffle,
-                    checked = state.isRandomizeFileNamesEnabled,
-                    onCheckedChange = { viewModel.storeRandomizeFileNames(it) },
-                )
-            }
-
-            item {
-                SwitchPreferenceItem(
-                    title = stringResource(R.string.settings_use_datetime_name),
-                    subtitle = stringResource(R.string.settings_use_datetime_name_summary),
-                    icon = Icons.Outlined.Schedule,
-                    checked = state.isUseDateTimeNameEnabled,
-                    onCheckedChange = { viewModel.storeUseDateTimeName(it) },
+                DiscreteSliderPreference(
+                    title = stringResource(R.string.settings_section_file_name),
+                    position = state.fileNameMode.ordinal,
+                    positionLabels = fileNameSliderLabels,
+                    dynamicLabel = fileNameSliderLabels[state.fileNameMode.ordinal],
+                    gradientStartLabel = stringResource(R.string.file_name_gradient_private),
+                    gradientEndLabel = stringResource(R.string.file_name_gradient_less_private),
+                    description = fileNameSliderDescriptions[state.fileNameMode.ordinal],
+                    onPositionChange = { position ->
+                        viewModel.storeFileNameMode(FileNameMode.entries[position])
+                    },
                 )
             }
 
@@ -320,29 +331,17 @@ fun SettingsScreen(
             }
 
             item {
-                themeModeOptions.forEach { (mode, label) ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clickable {
-                                viewModel.storeThemeMode(mode)
-                            }
-                            .padding(horizontal = 16.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        RadioButton(
-                            selected = state.themeMode == mode,
-                            onClick = {
-                                viewModel.storeThemeMode(mode)
-                            },
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Text(
-                            text = label,
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
-                    }
-                }
+                DiscreteSliderPreference(
+                    title = stringResource(R.string.theme_section),
+                    position = themeCurrentPosition,
+                    positionLabels = themePositionLabels,
+                    dynamicLabel = themePositionLabels[themeCurrentPosition],
+                    gradientStartLabel = stringResource(R.string.theme_gradient_light),
+                    gradientEndLabel = stringResource(R.string.theme_gradient_dark),
+                    onPositionChange = { position ->
+                        viewModel.storeThemeMode(themeSliderPositions[position])
+                    },
+                )
             }
 
             item {
