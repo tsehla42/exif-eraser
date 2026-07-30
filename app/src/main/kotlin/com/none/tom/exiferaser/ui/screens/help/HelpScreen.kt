@@ -17,7 +17,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.BuildCircle
 import androidx.compose.material.icons.outlined.Code
-import androidx.compose.material.icons.outlined.Translate
+
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,11 +51,7 @@ fun HelpScreen(
             title = stringResource(R.string.help_supported_formats),
             subtitle = stringResource(R.string.help_supported_formats_summary),
         ),
-        HelpItem(
-            icon = Icons.Outlined.Translate,
-            title = stringResource(R.string.help_translate),
-            subtitle = stringResource(R.string.help_translate_summary),
-        ),
+
         HelpItem(
             icon = Icons.Outlined.BugReport,
             title = stringResource(R.string.help_feedback),
