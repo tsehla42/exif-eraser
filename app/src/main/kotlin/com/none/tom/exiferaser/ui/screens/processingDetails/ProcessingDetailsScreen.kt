@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Intent
 import android.net.Uri
 import android.provider.DocumentsContract
+import timber.log.Timber
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -123,23 +124,21 @@ fun ProcessingDetailsScreen(
                 }
                 is ImageProcessingDetailsSideEffect.OpenFolder -> {
                     try {
-                        // Try opening the folder with ACTION_VIEW
-                        val intent = Intent(Intent.ACTION_VIEW, sideEffect.folderUri)
-                        context.startActivity(intent)
+                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                            setDataAndType(sideEffect.folderUri, DocumentsContract.Document.MIME_TYPE_DIR)
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        val chooser = Intent.createChooser(intent, "Open folder with")
+                        context.startActivity(chooser)
                     } catch (e: Exception) {
-                        // Try with Documents UI
+                        Timber.e(e, "Failed to open folder")
                         try {
-                            val docIntent = Intent(Intent.ACTION_VIEW).apply {
-                                setDataAndType(sideEffect.folderUri, "vnd.android.document/directory")
-                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                            }
-                            context.startActivity(docIntent)
-                        } catch (e2: Exception) {
-                            // Last resort: copy the path
                             val clipboard = context.getSystemService(ClipboardManager::class.java)
                             val path = sideEffect.folderUri.path ?: sideEffect.folderUri.toString()
                             val clip = ClipData.newPlainText("folder path", path)
                             clipboard.setPrimaryClip(clip)
+                        } catch (e2: Exception) {
+                            Timber.e(e2, "Failed to copy path to clipboard")
                         }
                     }
                 }
