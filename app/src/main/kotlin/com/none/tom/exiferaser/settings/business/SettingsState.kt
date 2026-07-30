@@ -21,6 +21,7 @@
 package com.none.tom.exiferaser.settings.business
 
 import android.os.Parcelable
+import com.none.tom.exiferaser.core.image.FileNameMode
 import kotlinx.parcelize.Parcelize
 
 enum class ThemeMode {
@@ -45,4 +46,5 @@ data class SettingsState(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val useDynamicColor: Boolean = true,
     val isUseDateTimeNameEnabled: Boolean = false,
+    val fileNameMode: FileNameMode = FileNameMode.IMAGE_ID,
 ) : Parcelable
