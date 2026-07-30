@@ -8,6 +8,8 @@ A Jetpack Compose Android app that removes EXIF metadata from images and display
 
 **Tech stack:** Kotlin, Jetpack Compose, Material3, Hilt (DI), Orbit MVI, Navigation Compose, metadata-extractor, exif-interface-extended, DataStore, Wire (protobuf)
 
+**Upstream reference:** This project is a spin-off from [Tommy-Geenexus/exif-eraser](https://github.com/Tommy-Geenexus/exif-eraser). That repository is used as a reference for building this one — check it for original implementations, patterns, and design decisions when working on this codebase.
+
 ## Documentation
 
 For detailed documentation, see `docs/README.md` (human-readable overview) and the following module docs:
@@ -56,7 +58,7 @@ exif-eraser/
 │       ├── screens/                # Screen composables
 │       │   ├── main/               # Main screen
 │       │   ├── processing/         # Processing screen with no-EXIF labels
-│       │   ├── processingDetails/  # File list with thumbnails + View EXIF button
+│       │   ├── processingDetails/  # File list with thumbnails + context menu (View EXIF, Open with, Copy path, Share)
 │       │   ├── metadataViewer/     # Bottom control bar (Pretty, Raw, Expand/Collapse)
 │       │   ├── settings/           # Settings with use original name toggle
 │       │   ├── savePath/           # Save path selection
@@ -87,7 +89,7 @@ exif-eraser/
 | `settings/business` | settings/data | `SettingsViewModel` - manages settings UI state |
 | `navigation` | all screens | `AppNavHost` - Navigation Compose graph, `Screen` sealed class |
 | `ui/theme` | Material3 | `ExifEraserTheme` - Light/Dark/AMOLED themes with dynamic color |
-| `ui/screens` | all ViewModels | Compose screens: Main, Processing, ProcessingDetails (file list with thumbnails + View EXIF), SavePath, MetadataViewer, Settings, Help |
+| `ui/screens` | all ViewModels | Compose screens: Main, Processing, ProcessingDetails (file list with thumbnails + context menu), SavePath, MetadataViewer, Settings, Help |
 | `ui/components` | nothing | Reusable composables: dialogs, cards, metadata items, loading/empty/error states |
 
 ## Data Flow
@@ -104,7 +106,7 @@ exif-eraser/
 8. Optionally deletes original (auto-delete setting)
 9. Emits `ImageProcessingStep.FinishedSingle` per image with summary
 10. **No-EXIF handling:** When no metadata found, displays "Files already have no EXIF" (0 modified) or "Some files already had no EXIF" (partial cases)
-11. Single file processed: shows "View new EXIF" button; multiple files: shows "View details" button for ProcessingDetailsScreen
+11. Shows "View details" button for ProcessingDetailsScreen (for both single and multiple files)
 12. User can view details or share processed images
 
 ### Metadata Viewer Flow
@@ -154,6 +156,8 @@ exif-eraser/
 **Modify EXIF removal logic:** Edit `ImageProcessingRepository.removeMetaData()` for per-image processing, `ImageProcessingRepository.scanImage()` for detection.
 
 **Add new UI component:** Create composable in `ui/components/`, follow existing patterns (e.g., `ConfirmDialog.kt`, `ImageSourceCard.kt`).
+
+**After rebuilding the app:** Always run `adb install -r app/build/outputs/apk/debug/app-debug.apk` to deploy to connected devices. Check `adb devices` first — if no devices are connected, warn the user before proceeding with the build.
 
 ## Docs Index
 
