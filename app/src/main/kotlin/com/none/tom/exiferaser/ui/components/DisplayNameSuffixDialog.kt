@@ -1,7 +1,11 @@
 package com.none.tom.exiferaser.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -45,6 +49,16 @@ fun DisplayNameSuffixDialog(
                 isError = error != null,
                 supportingText = error?.let { msg ->
                     { Text(text = msg) }
+                },
+                trailingIcon = {
+                    if (suffix.isNotEmpty()) {
+                        IconButton(onClick = { suffix = "" }) {
+                            Icon(
+                                imageVector = Icons.Filled.Clear,
+                                contentDescription = stringResource(R.string.clear),
+                            )
+                        }
+                    }
                 },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),

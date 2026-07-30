@@ -250,6 +250,15 @@ class SettingsRepository @Inject constructor(
         }
     }
 
+    suspend fun getDefaultSavePathForProcessing(): Uri = withContext(dispatcherIo) {
+        val defaultSavePath = getDefaultSavePath()
+        if (defaultSavePath.isNotNullOrEmpty()) {
+            defaultSavePath
+        } else {
+            Uri.EMPTY
+        }
+    }
+
     suspend fun getPrivilegedDefaultSavePath(): Result<Uri> = withContext(dispatcherIo) {
         coroutineContext.suspendRunCatching {
             val defaultSavePath = getDefaultSavePath()

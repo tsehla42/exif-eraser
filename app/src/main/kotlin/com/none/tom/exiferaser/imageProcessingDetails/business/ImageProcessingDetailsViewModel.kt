@@ -26,15 +26,18 @@ import androidx.lifecycle.ViewModel
 import com.none.tom.exiferaser.core.extension.isNotNullOrEmpty
 import com.none.tom.exiferaser.core.image.ImageProcessingSummary
 import com.none.tom.exiferaser.imageProcessing.data.ImageProcessingRepository
+import com.none.tom.exiferaser.settings.data.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.viewmodel.container
+import timber.log.Timber
 
 @HiltViewModel
 class ImageProcessingDetailsViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val imageProcessingRepository: ImageProcessingRepository
+    private val imageProcessingRepository: ImageProcessingRepository,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel(),
     ContainerHost<ImageProcessingDetailsState, ImageProcessingDetailsSideEffect> {
 
@@ -100,20 +103,68 @@ class ImageProcessingDetailsViewModel @Inject constructor(
     }
 
     fun handleCopyPath(position: Int) = intent {
-        val path = state.imageProcessingSummaries.getOrNull(position)?.uri?.path
-        if (!path.isNullOrBlank()) {
-            postSideEffect(ImageProcessingDetailsSideEffect.CopyPath(path))
+        val summary = state.imageProcessingSummaries.getOrNull(position)
+        if (summary != null) {
+            // Get the URI path in the format /tree/primary:.../document/primary:...
+            val path = summary.uri.path ?: summary.uri.toString()
+            if (path.isNotBlank()) {
+                postSideEffect(ImageProcessingDetailsSideEffect.CopyPath(path))
+            }
         }
     }
 
     fun handleOpenFolder(position: Int) = intent {
         val summary = state.imageProcessingSummaries.getOrNull(position) ?: return@intent
-        val path = summary.uri.path ?: return@intent
-        val treeDocumentId = path.substringBeforeLast('/')
-        val folderUri = DocumentsContract.buildDocumentUri(
-            summary.uri.authority,
-            treeDocumentId.ifEmpty { path }
-        )
-        postSideEffect(ImageProcessingDetailsSideEffect.OpenFolder(folderUri))
+        try {
+            // Extract the tree path from the URI to get the save folder
+            val uriString = summary.uri.toString()
+            Timber.d("URI for open folder: $uriString")
+            
+            // URI format: content://com.android.externalstorage.documents/tree/primary%3APictures%2FexifEdit/document/primary%3APictures%2FexifEdit%2F5427.jpg
+            // Extract the tree document ID from the URI
+            if (uriString.contains("/tree/")) {
+                val treeStart = uriString.indexOf("/tree/") + 6
+                val treeEnd = uriString.indexOf("/document/")
+                if (treeEnd > treeStart) {
+                    val encodedTreeId = uriString.substring(treeStart, treeEnd)
+                    val treeDocumentId = java.net.URLDecoder.decode(encodedTreeId, "UTF-8")
+                    Timber.d("Tree document ID: $treeDocumentId")
+                    
+                    // Build the tree URI
+                    val folderUri = DocumentsContract.buildTreeDocumentUri(
+                        summary.uri.authority,
+                        treeDocumentId
+                    )
+                    Timber.d("Opening folder: $folderUri")
+                    postSideEffect(ImageProcessingDetailsSideEffect.OpenFolder(folderUri))
+                    return@intent
+                }
+            }
+            
+            // Fallback: try to get from settings
+            val savePath = settingsRepository.getDefaultSavePathForProcessing()
+            if (savePath.isNotNullOrEmpty() && savePath.toString() != "content://null") {
+                Timber.d("Fallback: Opening save folder from settings: $savePath")
+                postSideEffect(ImageProcessingDetailsSideEffect.OpenFolder(savePath))
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to open folder")
+        }
+    }
+
+    companion object {
+        fun getDisplayPath(uri: android.net.Uri): String {
+            // For document URIs (content://com.android.externalstorage.documents/...), extract a clean path
+            val uriString = uri.toString()
+            if (uriString.contains("com.android.externalstorage.documents")) {
+                val documentId = DocumentsContract.getDocumentId(uri)
+                if (documentId.contains(":")) {
+                    return documentId.substringAfter(":")
+                }
+                return documentId
+            }
+            // For other URIs, return the path or the last segment
+            return uri.path ?: uri.lastPathSegment ?: uriString
+        }
     }
 }

@@ -24,6 +24,7 @@ import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Save
+import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -211,42 +212,6 @@ fun SettingsScreen(
 
             item {
                 Text(
-                    text = stringResource(R.string.settings_section_image),
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                )
-            }
-
-            item {
-                SwitchPreferenceItem(
-                    title = stringResource(R.string.settings_preserve_orientation),
-                    icon = Icons.Outlined.Image,
-                    checked = state.isPreserveOrientationEnabled,
-                    onCheckedChange = { viewModel.storePreserveOrientation(it) },
-                )
-            }
-
-            item {
-                SwitchPreferenceItem(
-                    title = stringResource(R.string.settings_auto_delete),
-                    icon = Icons.Outlined.AutoDelete,
-                    checked = state.isAutoDeleteEnabled,
-                    onCheckedChange = { viewModel.storeAutoDelete(it) },
-                )
-            }
-
-            item {
-                SwitchPreferenceItem(
-                    title = stringResource(R.string.settings_legacy_image_selection),
-                    icon = Icons.Outlined.PhotoLibrary,
-                    checked = state.isLegacyImageSelectionEnabled,
-                    onCheckedChange = { viewModel.storeLegacyImageSelection(it) },
-                )
-            }
-
-            item {
-                Text(
                     text = stringResource(R.string.settings_section_file_name),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.primary,
@@ -291,8 +256,45 @@ fun SettingsScreen(
                 SwitchPreferenceItem(
                     title = stringResource(R.string.settings_use_datetime_name),
                     subtitle = stringResource(R.string.settings_use_datetime_name_summary),
+                    icon = Icons.Outlined.Schedule,
                     checked = state.isUseDateTimeNameEnabled,
                     onCheckedChange = { viewModel.storeUseDateTimeName(it) },
+                )
+            }
+
+            item {
+                Text(
+                    text = stringResource(R.string.settings_section_image),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                )
+            }
+
+            item {
+                SwitchPreferenceItem(
+                    title = stringResource(R.string.settings_preserve_orientation),
+                    icon = Icons.Outlined.Image,
+                    checked = state.isPreserveOrientationEnabled,
+                    onCheckedChange = { viewModel.storePreserveOrientation(it) },
+                )
+            }
+
+            item {
+                SwitchPreferenceItem(
+                    title = stringResource(R.string.settings_auto_delete),
+                    icon = Icons.Outlined.AutoDelete,
+                    checked = state.isAutoDeleteEnabled,
+                    onCheckedChange = { viewModel.storeAutoDelete(it) },
+                )
+            }
+
+            item {
+                SwitchPreferenceItem(
+                    title = stringResource(R.string.settings_legacy_image_selection),
+                    icon = Icons.Outlined.PhotoLibrary,
+                    checked = state.isLegacyImageSelectionEnabled,
+                    onCheckedChange = { viewModel.storeLegacyImageSelection(it) },
                 )
             }
 

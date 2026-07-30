@@ -70,7 +70,13 @@ fun AppNavHost(navController: NavHostController) {
             val summariesJson = backStackEntry.arguments?.getString("summariesJson") ?: "[]"
             ProcessingDetailsScreen(
                 onNavigateBack = { navController.popBackStack() },
-                onNavigateToMain = { navController.navigate(Screen.Main.route) },
+                onNavigateToMain = {
+                    navController.navigate(Screen.Main.route) {
+                        popUpTo(Screen.Main.route) {
+                            inclusive = true
+                        }
+                    }
+                },
                 onNavigateToMetadataViewer = { uri, displayName ->
                     navController.navigate(Screen.MetadataViewer.createRoute(uri, displayName, hideDelete = true))
                 },
@@ -99,7 +105,13 @@ fun AppNavHost(navController: NavHostController) {
             val hideDelete = backStackEntry.arguments?.getBoolean("hideDelete") ?: false
             MetadataViewerScreen(
                 onNavigateBack = { navController.popBackStack() },
-                onNavigateToMain = { navController.navigate(Screen.Main.route) },
+                onNavigateToMain = {
+                    navController.navigate(Screen.Main.route) {
+                        popUpTo(Screen.Main.route) {
+                            inclusive = true
+                        }
+                    }
+                },
                 onNavigateToHelp = { navController.navigate(Screen.Help.route) },
                 onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
                 onRemoveMetadata = {

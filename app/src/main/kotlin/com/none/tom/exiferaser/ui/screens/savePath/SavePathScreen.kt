@@ -20,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -57,9 +58,17 @@ fun SavePathScreen(
         }
     }
 
+    // Determine container color based on theme
+    val containerColor = when (MaterialTheme.colorScheme.background) {
+        Color.Black -> Color(0xFF000000) // AMOLED - pure black
+        else -> MaterialTheme.colorScheme.surface // Light and Dark
+    }
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
+        containerColor = containerColor,
+        scrimColor = Color.Black.copy(alpha = 0.5f),
     ) {
         Column(
             modifier = Modifier

@@ -122,11 +122,26 @@ fun ProcessingDetailsScreen(
                     clipboard.setPrimaryClip(clip)
                 }
                 is ImageProcessingDetailsSideEffect.OpenFolder -> {
-                    val intent = Intent(Intent.ACTION_VIEW).apply {
-                        setDataAndType(sideEffect.folderUri, DocumentsContract.Document.MIME_TYPE_DIR)
-                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    try {
+                        // Try opening the folder with ACTION_VIEW
+                        val intent = Intent(Intent.ACTION_VIEW, sideEffect.folderUri)
+                        context.startActivity(intent)
+                    } catch (e: Exception) {
+                        // Try with Documents UI
+                        try {
+                            val docIntent = Intent(Intent.ACTION_VIEW).apply {
+                                setDataAndType(sideEffect.folderUri, "vnd.android.document/directory")
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            }
+                            context.startActivity(docIntent)
+                        } catch (e2: Exception) {
+                            // Last resort: copy the path
+                            val clipboard = context.getSystemService(ClipboardManager::class.java)
+                            val path = sideEffect.folderUri.path ?: sideEffect.folderUri.toString()
+                            val clip = ClipData.newPlainText("folder path", path)
+                            clipboard.setPrimaryClip(clip)
+                        }
                     }
-                    context.startActivity(intent)
                 }
                 ImageProcessingDetailsSideEffect.ImageSaved.Unsupported -> {
                 }
@@ -241,7 +256,7 @@ private fun ProcessingResultItemSimple(
                 contentScale = ContentScale.Crop,
             )
             Text(
-                text = summary.uri.path ?: summary.displayName,
+                text = com.none.tom.exiferaser.imageProcessingDetails.business.ImageProcessingDetailsViewModel.getDisplayPath(summary.uri),
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
@@ -284,6 +299,20 @@ private fun ProcessingResultItemSimple(
                 },
             )
             DropdownMenuItem(
+                text = { Text(stringResource(R.string.open_folder)) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.FolderOpen,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                    )
+                },
+                onClick = {
+                    showMenu = false
+                    onOpenFolder()
+                },
+            )
+            DropdownMenuItem(
                 text = { Text(stringResource(R.string.copy_path)) },
                 leadingIcon = {
                     Icon(
@@ -309,20 +338,6 @@ private fun ProcessingResultItemSimple(
                 onClick = {
                     showMenu = false
                     onShare()
-                },
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.open_folder)) },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Outlined.FolderOpen,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                    )
-                },
-                onClick = {
-                    showMenu = false
-                    onOpenFolder()
                 },
             )
         }

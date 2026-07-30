@@ -366,11 +366,13 @@ fun MainScreen(
                         snackbarData = data,
                         containerColor = when (currentThemeMode) {
                             ThemeMode.AMOLED -> Color(0xFF333333)
-                            else -> MaterialTheme.colorScheme.inverseSurface
+                            ThemeMode.DARK -> MaterialTheme.colorScheme.surfaceVariant
+                            ThemeMode.LIGHT -> MaterialTheme.colorScheme.surfaceVariant
+                            ThemeMode.SYSTEM -> MaterialTheme.colorScheme.surfaceVariant
                         },
                         contentColor = when (currentThemeMode) {
                             ThemeMode.AMOLED -> Color.White
-                            else -> MaterialTheme.colorScheme.inverseOnSurface
+                            else -> MaterialTheme.colorScheme.onSurfaceVariant
                         },
                     )
                 },

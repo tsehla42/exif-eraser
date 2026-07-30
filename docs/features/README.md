@@ -14,10 +14,13 @@
 | Auto Delete | Optionally delete originals after processing | `settings/data/SettingsRepository.kt` |
 | Randomize Filenames | UUID-based output filenames | `imageProcessing/data/ImageProcessingRepository.kt` |
 | Preserve Orientation | Keep EXIF orientation on output | `imageProcessing/data/ImageProcessingRepository.kt` |
-| Share by Default | Auto-share after processing | `imageProcessing/business/ImageProcessingViewModel.kt` |
+| Share by Default | Auto-share after processing | `settings/data/SettingsRepository.kt` |
 | Custom Suffix | Append suffix to output filenames | `settings/data/SettingsRepository.kt` |
 | Save Path Skip | Skip path selection with default | `settings/data/SettingsRepository.kt` |
 | Legacy Image Selection | Fallback image picker on older devices | `settings/data/SettingsRepository.kt` |
 | Use Original Name | Keep original filename (disables suffix and randomize) | `settings/data/SettingsRepository.kt` |
+| Use Datetime as Name | Use processing timestamp as filename (format: yyyyMMdd_HHmmss_SSS) | `settings/data/SettingsRepository.kt` |
 | Clear Cache | Clear cached images with size display | `ui/screens/settings/SettingsScreen.kt` |
 | Processing Details | View list of processed files with thumbnails | `ui/screens/processingDetails/ProcessingDetailsScreen.kt` |
+| Open Folder | Open save folder in file manager from details screen | `ui/screens/processingDetails/ProcessingDetailsScreen.kt` |
+| Themed Snackbar | Error messages themed for AMOLED/Dark/Light | `ui/screens/main/MainScreen.kt` |

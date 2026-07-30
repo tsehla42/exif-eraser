@@ -143,6 +143,7 @@
     <string name="settings_clear_cache">Clear cache</string>
     <string name="clear_cache">Clear cache</string>
     <string name="clear_cache_message">This will delete all cached images. Are you sure?</string>
+    <string name="clear">Clear</string>
 
     <!-- Processing Complete -->
     <string name="ok">OK</string>
@@ -150,5 +151,6 @@
     <string name="copy_path">Copy path</string>
     <string name="share_image">Share</string>
     <string name="open_folder">Open folder</string>
+    <string name="saved_images_count">Saved %1$d images</string>
 
 </resources>

@@ -125,10 +125,13 @@ class ImageProcessingRepository @Inject constructor(
                 )
                 val (exifInterfaceExtended, scanResult) = scanImage(sourceUri).getOrThrow()
                 imageMetadataSnapshot = scanResult
-                val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
+                val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS")
+                Timber.d("Processing image: $displayName, isUseOriginalNameEnabled: $isUseOriginalNameEnabled, isUseDateTimeNameEnabled: $isUseDateTimeNameEnabled, isRandomizeFileNamesEnabled: $isRandomizeFileNamesEnabled, hasMetadata: ${scanResult.isMetadataContained()}")
                 if (scanResult.isMetadataContained() || isRandomizeFileNamesEnabled || isUseOriginalNameEnabled || isUseDateTimeNameEnabled) {
                     formattedDisplayName = if (isUseOriginalNameEnabled) {
-                        FileUtilsKt.buildValidExtFilename(displayName)
+                        val name = FileUtilsKt.buildValidExtFilename(displayName)
+                        Timber.d("Using original name: $name")
+                        name
                     } else if (isUseDateTimeNameEnabled) {
                         LocalDateTime.now().format(dateTimeFormatter)
                     } else if (isRandomizeFileNamesEnabled) {
@@ -296,22 +299,92 @@ class ImageProcessingRepository @Inject constructor(
 
     private suspend fun getDisplayName(uri: Uri): Result<String> = withContext(dispatcherIo) {
         coroutineContext.suspendRunCatching {
-            checkNotNull(
-                context
-                    .contentResolver
-                    .query(uri, null, null, null, null)
-            ).use { cursor ->
-                check(cursor.moveToFirst())
-                val baseName = FilenameUtils.getBaseName(
-                    cursor.getString(
-                        cursor.getColumnIndexOrThrow(
-                            MediaStore.Images.ImageColumns.DISPLAY_NAME
-                        )
-                    )
-                )
-                check(baseName.isNotEmpty())
-                Result.success(baseName)
+            val name = if (DocumentsContract.isDocumentUri(context, uri)) {
+                // For SAF document URIs, get the document ID which is the filename
+                val documentId = DocumentsContract.getDocumentId(uri)
+                Timber.d("Document ID: $documentId for URI: $uri")
+                // Document ID format is usually "primary:path/to/file" or just the filename
+                val path = if (documentId.contains(":")) {
+                    documentId.substringAfter(":")
+                } else {
+                    documentId
+                }
+                val baseName = FilenameUtils.getBaseName(path)
+                Timber.d("Extracted base name: $baseName from path: $path")
+                baseName
+            } else {
+                // For photo picker and other content URIs, try to get the actual filename
+                checkNotNull(
+                    context
+                        .contentResolver
+                        .query(uri, null, null, null, null)
+                ).use { cursor ->
+                    check(cursor.moveToFirst())
+                    
+                    // Try to get the display name
+                    val displayNameIndex = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME)
+                    val displayName = if (displayNameIndex >= 0) {
+                        cursor.getString(displayNameIndex) ?: ""
+                    } else {
+                        ""
+                    }
+                    
+                    Timber.d("MediaStore display name: $displayName for URI: $uri")
+                    
+                    // Check if this is just a numeric ID (common with photo picker)
+                    val baseNameWithoutExt = FilenameUtils.getBaseName(displayName)
+                    val isNumericId = baseNameWithoutExt.all { it.isDigit() }
+                    
+                    if (isNumericId) {
+                        // Try to get the actual filename from the _data column (file path)
+                        val dataIndex = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
+                        if (dataIndex >= 0) {
+                            val filePath = cursor.getString(dataIndex) ?: ""
+                            if (filePath.isNotEmpty()) {
+                                val actualFileName = FilenameUtils.getName(filePath)
+                                Timber.d("Got actual filename from file path: $actualFileName")
+                                // If the file path also has a numeric name, try to get from _display_name
+                                val actualBaseName = FilenameUtils.getBaseName(actualFileName)
+                                if (actualBaseName.all { it.isDigit() }) {
+                                    // Both are numeric, try to get from content resolver query
+                                    // with DISPLAY_NAME projection
+                                    val projection = arrayOf(MediaStore.Images.ImageColumns.DISPLAY_NAME)
+                                    context.contentResolver.query(uri, projection, null, null, null)?.use { nameCursor ->
+                                        if (nameCursor.moveToFirst()) {
+                                            val nameIndex = nameCursor.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME)
+                                            if (nameIndex >= 0) {
+                                                val name = nameCursor.getString(nameIndex) ?: ""
+                                                val nameBase = FilenameUtils.getBaseName(name)
+                                                if (!nameBase.all { it.isDigit() }) {
+                                                    Timber.d("Got actual name from projection: $name")
+                                                    nameBase
+                                                } else {
+                                                    // Fall back to the numeric ID
+                                                    baseNameWithoutExt
+                                                }
+                                            } else {
+                                                baseNameWithoutExt
+                                            }
+                                        } else {
+                                            baseNameWithoutExt
+                                        }
+                                    } ?: baseNameWithoutExt
+                                } else {
+                                    actualBaseName
+                                }
+                            } else {
+                                baseNameWithoutExt
+                            }
+                        } else {
+                            baseNameWithoutExt
+                        }
+                    } else {
+                        baseNameWithoutExt
+                    }
+                }
             }
+            check(name.isNotEmpty())
+            Result.success(name)
         }.getOrElse { exception ->
             Timber.e(exception)
             Result.failure(exception)

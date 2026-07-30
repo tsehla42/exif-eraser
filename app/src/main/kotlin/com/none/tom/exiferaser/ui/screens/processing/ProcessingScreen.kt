@@ -169,6 +169,19 @@ private fun FinishedContent(
         textAlign = TextAlign.Center,
     )
     Spacer(modifier = Modifier.height(8.dp))
+    
+    // Show saved count and modified count
+    val showSavedCount = imagesSavedCount > 0 && imagesWithMetadataCount != imagesProcessedCount
+    if (showSavedCount) {
+        Text(
+            text = stringResource(R.string.saved_images_count, imagesSavedCount),
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+    }
+    
+    // Show modified count
     Text(
         text = stringResource(
             R.string.images_modified_placeholder,
@@ -180,6 +193,8 @@ private fun FinishedContent(
         style = MaterialTheme.typography.bodyLarge,
         textAlign = TextAlign.Center,
     )
+    
+    // Show info about files with no EXIF
     val alreadyNoExifCount = imagesProcessedCount - imagesWithMetadataCount
     if (alreadyNoExifCount > 0) {
         Spacer(modifier = Modifier.height(4.dp))
