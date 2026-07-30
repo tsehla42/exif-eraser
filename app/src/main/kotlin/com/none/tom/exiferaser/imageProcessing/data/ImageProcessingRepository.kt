@@ -41,6 +41,8 @@ import com.none.tom.exiferaser.core.provider.CameraFileProvider
 import com.none.tom.exiferaser.core.util.FileUtilsKt
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.tommygeenexus.exifinterfaceextended.ExifInterfaceExtended
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -66,7 +68,8 @@ class ImageProcessingRepository @Inject constructor(
         isAutoDeleteEnabled: Boolean,
         isPreserveOrientationEnabled: Boolean,
         isRandomizeFileNamesEnabled: Boolean,
-        isUseOriginalNameEnabled: Boolean
+        isUseOriginalNameEnabled: Boolean,
+        isUseDateTimeNameEnabled: Boolean
     ): Flow<ImageProcessingStep> = flow {
         protos.forEachIndexed { index, proto ->
             emit(
@@ -78,6 +81,7 @@ class ImageProcessingRepository @Inject constructor(
                     isPreserveOrientationEnabled = isPreserveOrientationEnabled,
                     isRandomizeFileNamesEnabled = isRandomizeFileNamesEnabled,
                     isUseOriginalNameEnabled = isUseOriginalNameEnabled,
+                    isUseDateTimeNameEnabled = isUseDateTimeNameEnabled,
                     progress = ImageProcessingProgress.calculate(
                         index = index,
                         count = protos.size
@@ -98,6 +102,7 @@ class ImageProcessingRepository @Inject constructor(
         isPreserveOrientationEnabled: Boolean,
         isRandomizeFileNamesEnabled: Boolean,
         isUseOriginalNameEnabled: Boolean,
+        isUseDateTimeNameEnabled: Boolean,
         progress: ImageProcessingProgress
     ): ImageProcessingStep.FinishedSingle {
         var sourceUri = Uri.EMPTY
@@ -120,9 +125,12 @@ class ImageProcessingRepository @Inject constructor(
                 )
                 val (exifInterfaceExtended, scanResult) = scanImage(sourceUri).getOrThrow()
                 imageMetadataSnapshot = scanResult
-                if (scanResult.isMetadataContained() || isRandomizeFileNamesEnabled || isUseOriginalNameEnabled) {
+                val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
+                if (scanResult.isMetadataContained() || isRandomizeFileNamesEnabled || isUseOriginalNameEnabled || isUseDateTimeNameEnabled) {
                     formattedDisplayName = if (isUseOriginalNameEnabled) {
                         FileUtilsKt.buildValidExtFilename(displayName)
+                    } else if (isUseDateTimeNameEnabled) {
+                        LocalDateTime.now().format(dateTimeFormatter)
                     } else if (isRandomizeFileNamesEnabled) {
                         val randomName = UUID.randomUUID().toString()
                         if (FileUtilsKt.isValidExtFilename(displayNameSuffix)) {
