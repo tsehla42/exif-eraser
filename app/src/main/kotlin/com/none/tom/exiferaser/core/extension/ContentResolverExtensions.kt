@@ -1,27 +1,8 @@
-/*
- * Copyright (c) 2024-2026, Tom Geiselmann (tomgapplicationsdevelopment@gmail.com)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
- * and associated documentation files (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge, publish, distribute,
- * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
 package com.none.tom.exiferaser.core.extension
 
 import android.content.ContentResolver
 import android.net.Uri
+import android.os.Build
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import kotlinx.coroutines.Dispatchers
@@ -55,6 +36,15 @@ suspend fun ContentResolver.getDisplayName(uri: Uri): String {
                 }
             }
 
+            val mediaId = extractMediaId(uri)
+            if (mediaId != null) {
+                val realName = queryDisplayNameById(mediaId)
+                if (realName != null) {
+                    Timber.d("Got real display name from MediaStore by ID $mediaId: $realName")
+                    return@withContext realName
+                }
+            }
+
             resolver.query(uri, null, null, null, null)?.use { cursor ->
                 if (cursor.moveToFirst()) {
                     val displayNameIndex = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME)
@@ -82,6 +72,8 @@ suspend fun ContentResolver.getDisplayName(uri: Uri): String {
                                 }
                             }
                         }
+
+                        return@withContext baseNameWithoutExt
                     } else {
                         return@withContext baseNameWithoutExt
                     }
@@ -92,5 +84,62 @@ suspend fun ContentResolver.getDisplayName(uri: Uri): String {
         }
 
         return@withContext ""
+    }
+}
+
+private fun extractMediaId(uri: Uri): String? {
+    val uriString = uri.toString()
+
+    if (uriString.contains("media/picker") || uriString.contains("media/external")) {
+        val lastSegment = uri.lastPathSegment
+        if (lastSegment != null && lastSegment.all { it.isDigit() }) {
+            return lastSegment
+        }
+    }
+
+    val pathSegments = uri.pathSegments
+    for (i in pathSegments.size - 1 downTo 0) {
+        val segment = pathSegments[i]
+        if (segment.all { it.isDigit() } && segment.isNotEmpty()) {
+            return segment
+        }
+    }
+
+    return null
+}
+
+private suspend fun ContentResolver.queryDisplayNameById(mediaId: String): String? {
+    return withContext(Dispatchers.IO) {
+        try {
+            val contentUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
+            } else {
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            }
+
+            val projection = arrayOf(
+                MediaStore.Images.Media._ID,
+                MediaStore.Images.Media.DISPLAY_NAME
+            )
+            val selection = "${MediaStore.Images.Media._ID} = ?"
+            val selectionArgs = arrayOf(mediaId)
+
+            query(contentUri, projection, selection, selectionArgs, null)?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val nameIndex = cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME)
+                    if (nameIndex >= 0) {
+                        val name = cursor.getString(nameIndex) ?: ""
+                        val baseName = FilenameUtils.getBaseName(name)
+                        Timber.d("queryDisplayNameById: ID=$mediaId, raw=$name, baseName=$baseName")
+                        if (baseName.isNotEmpty() && !baseName.all { it.isDigit() }) {
+                            return@withContext baseName
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to query display name for media ID: $mediaId")
+        }
+        null
     }
 }

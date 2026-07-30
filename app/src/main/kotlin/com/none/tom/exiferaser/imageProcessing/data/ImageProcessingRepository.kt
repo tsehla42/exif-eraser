@@ -69,7 +69,6 @@ class ImageProcessingRepository @Inject constructor(
         isAutoDeleteEnabled: Boolean,
         isPreserveOrientationEnabled: Boolean,
         isRandomizeFileNamesEnabled: Boolean,
-        isUseOriginalNameEnabled: Boolean,
         isUseDateTimeNameEnabled: Boolean
     ): Flow<ImageProcessingStep> = flow {
         protos.forEachIndexed { index, proto ->
@@ -81,7 +80,6 @@ class ImageProcessingRepository @Inject constructor(
                     isAutoDeleteEnabled = isAutoDeleteEnabled,
                     isPreserveOrientationEnabled = isPreserveOrientationEnabled,
                     isRandomizeFileNamesEnabled = isRandomizeFileNamesEnabled,
-                    isUseOriginalNameEnabled = isUseOriginalNameEnabled,
                     isUseDateTimeNameEnabled = isUseDateTimeNameEnabled,
                     progress = ImageProcessingProgress.calculate(
                         index = index,
@@ -102,7 +100,6 @@ class ImageProcessingRepository @Inject constructor(
         isAutoDeleteEnabled: Boolean,
         isPreserveOrientationEnabled: Boolean,
         isRandomizeFileNamesEnabled: Boolean,
-        isUseOriginalNameEnabled: Boolean,
         isUseDateTimeNameEnabled: Boolean,
         progress: ImageProcessingProgress
     ): ImageProcessingStep.FinishedSingle {
@@ -127,13 +124,9 @@ class ImageProcessingRepository @Inject constructor(
                 val (exifInterfaceExtended, scanResult) = scanImage(sourceUri).getOrThrow()
                 imageMetadataSnapshot = scanResult
                 val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS")
-                Timber.d("Processing image: $displayName, isUseOriginalNameEnabled: $isUseOriginalNameEnabled, isUseDateTimeNameEnabled: $isUseDateTimeNameEnabled, isRandomizeFileNamesEnabled: $isRandomizeFileNamesEnabled, hasMetadata: ${scanResult.isMetadataContained()}")
-                if (scanResult.isMetadataContained() || isRandomizeFileNamesEnabled || isUseOriginalNameEnabled || isUseDateTimeNameEnabled) {
-                    formattedDisplayName = if (isUseOriginalNameEnabled) {
-                        val name = FileUtilsKt.buildValidExtFilename(displayName)
-                        Timber.d("Using original name: $name")
-                        name
-                    } else if (isUseDateTimeNameEnabled) {
+                Timber.d("Processing image: $displayName, isUseDateTimeNameEnabled: $isUseDateTimeNameEnabled, isRandomizeFileNamesEnabled: $isRandomizeFileNamesEnabled, hasMetadata: ${scanResult.isMetadataContained()}")
+                if (scanResult.isMetadataContained() || isRandomizeFileNamesEnabled || isUseDateTimeNameEnabled) {
+                    formattedDisplayName = if (isUseDateTimeNameEnabled) {
                         LocalDateTime.now().format(dateTimeFormatter)
                     } else if (isRandomizeFileNamesEnabled) {
                         val randomName = UUID.randomUUID().toString()

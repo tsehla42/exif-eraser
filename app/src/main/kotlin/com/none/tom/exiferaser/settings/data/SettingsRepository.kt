@@ -51,7 +51,6 @@ import com.none.tom.exiferaser.core.util.SETTINGS_KEY_SHARE_BY_DEFAULT
 import com.none.tom.exiferaser.core.util.SETTINGS_KEY_THEME_MODE
 import com.none.tom.exiferaser.core.util.SETTINGS_KEY_DYNAMIC_COLOR
 import com.none.tom.exiferaser.core.util.SETTINGS_KEY_USE_DATETIME_NAME
-import com.none.tom.exiferaser.core.util.SETTINGS_KEY_USE_ORIGINAL_NAME
 import com.none.tom.exiferaser.core.util.defaultNightMode
 import com.none.tom.exiferaser.settings.business.ThemeMode
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -86,7 +85,6 @@ class SettingsRepository @Inject constructor(
     private val keyThemeMode = intPreferencesKey(SETTINGS_KEY_THEME_MODE)
     private val keyDynamicColor = booleanPreferencesKey(SETTINGS_KEY_DYNAMIC_COLOR)
     private val keyUseDateTimeName = booleanPreferencesKey(SETTINGS_KEY_USE_DATETIME_NAME)
-    private val keyUseOriginalName = booleanPreferencesKey(SETTINGS_KEY_USE_ORIGINAL_NAME)
 
     suspend fun putDefaultOpenPath(
         newDefaultOpenPath: Uri,
@@ -420,22 +418,6 @@ class SettingsRepository @Inject constructor(
     suspend fun putDynamicColor(value: Boolean): Result<Unit> = withContext(dispatcherIo) {
         coroutineContext.suspendRunCatching {
             dataStore.edit { preferences -> preferences[keyDynamicColor] = value }
-            Result.success(Unit)
-        }.getOrElse { exception ->
-            Timber.e(exception)
-            Result.failure(exception)
-        }
-    }
-
-    suspend fun isUseOriginalNameEnabled(): Boolean = dataStore
-        .data
-        .catch { exception -> Timber.e(exception) }
-        .map { preferences -> preferences[keyUseOriginalName] }
-        .firstOrNull() == true
-
-    suspend fun putUseOriginalName(value: Boolean): Result<Unit> = withContext(dispatcherIo) {
-        coroutineContext.suspendRunCatching {
-            dataStore.edit { preferences -> preferences[keyUseOriginalName] = value }
             Result.success(Unit)
         }.getOrElse { exception ->
             Timber.e(exception)

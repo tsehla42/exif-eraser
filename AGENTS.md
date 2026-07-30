@@ -29,7 +29,7 @@ exif-eraser/
 │   ├── core/                       # Shared utilities
 │   │   ├── contract/               # ActivityResultContracts (share, camera, view URL)
 │   │   ├── di/                     # Hilt modules (Context, Coroutine, DataStore)
-│   │   ├── extension/              # Extension functions (ClipData, Context, URI, etc.)
+│   │   ├── extension/              # Extension functions (ClipData, Context, URI, ContentResolver, etc.)
 │   │   ├── image/                  # Image models (format, metadata snapshot, processing)
 │   │   ├── provider/               # CameraFileProvider for camera capture
 │   │   ├── serializer/             # Wire protobuf serializers
@@ -58,10 +58,10 @@ exif-eraser/
 │       ├── screens/                # Screen composables
 │       │   ├── main/               # Main screen
 │       │   ├── processing/         # Processing screen with no-EXIF labels
-│       │   ├── processingDetails/  # File list with thumbnails + context menu (View EXIF, Open with, Open folder, Copy path, Share)
+│   │   ├── processingDetails/  # File list with thumbnails + context menu (View EXIF, Open with, Copy path, Share)
 │       │   ├── metadataViewer/     # Bottom control bar (Pretty, Raw, Expand/Collapse)
-│       │   ├── settings/           # Settings with use original name toggle
-│       │   ├── savePath/           # Save path selection
+│   │   ├── settings/           # Settings with use datetime as name toggle
+│   │   ├── savePath/           # Save path selection (full-screen Scaffold with checkbox for skip)
 │       │   └── help/               # Help screen
 │       └── theme/                  # Color, Theme, Typography
 ├── build.gradle.kts                # Root build (plugin declarations)
@@ -76,14 +76,14 @@ exif-eraser/
 |---|---|---|
 | `core/image` | nothing | Data models: `ImageFormat` (JPEG/PNG/WebP), `ImageMetadataSnapshot`, `ImageProcessingStep`, `ImageProcessingSummary`, `ImageProcessingProgress` |
 | `core/di` | Hilt | DI modules: `ContextModule`, `CoroutineModule`, `DataStoreModule` |
-| `core/extension` | nothing | Kotlin extensions for ClipData, Context, Coroutine, List, Uri |
+| `core/extension` | nothing | Kotlin extensions for ClipData, Context, ContentResolver, Coroutine, List, Uri |
 | `core/contract` | core/image | Activity result contracts: share images, take picture, view URL |
 | `core/serializer` | Wire | Protobuf serializers for `ImageSources` and `Selection` |
 | `main/business` | main/data, settings, core/image | `MainViewModel` - handles image source selection, clipboard paste, camera, shortcuts |
 | `main/data` | core | `MainRepository` (clip, camera, file ops), `SelectionRepository` (protobuf), `ImageSourcesRepository` |
-| `imageProcessing/data` | core/image, exif-interface | `ImageProcessingRepository` - scans images, removes metadata, saves results. Accepts `isUseOriginalNameEnabled`, `isUseDateTimeNameEnabled` parameters to control filename behavior |
+| `imageProcessing/data` | core/image, exif-interface | `ImageProcessingRepository` - scans images, removes metadata, saves results. Accepts `isUseDateTimeNameEnabled` parameters to control filename behavior |
 | `imageProcessing/business` | imageProcessing/data, main/data, settings | `ImageProcessingViewModel` - orchestrates bulk EXIF removal with progress |
-| `imageProcessingDetails/business` | imageProcessing/data, settings | `ImageProcessingDetailsViewModel` - handles processed file list, copy path, open folder |
+| `imageProcessingDetails/business` | imageProcessing/data, settings | `ImageProcessingDetailsViewModel` - handles processed file list, copy path |
 | `metadataViewer/data` | metadata-extractor | `MetadataViewerRepository` - reads all metadata via `ImageMetadataReader` |
 | `metadataViewer/business` | metadataViewer/data | `MetadataViewerViewModel` - loads metadata, toggles expand/collapse, raw/pretty mode |
 | `settings/data` | DataStore | `SettingsRepository` - all preferences (paths, theme, auto-delete, etc.) |
@@ -100,15 +100,15 @@ exif-eraser/
 1. User selects images via MainScreen (pick single/multiple, directory, camera, or paste)
 2. Images stored in protobuf via `SelectionRepository`
 3. User navigates to save path selection (or skips if default configured)
-4. `ImageProcessingViewModel` reads selection, calls `ImageProcessingRepository.removeMetadata(isUseOriginalNameEnabled, isUseDateTimeNameEnabled, isRandomizeFileNamesEnabled, displayNameSuffix)`
+4. `ImageProcessingViewModel` reads selection, calls `ImageProcessingRepository.removeMetadata(isUseDateTimeNameEnabled, isRandomizeFileNamesEnabled, displayNameSuffix)`
 5. Repository scans each image with `ExifInterfaceExtended`, builds `ImageMetadataSnapshot`
 6. Creates new document in save directory, writes metadata-stripped image
-7. **Filename logic:** Priority order: Use Original Name → Use Datetime → Randomize + Suffix → Default (original + camera suffix + suffix)
+7. **Filename logic:** Priority order: Use Datetime → Randomize + Suffix → Default (original + camera suffix + suffix)
 8. Optionally deletes original (auto-delete setting)
 9. Emits `ImageProcessingStep.FinishedSingle` per image with summary
 10. **No-EXIF handling:** When no metadata found, displays "Files already have no EXIF" (0 modified) or "Some files already had no EXIF" (partial cases)
 11. Shows "View details" button for ProcessingDetailsScreen (for both single and multiple files)
-12. User can view details, copy path, open folder, or share processed images
+12. User can view details, copy path, or share processed images
 
 ### Metadata Viewer Flow
 
@@ -138,18 +138,17 @@ exif-eraser/
 - **Edge-to-edge** - System bars handled in `MainActivity`, AMOLED gets black bars
 - **Material3 themes** - Light, Dark, AMOLED (pure black), System (follows OS)
 - **Dynamic colors** - Material You support on Android 12+, togglable in settings
-- **Use original name** - Toggle in settings controls filename behavior: when enabled, suffix and randomize are disabled
 - **Use datetime as name** - Toggle in settings uses processing timestamp as filename (format: yyyyMMdd_HHmmss_SSS)
 - **Bottom control bar** - MetadataViewerScreen uses labeled buttons (Pretty, Raw, Expand/Collapse) above navigation bar
 - **No-EXIF labels** - ProcessingScreen displays "Files already have no EXIF" (0 modified) or "Some files already had no EXIF" (partial)
 - **Themed snackbar** - Error snackbars use #333 for AMOLED, surfaceVariant for light/dark themes
-- **Context menu** - ProcessingDetailsScreen provides: View EXIF, Open with, Open folder, Copy path, Share
+- **Context menu** - ProcessingDetailsScreen provides: View EXIF, Open with, Copy path, Share
 
 ## Common Tasks
 
 **Add a new image format:** Edit `core/image/ImageFormat.kt` to add data class, update `supportedImageFormats` list, update MIME type filter in `core/util/Constants.kt`.
 
-**Add a new setting:** Add key constant in `core/util/Constants.kt`, add DataStore read/write in `SettingsRepository`, add state field in `SettingsState`, add UI in `SettingsScreen`. For toggle-dependent settings (like "Use original name"), update `SettingsViewModel` to handle disabling related options when the parent toggle is enabled. Add icon to the toggle in SettingsScreen.
+**Add a new setting:** Add key constant in `core/util/Constants.kt`, add DataStore read/write in `SettingsRepository`, add state field in `SettingsState`, add UI in `SettingsScreen`. Add icon to the toggle in SettingsScreen.
 
 **Add a new screen:** Create `business/` package with ViewModel/State/SideEffect, create screen composable in `ui/screens/`, add `Screen` sealed class entry, register in `AppNavHost`.
 

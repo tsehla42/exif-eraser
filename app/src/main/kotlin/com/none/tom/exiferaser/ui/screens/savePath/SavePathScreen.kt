@@ -5,21 +5,30 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -39,6 +48,7 @@ fun SavePathScreen(
     viewModel: ImageSavePathSelectionViewModel = hiltViewModel(),
 ) {
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
+    var skipSavePathSelection by remember { mutableStateOf(false) }
 
     val pickDocumentTreeLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree(),
@@ -83,26 +93,66 @@ fun SavePathScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
+            Spacer(modifier = Modifier.height(120.dp))
             Text(
                 text = stringResource(R.string.choose_save_path_description),
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.headlineMedium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 32.dp),
             )
 
-            if (state.hasPrivilegedDefaultSavePath) {
-                TextButton(
-                    onClick = { viewModel.handleSelection(savePath = Uri.EMPTY) },
-                    modifier = Modifier.padding(bottom = 16.dp),
-                ) {
-                    Text(text = stringResource(R.string.use_default_save_path))
-                }
-            }
-
-            TextButton(
-                onClick = { viewModel.chooseSelectionSavePath() },
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(text = stringResource(R.string.choose_custom_save_path))
+                if (state.hasPrivilegedDefaultSavePath) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .padding(bottom = 0.dp),
+                    ) {
+                        OutlinedButton(
+                            onClick = {
+                                viewModel.setSkipSavePathSelection(skipSavePathSelection)
+                                viewModel.handleSelection(savePath = Uri.EMPTY)
+                            },
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Text(text = stringResource(R.string.use_default_save_path))
+                        }
+                        Checkbox(
+                            checked = skipSavePathSelection,
+                            onCheckedChange = { skipSavePathSelection = it },
+                            colors = CheckboxDefaults.colors(
+                                checkedColor = MaterialTheme.colorScheme.primary,
+                            ),
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    androidx.compose.foundation.layout.Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .height(16.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        if (skipSavePathSelection) {
+                            Text(
+                                text = stringResource(R.string.settings_skip_save_path_selection),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+
+                OutlinedButton(
+                    onClick = { viewModel.chooseSelectionSavePath() },
+                    modifier = Modifier.fillMaxWidth(0.8f),
+                ) {
+                    Text(text = stringResource(R.string.choose_custom_save_path))
+                }
             }
         }
     }

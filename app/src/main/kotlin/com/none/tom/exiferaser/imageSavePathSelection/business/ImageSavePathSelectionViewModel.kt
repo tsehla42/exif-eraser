@@ -76,4 +76,8 @@ class ImageSavePathSelectionViewModel @Inject constructor(
             state.copy(hasPrivilegedDefaultSavePath = hasPrivilegedDefaultSavePath)
         }
     }
+
+    fun setSkipSavePathSelection(skip: Boolean) = intent {
+        settingsRepository.putSavePathSelectionSkip(skip)
+    }
 }

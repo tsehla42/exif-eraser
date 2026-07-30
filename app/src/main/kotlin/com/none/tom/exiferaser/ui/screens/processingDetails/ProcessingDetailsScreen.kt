@@ -4,8 +4,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
 import android.net.Uri
-import android.provider.DocumentsContract
-import timber.log.Timber
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,7 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.ContentCopy
-import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Visibility
@@ -122,26 +119,6 @@ fun ProcessingDetailsScreen(
                     val clip = ClipData.newPlainText("image path", sideEffect.path)
                     clipboard.setPrimaryClip(clip)
                 }
-                is ImageProcessingDetailsSideEffect.OpenFolder -> {
-                    try {
-                        val intent = Intent(Intent.ACTION_VIEW).apply {
-                            setDataAndType(sideEffect.folderUri, DocumentsContract.Document.MIME_TYPE_DIR)
-                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                        }
-                        val chooser = Intent.createChooser(intent, "Open folder with")
-                        context.startActivity(chooser)
-                    } catch (e: Exception) {
-                        Timber.e(e, "Failed to open folder")
-                        try {
-                            val clipboard = context.getSystemService(ClipboardManager::class.java)
-                            val path = sideEffect.folderUri.path ?: sideEffect.folderUri.toString()
-                            val clip = ClipData.newPlainText("folder path", path)
-                            clipboard.setPrimaryClip(clip)
-                        } catch (e2: Exception) {
-                            Timber.e(e2, "Failed to copy path to clipboard")
-                        }
-                    }
-                }
                 ImageProcessingDetailsSideEffect.ImageSaved.Unsupported -> {
                 }
                 is ImageProcessingDetailsSideEffect.Navigate.ToImageModifiedDetails -> {
@@ -181,7 +158,7 @@ fun ProcessingDetailsScreen(
             ) {
                 items(
                     items = state.imageProcessingSummaries,
-                    key = { "${it.displayName}_${it.extension}" },
+                    key = { "${it.uri}_${it.displayName}_${it.extension}" },
                 ) { summary ->
                     val index = state.imageProcessingSummaries.indexOf(summary)
                     ProcessingResultItemSimple(
@@ -206,7 +183,6 @@ fun ProcessingDetailsScreen(
                         },
                         onCopyPath = { viewModel.handleCopyPath(index) },
                         onShare = { viewModel.handleShareImage(index) },
-                        onOpenFolder = { viewModel.handleOpenFolder(index) },
                     )
                 }
             }
@@ -232,7 +208,6 @@ private fun ProcessingResultItemSimple(
     onOpenWith: () -> Unit,
     onCopyPath: () -> Unit,
     onShare: () -> Unit,
-    onOpenFolder: () -> Unit,
 ) {
     var showMenu by remember { mutableStateOf(false) }
     val menuShape = RoundedCornerShape(16.dp)
@@ -295,20 +270,6 @@ private fun ProcessingResultItemSimple(
                 onClick = {
                     showMenu = false
                     onOpenWith()
-                },
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.open_folder)) },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Outlined.FolderOpen,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                    )
-                },
-                onClick = {
-                    showMenu = false
-                    onOpenFolder()
                 },
             )
             DropdownMenuItem(

@@ -54,10 +54,9 @@ If metadata is found (or randomize filenames is enabled):
 ### 5. Filename Formatting
 
 Output filenames are determined by priority order:
-1. `isUseOriginalNameEnabled` → keep original filename (skip suffix and randomize)
-2. `isUseDateTimeNameEnabled` → use processing timestamp (format: yyyyMMdd_HHmmss_SSS)
-3. `isRandomizeFileNamesEnabled` → UUID filename + suffix (if provided)
-4. Default: original name + camera suffix (if from camera) + display name suffix
+1. `isUseDateTimeNameEnabled` → use processing timestamp (format: yyyyMMdd_HHmmss_SSS)
+2. `isRandomizeFileNamesEnabled` → UUID filename + suffix (if provided)
+3. Default: original name + camera suffix (if from camera) + display name suffix
 
 ## Key Classes
 
@@ -89,7 +88,6 @@ Defined in `core/image/ImageFormat.kt`:
 | Randomize File Names | false | UUID-based output filenames |
 | Share by Default | false | Auto-share processed images |
 | Display Name Suffix | "" | Append suffix to output filenames |
-| Use Original Name | false | Keep original filename (disables suffix and randomize) |
 | Use Datetime as Name | false | Use processing timestamp as filename (format: yyyyMMdd_HHmmss_SSS) |
 | Skip Save Path Selection | false | Use default save path directly |
 
@@ -111,9 +109,8 @@ After processing completes:
 
 - **Single file**: "View new EXIF" button opens metadata viewer
 - **Multiple files**: "View details" button opens file list with thumbnails
-- Each file entry has a context menu with: View EXIF, Open with, Open folder, Copy path, Share
+- Each file entry has a context menu with: View EXIF, Open with, Copy path, Share
 - When images have no EXIF: "Files already have no EXIF" label
 - When some images have no EXIF: "Some files already had no EXIF" label
 - Shows saved count and modified count: "Saved X images, Y of Z modified"
 - Copy path returns clean path format: `Pictures/exifEdit/filename.jpg`
-- Open folder opens the save directory in file manager

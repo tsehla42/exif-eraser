@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Shuffle
-import androidx.compose.material.icons.outlined.Title
 import androidx.compose.material.icons.outlined.AutoDelete
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.DeleteSweep
@@ -49,7 +48,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -220,35 +218,20 @@ fun SettingsScreen(
             }
 
             item {
-                SwitchPreferenceItem(
-                    title = stringResource(R.string.settings_use_original_name),
-                    icon = Icons.Outlined.Title,
-                    checked = state.isUseOriginalNameEnabled,
-                    onCheckedChange = { viewModel.storeUseOriginalName(it) },
-                )
-            }
-
-            item {
-                val alpha = if (state.isUseOriginalNameEnabled) 0.5f else 1f
                 PreferenceItem(
                     title = stringResource(R.string.settings_default_display_name_suffix),
                     subtitle = state.defaultDisplayNameSuffix.ifBlank { stringResource(R.string.settings_not_set) },
                     icon = Icons.Outlined.Description,
                     onClick = { viewModel.handleDefaultDisplayNameSuffix() },
-                    enabled = !state.isUseOriginalNameEnabled,
-                    modifier = Modifier.graphicsLayer(alpha = alpha),
                 )
             }
 
             item {
-                val alpha = if (state.isUseOriginalNameEnabled) 0.5f else 1f
                 SwitchPreferenceItem(
                     title = stringResource(R.string.settings_randomize_file_names),
                     icon = Icons.Outlined.Shuffle,
                     checked = state.isRandomizeFileNamesEnabled,
                     onCheckedChange = { viewModel.storeRandomizeFileNames(it) },
-                    enabled = !state.isUseOriginalNameEnabled,
-                    modifier = Modifier.graphicsLayer(alpha = alpha),
                 )
             }
 

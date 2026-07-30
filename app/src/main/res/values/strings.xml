@@ -68,7 +68,6 @@
     <string name="settings_section_image">Image</string>
     <string name="settings_section_file_name">File Name</string>
     <string name="settings_section_user_interface">UX</string>
-    <string name="settings_use_original_name">Use original file name</string>
     <string name="settings_use_datetime_name">Use datetime as name</string>
     <string name="settings_use_datetime_name_summary">Use processing timestamp as filename</string>
     <string name="settings_randomize_file_names">Randomize file names</string>
@@ -150,7 +149,6 @@
     <string name="open_with">Open with</string>
     <string name="copy_path">Copy path</string>
     <string name="share_image">Share</string>
-    <string name="open_folder">Open folder</string>
     <string name="saved_images_count">Saved %1$d images</string>
 
 </resources>

@@ -31,7 +31,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.viewmodel.container
-import timber.log.Timber
 
 @HiltViewModel
 class ImageProcessingDetailsViewModel @Inject constructor(
@@ -110,45 +109,6 @@ class ImageProcessingDetailsViewModel @Inject constructor(
             if (path.isNotBlank()) {
                 postSideEffect(ImageProcessingDetailsSideEffect.CopyPath(path))
             }
-        }
-    }
-
-    fun handleOpenFolder(position: Int) = intent {
-        val summary = state.imageProcessingSummaries.getOrNull(position) ?: return@intent
-        try {
-            // Extract the tree path from the URI to get the save folder
-            val uriString = summary.uri.toString()
-            Timber.d("URI for open folder: $uriString")
-            
-            // URI format: content://com.android.externalstorage.documents/tree/primary%3APictures%2FexifEdit/document/primary%3APictures%2FexifEdit%2F5427.jpg
-            // Extract the tree document ID from the URI
-            if (uriString.contains("/tree/")) {
-                val treeStart = uriString.indexOf("/tree/") + 6
-                val treeEnd = uriString.indexOf("/document/")
-                if (treeEnd > treeStart) {
-                    val encodedTreeId = uriString.substring(treeStart, treeEnd)
-                    val treeDocumentId = java.net.URLDecoder.decode(encodedTreeId, "UTF-8")
-                    Timber.d("Tree document ID: $treeDocumentId")
-                    
-                    // Build the tree URI
-                    val folderUri = DocumentsContract.buildTreeDocumentUri(
-                        summary.uri.authority,
-                        treeDocumentId
-                    )
-                    Timber.d("Opening folder: $folderUri")
-                    postSideEffect(ImageProcessingDetailsSideEffect.OpenFolder(folderUri))
-                    return@intent
-                }
-            }
-            
-            // Fallback: try to get from settings
-            val savePath = settingsRepository.getDefaultSavePathForProcessing()
-            if (savePath.isNotNullOrEmpty() && savePath.toString() != "content://null") {
-                Timber.d("Fallback: Opening save folder from settings: $savePath")
-                postSideEffect(ImageProcessingDetailsSideEffect.OpenFolder(savePath))
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Failed to open folder")
         }
     }
 

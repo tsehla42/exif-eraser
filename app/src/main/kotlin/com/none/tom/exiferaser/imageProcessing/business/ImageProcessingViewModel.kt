@@ -70,7 +70,6 @@ class ImageProcessingViewModel @Inject constructor(
             isAutoDeleteEnabled = settingsRepository.isAutoDeleteEnabled(),
             isPreserveOrientationEnabled = settingsRepository.isPreserveOrientationEnabled(),
             isRandomizeFileNamesEnabled = settingsRepository.isRandomizeFileNamesEnabled(),
-            isUseOriginalNameEnabled = settingsRepository.isUseOriginalNameEnabled(),
             isUseDateTimeNameEnabled = settingsRepository.isUseDateTimeNameEnabled()
         ).collect { result ->
             reduce {

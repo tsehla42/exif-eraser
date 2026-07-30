@@ -28,7 +28,7 @@ The app is a single-module project (`app/`). Code is organized by feature under 
 core/                    # Shared code used across features
 ├── contract/            # AndroidX ActivityResultContracts
 ├── di/                  # Hilt DI modules (Context, Coroutine, DataStore)
-├── extension/           # Kotlin extension functions
+├── extension/           # Kotlin extension functions (ContentResolver, ClipData, etc.)
 ├── image/               # Image data models (format, metadata, processing)
 ├── provider/            # CameraFileProvider for camera capture
 ├── serializer/          # Wire protobuf serializers
@@ -81,7 +81,7 @@ User selects images
   → ImageProcessingRepository.removeMetadata() flow:
       For each image:
         1. Scan with ExifInterfaceExtended → ImageMetadataSnapshot
-        2. If metadata found or randomize enabled:
+        2. If metadata found, datetime naming, or randomize enabled:
            a. Create new document via DocumentsContract
            b. Write image without metadata via saveExclusive()
            c. Optionally delete original

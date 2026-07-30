@@ -57,7 +57,6 @@ class SettingsViewModel @Inject constructor(
         val defaultNightModeName = settingsRepository.getDefaultNightModeName()
         val themeMode = settingsRepository.getThemeMode()
         val useDynamicColor = settingsRepository.getDynamicColor()
-        val isUseOriginalNameEnabled = settingsRepository.isUseOriginalNameEnabled()
         val isUseDateTimeNameEnabled = settingsRepository.isUseDateTimeNameEnabled()
         reduce {
             state.copy(
@@ -73,7 +72,6 @@ class SettingsViewModel @Inject constructor(
                 defaultNightModeName = defaultNightModeName,
                 themeMode = themeMode,
                 useDynamicColor = useDynamicColor,
-                isUseOriginalNameEnabled = isUseOriginalNameEnabled,
                 isUseDateTimeNameEnabled = isUseDateTimeNameEnabled,
             )
         }
@@ -293,18 +291,6 @@ class SettingsViewModel @Inject constructor(
             postSideEffect(SettingsSideEffect.Theme.Success)
         } else {
             postSideEffect(SettingsSideEffect.Theme.Failure)
-        }
-    }
-
-    fun storeUseOriginalName(isEnabled: Boolean) = intent {
-        val result = settingsRepository.putUseOriginalName(isEnabled)
-        if (result.isSuccess) {
-            reduce {
-                state.copy(isUseOriginalNameEnabled = isEnabled)
-            }
-            postSideEffect(SettingsSideEffect.UseOriginalName.Success)
-        } else {
-            postSideEffect(SettingsSideEffect.UseOriginalName.Failure)
         }
     }
 
