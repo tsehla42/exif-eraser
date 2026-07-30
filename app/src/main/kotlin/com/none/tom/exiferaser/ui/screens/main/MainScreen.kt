@@ -42,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,8 +53,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import com.none.tom.exiferaser.R
 import com.none.tom.exiferaser.core.contract.ActivityResultContractTakePicture
+import com.none.tom.exiferaser.core.extension.getDisplayName
 import com.none.tom.exiferaser.main.business.MainSideEffect
 import com.none.tom.exiferaser.main.business.MainViewModel
 import com.none.tom.exiferaser.settings.business.ThemeMode
@@ -85,6 +88,7 @@ fun MainScreen(
     var selectedNavItem by remember { mutableIntStateOf(2) }
     var isLauncherActive by remember { mutableStateOf(false) }
     val context = androidx.compose.ui.platform.LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     val chooseImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
@@ -164,7 +168,10 @@ fun MainScreen(
     ) { result ->
         isLauncherActive = false
         if (result != null) {
-            onNavigateToMetadataViewer(result.toString(), result.lastPathSegment ?: "")
+            coroutineScope.launch {
+                val displayName = context.contentResolver.getDisplayName(result)
+                onNavigateToMetadataViewer(result.toString(), displayName)
+            }
         }
     }
 
