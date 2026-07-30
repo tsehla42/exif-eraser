@@ -193,4 +193,13 @@ sealed class SettingsSideEffect : Parcelable {
         @Parcelize
         data object Success : UseOriginalName()
     }
+
+    sealed class UseDateTimeName : SettingsSideEffect() {
+
+        @Parcelize
+        data object Failure : UseDateTimeName()
+
+        @Parcelize
+        data object Success : UseDateTimeName()
+    }
 }

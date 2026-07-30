@@ -220,15 +220,6 @@ fun SettingsScreen(
 
             item {
                 SwitchPreferenceItem(
-                    title = stringResource(R.string.settings_use_original_name),
-                    icon = Icons.Outlined.Title,
-                    checked = state.isUseOriginalNameEnabled,
-                    onCheckedChange = { viewModel.storeUseOriginalName(it) },
-                )
-            }
-
-            item {
-                SwitchPreferenceItem(
                     title = stringResource(R.string.settings_preserve_orientation),
                     icon = Icons.Outlined.Image,
                     checked = state.isPreserveOrientationEnabled,
@@ -242,6 +233,33 @@ fun SettingsScreen(
                     icon = Icons.Outlined.AutoDelete,
                     checked = state.isAutoDeleteEnabled,
                     onCheckedChange = { viewModel.storeAutoDelete(it) },
+                )
+            }
+
+            item {
+                SwitchPreferenceItem(
+                    title = stringResource(R.string.settings_legacy_image_selection),
+                    icon = Icons.Outlined.PhotoLibrary,
+                    checked = state.isLegacyImageSelectionEnabled,
+                    onCheckedChange = { viewModel.storeLegacyImageSelection(it) },
+                )
+            }
+
+            item {
+                Text(
+                    text = stringResource(R.string.settings_section_file_name),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                )
+            }
+
+            item {
+                SwitchPreferenceItem(
+                    title = stringResource(R.string.settings_use_original_name),
+                    icon = Icons.Outlined.Title,
+                    checked = state.isUseOriginalNameEnabled,
+                    onCheckedChange = { viewModel.storeUseOriginalName(it) },
                 )
             }
 
@@ -271,10 +289,10 @@ fun SettingsScreen(
 
             item {
                 SwitchPreferenceItem(
-                    title = stringResource(R.string.settings_legacy_image_selection),
-                    icon = Icons.Outlined.PhotoLibrary,
-                    checked = state.isLegacyImageSelectionEnabled,
-                    onCheckedChange = { viewModel.storeLegacyImageSelection(it) },
+                    title = stringResource(R.string.settings_use_datetime_name),
+                    subtitle = stringResource(R.string.settings_use_datetime_name_summary),
+                    checked = state.isUseDateTimeNameEnabled,
+                    onCheckedChange = { viewModel.storeUseDateTimeName(it) },
                 )
             }
 

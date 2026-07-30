@@ -45,4 +45,5 @@ data class SettingsState(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val useDynamicColor: Boolean = true,
     val isUseOriginalNameEnabled: Boolean = false,
+    val isUseDateTimeNameEnabled: Boolean = false,
 ) : Parcelable

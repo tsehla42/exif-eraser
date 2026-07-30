@@ -66,8 +66,11 @@
     <!-- Settings -->
     <string name="settings_section_filesystem">Filesystem</string>
     <string name="settings_section_image">Image</string>
+    <string name="settings_section_file_name">File Name</string>
     <string name="settings_section_user_interface">UX</string>
     <string name="settings_use_original_name">Use original file name</string>
+    <string name="settings_use_datetime_name">Use datetime as name</string>
+    <string name="settings_use_datetime_name_summary">Use processing timestamp as filename</string>
     <string name="settings_randomize_file_names">Randomize file names</string>
     <string name="settings_default_open_path">Default open path</string>
     <string name="settings_default_save_path">Default save path</string>

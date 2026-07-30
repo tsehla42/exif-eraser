@@ -58,6 +58,7 @@ class SettingsViewModel @Inject constructor(
         val themeMode = settingsRepository.getThemeMode()
         val useDynamicColor = settingsRepository.getDynamicColor()
         val isUseOriginalNameEnabled = settingsRepository.isUseOriginalNameEnabled()
+        val isUseDateTimeNameEnabled = settingsRepository.isUseDateTimeNameEnabled()
         reduce {
             state.copy(
                 isRandomizeFileNamesEnabled = isRandomizeFileNamesEnabled,
@@ -73,6 +74,7 @@ class SettingsViewModel @Inject constructor(
                 themeMode = themeMode,
                 useDynamicColor = useDynamicColor,
                 isUseOriginalNameEnabled = isUseOriginalNameEnabled,
+                isUseDateTimeNameEnabled = isUseDateTimeNameEnabled,
             )
         }
     }
@@ -303,6 +305,18 @@ class SettingsViewModel @Inject constructor(
             postSideEffect(SettingsSideEffect.UseOriginalName.Success)
         } else {
             postSideEffect(SettingsSideEffect.UseOriginalName.Failure)
+        }
+    }
+
+    fun storeUseDateTimeName(isEnabled: Boolean) = intent {
+        val result = settingsRepository.putUseDateTimeName(isEnabled)
+        if (result.isSuccess) {
+            reduce {
+                state.copy(isUseDateTimeNameEnabled = isEnabled)
+            }
+            postSideEffect(SettingsSideEffect.UseDateTimeName.Success)
+        } else {
+            postSideEffect(SettingsSideEffect.UseDateTimeName.Failure)
         }
     }
 

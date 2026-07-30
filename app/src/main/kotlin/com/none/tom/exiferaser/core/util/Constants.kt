@@ -72,6 +72,7 @@ const val SETTINGS_KEY_SAVE_PATH_SELECTION_SKIP = "save_path_selection_skip"
 const val SETTINGS_KEY_SHARE_BY_DEFAULT = "image_share_by_default"
 const val SETTINGS_KEY_THEME_MODE = "theme_mode"
 const val SETTINGS_KEY_DYNAMIC_COLOR = "dynamic_color"
+const val SETTINGS_KEY_USE_DATETIME_NAME = "use_datetime_name"
 const val SETTINGS_KEY_USE_ORIGINAL_NAME = "use_original_name"
 
 const val TAG_ITEM_HELP_TRANSLATE = TOP_LEVEL_PACKAGE_NAME + "ITEM_HELP_TRANSLATE"
