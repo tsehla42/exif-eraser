@@ -23,6 +23,7 @@ package com.none.tom.exiferaser.settings.business
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import com.none.tom.exiferaser.core.image.FileNameMode
 import com.none.tom.exiferaser.settings.data.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -58,6 +59,7 @@ class SettingsViewModel @Inject constructor(
         val themeMode = settingsRepository.getThemeMode()
         val useDynamicColor = settingsRepository.getDynamicColor()
         val isUseDateTimeNameEnabled = settingsRepository.isUseDateTimeNameEnabled()
+        val fileNameMode = settingsRepository.getFileNameMode()
         reduce {
             state.copy(
                 isRandomizeFileNamesEnabled = isRandomizeFileNamesEnabled,
@@ -73,6 +75,7 @@ class SettingsViewModel @Inject constructor(
                 themeMode = themeMode,
                 useDynamicColor = useDynamicColor,
                 isUseDateTimeNameEnabled = isUseDateTimeNameEnabled,
+                fileNameMode = fileNameMode,
             )
         }
     }
@@ -303,6 +306,18 @@ class SettingsViewModel @Inject constructor(
             postSideEffect(SettingsSideEffect.UseDateTimeName.Success)
         } else {
             postSideEffect(SettingsSideEffect.UseDateTimeName.Failure)
+        }
+    }
+
+    fun storeFileNameMode(mode: FileNameMode) = intent {
+        val result = settingsRepository.putFileNameMode(mode)
+        if (result.isSuccess) {
+            reduce {
+                state.copy(fileNameMode = mode)
+            }
+            postSideEffect(SettingsSideEffect.FileName.Success)
+        } else {
+            postSideEffect(SettingsSideEffect.FileName.Failure)
         }
     }
 
