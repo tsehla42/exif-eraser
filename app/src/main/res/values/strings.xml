@@ -71,6 +71,21 @@
     <string name="settings_use_datetime_name">Use datetime as name</string>
     <string name="settings_use_datetime_name_summary">Use processing timestamp as filename</string>
     <string name="settings_randomize_file_names">Randomize file names</string>
+
+    <!-- File name slider -->
+    <string name="file_name_random">Random names</string>
+    <string name="file_name_image_id">Image ID</string>
+    <string name="file_name_conversion_date">Conversion date</string>
+    <string name="file_name_last_modified">Last modified</string>
+    <string name="file_name_slider_description_conversion">Converted at time of processing</string>
+    <string name="file_name_slider_description_last_modified">May leak info</string>
+    <string name="file_name_slider_description_random">No metadata in filename</string>
+    <string name="file_name_slider_description_image_id">Uses original filename</string>
+    <string name="theme_gradient_light">Light</string>
+    <string name="theme_gradient_dark">Dark</string>
+    <string name="file_name_gradient_private">More private</string>
+    <string name="file_name_gradient_less_private">Less private</string>
+
     <string name="settings_default_open_path">Default open path</string>
     <string name="settings_default_save_path">Default save path</string>
     <string name="settings_legacy_image_selection">Legacy image selection</string>
