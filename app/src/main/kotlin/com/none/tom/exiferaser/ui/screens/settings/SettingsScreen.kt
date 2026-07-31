@@ -252,7 +252,7 @@ fun SettingsScreen(
                     gradientEndLabel = stringResource(R.string.file_name_gradient_less_private),
                     gradientColors = listOf(
                         MaterialTheme.colorScheme.primary,
-                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        MaterialTheme.colorScheme.onSurface,
                     ),
                     onPositionChange = { position ->
                         viewModel.storeFileNameMode(FileNameMode.entries[position])
@@ -389,9 +389,8 @@ fun SettingsScreen(
                     gradientStartLabel = stringResource(R.string.theme_gradient_light),
                     gradientEndLabel = stringResource(R.string.theme_gradient_dark),
                     gradientColors = listOf(
-                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                        MaterialTheme.colorScheme.primary,
                         MaterialTheme.colorScheme.onSurface,
-                        Color(0xFF222222),
                     ),
                     showPositionLabels = false,
                     onPositionChange = { position ->
