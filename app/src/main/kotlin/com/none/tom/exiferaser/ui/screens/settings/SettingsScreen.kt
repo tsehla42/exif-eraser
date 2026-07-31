@@ -3,8 +3,11 @@ package com.none.tom.exiferaser.ui.screens.settings
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -39,7 +42,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -57,6 +62,9 @@ import com.none.tom.exiferaser.ui.components.DiscreteSliderPreference
 import com.none.tom.exiferaser.ui.components.PreferenceItem
 import com.none.tom.exiferaser.ui.components.SwitchPreferenceItem
 import com.none.tom.exiferaser.ui.components.DisplayNameSuffixDialog
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,7 +91,18 @@ fun SettingsScreen(
     }
 
     var cacheSize by remember { mutableStateOf(getCacheSize()) }
-    var fileNameDescriptionExpanded by remember { mutableStateOf(false) }
+    var isFileNameDescriptionExpanded by remember { mutableStateOf(false) }
+    var fileNameExampleRandom by remember { mutableStateOf(UUID.randomUUID().toString()) }
+    var fileNameExampleImageId by remember { mutableStateOf((1000..9999).random()) }
+    var fileNameExampleTimestamp by remember {
+        mutableStateOf(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS")))
+    }
+
+    fun refreshFileNameExamples() {
+        fileNameExampleRandom = UUID.randomUUID().toString()
+        fileNameExampleImageId = (1000..9999).random()
+        fileNameExampleTimestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS"))
+    }
 
     val defaultPathOpenLauncher = rememberLauncherForActivityResult(
         contract = OpenDocumentTree()
@@ -120,12 +139,6 @@ fun SettingsScreen(
         stringResource(R.string.file_name_image_id),
         stringResource(R.string.file_name_conversion_date),
         stringResource(R.string.file_name_last_modified),
-    )
-    val fileNameSliderDescriptions = listOf(
-        stringResource(R.string.file_name_slider_description_random),
-        stringResource(R.string.file_name_slider_description_image_id),
-        stringResource(R.string.file_name_slider_description_conversion),
-        stringResource(R.string.file_name_slider_description_last_modified),
     )
 
     LaunchedEffect(Unit) {
@@ -233,36 +246,64 @@ fun SettingsScreen(
             }
 
             item {
-                PreferenceItem(
-                    title = stringResource(R.string.settings_default_display_name_suffix),
-                    subtitle = state.defaultDisplayNameSuffix.ifBlank { stringResource(R.string.settings_not_set) },
-                    icon = Icons.Outlined.Description,
-                    onClick = { viewModel.handleDefaultDisplayNameSuffix() },
-                )
-            }
-
-            item {
                 DiscreteSliderPreference(
                     position = state.fileNameMode.ordinal,
                     positionLabels = fileNameSliderLabels,
                     dynamicLabel = fileNameSliderLabels[state.fileNameMode.ordinal],
                     gradientStartLabel = stringResource(R.string.file_name_gradient_private),
                     gradientEndLabel = stringResource(R.string.file_name_gradient_less_private),
-                    gradientStartColor = MaterialTheme.colorScheme.primary,
-                    gradientEndColor = MaterialTheme.colorScheme.tertiary,
+                    gradientStartColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                    gradientEndColor = MaterialTheme.colorScheme.primary,
                     onPositionChange = { position ->
                         viewModel.storeFileNameMode(FileNameMode.entries[position])
+                        refreshFileNameExamples()
                     },
-                    isDescriptionExpanded = fileNameDescriptionExpanded,
-                    onDescriptionToggle = { fileNameDescriptionExpanded = !fileNameDescriptionExpanded },
+                    isDescriptionExpanded = isFileNameDescriptionExpanded,
+                    onDescriptionToggle = { isFileNameDescriptionExpanded = !isFileNameDescriptionExpanded },
                     descriptionContent = {
-                        Text(
-                            text = fileNameSliderDescriptions[state.fileNameMode.ordinal],
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                        )
+                        Column(modifier = Modifier.padding(start = 24.dp, top = 4.dp)) {
+                            Text(
+                                text = stringResource(
+                                    when (state.fileNameMode) {
+                                        FileNameMode.RANDOM -> R.string.file_name_slider_description_random
+                                        FileNameMode.IMAGE_ID -> R.string.file_name_slider_description_image_id
+                                        FileNameMode.CONVERSION_DATE -> R.string.file_name_slider_description_conversion
+                                        FileNameMode.LAST_MODIFIED -> R.string.file_name_slider_description_last_modified
+                                    }
+                                ),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = stringResource(
+                                    when (state.fileNameMode) {
+                                        FileNameMode.RANDOM -> R.string.file_name_example_random
+                                        FileNameMode.IMAGE_ID -> R.string.file_name_example_image_id
+                                        FileNameMode.CONVERSION_DATE -> R.string.file_name_example_conversion
+                                        FileNameMode.LAST_MODIFIED -> R.string.file_name_example_last_modified
+                                    },
+                                    when (state.fileNameMode) {
+                                        FileNameMode.RANDOM -> fileNameExampleRandom
+                                        FileNameMode.IMAGE_ID -> fileNameExampleImageId
+                                        FileNameMode.CONVERSION_DATE -> fileNameExampleTimestamp
+                                        FileNameMode.LAST_MODIFIED -> fileNameExampleTimestamp
+                                    }
+                                ),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                     },
+                )
+            }
+
+            item {
+                PreferenceItem(
+                    title = stringResource(R.string.settings_default_display_name_suffix),
+                    subtitle = state.defaultDisplayNameSuffix.ifBlank { stringResource(R.string.settings_not_set) },
+                    icon = Icons.Outlined.Description,
+                    onClick = { viewModel.handleDefaultDisplayNameSuffix() },
                 )
             }
 
@@ -347,8 +388,8 @@ fun SettingsScreen(
                     dynamicLabel = themePositionLabels[themeCurrentPosition],
                     gradientStartLabel = stringResource(R.string.theme_gradient_light),
                     gradientEndLabel = stringResource(R.string.theme_gradient_dark),
-                    gradientStartColor = MaterialTheme.colorScheme.inverseSurface,
-                    gradientEndColor = MaterialTheme.colorScheme.surfaceVariant,
+                    gradientStartColor = Color(0xFFB0B0B0),
+                    gradientEndColor = MaterialTheme.colorScheme.onSurface,
                     onPositionChange = { position ->
                         viewModel.storeThemeMode(themeSliderPositions[position])
                     },
