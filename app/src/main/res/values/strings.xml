@@ -62,6 +62,8 @@
     <string name="raw">Raw</string>
     <string name="expand">Expand</string>
     <string name="collapse">Collapse</string>
+    <string name="expand_description">Expand description</string>
+    <string name="collapse_description">Collapse description</string>
 
     <!-- Settings -->
     <string name="settings_section_filesystem">Filesystem</string>
@@ -77,10 +79,14 @@
     <string name="file_name_image_id">Image ID</string>
     <string name="file_name_conversion_date">Conversion date</string>
     <string name="file_name_last_modified">Last modified</string>
-    <string name="file_name_slider_description_conversion">Converted at time of processing</string>
-    <string name="file_name_slider_description_last_modified">May leak info</string>
-    <string name="file_name_slider_description_random">No metadata in filename</string>
-    <string name="file_name_slider_description_image_id">Uses original filename</string>
+    <string name="file_name_slider_description_random">Generates a random UUID v4 filename \u2014 the most secure option. UUIDs are 128-bit values formatted as 8-4-4-4-12 hex digits.</string>
+    <string name="file_name_slider_description_image_id">Uses the file picker\u2019s internal ID, not the real filename you see in gallery or file manager. The real filename option is absent \u2014 Android\u2019s storage framework does not expose original filenames to apps.</string>
+    <string name="file_name_slider_description_conversion">Uses the current timestamp when processing: yyyyMMdd_HHmmss_SSS. The SSS is milliseconds \u2014 without it, multiple images processed in the same second would get identical names.</string>
+    <string name="file_name_slider_description_last_modified">May leak info as it preserves image metadata in the filename. Reads the EXIF DateTimeOriginal or DateTimeDigitized tag. Falls back to file system date, then current date.</string>
+    <string name="file_name_example_random">Example: %1$s.jpg</string>
+    <string name="file_name_example_image_id">Example: %1$d.jpg</string>
+    <string name="file_name_example_conversion">Example: %1$s.jpg</string>
+    <string name="file_name_example_last_modified">Example: %1$s.jpg</string>
     <string name="theme_gradient_light">Light</string>
     <string name="theme_gradient_dark">Dark</string>
     <string name="file_name_gradient_private">More private</string>
