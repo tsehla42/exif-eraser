@@ -89,7 +89,6 @@ fun SettingsScreen(
     }
 
     var cacheSize by remember { mutableStateOf(getCacheSize()) }
-    var isFileNameDescriptionExpanded by remember { mutableStateOf(false) }
     var fileNameExampleRandom by remember { mutableStateOf(UUID.randomUUID().toString()) }
     var fileNameExampleImageId by remember { mutableStateOf((1000..9999).random()) }
     var fileNameExampleTimestamp by remember {
@@ -258,8 +257,6 @@ fun SettingsScreen(
                         viewModel.storeFileNameMode(FileNameMode.entries[position])
                         refreshFileNameExamples()
                     },
-                    isDescriptionExpanded = isFileNameDescriptionExpanded,
-                    onDescriptionToggle = { isFileNameDescriptionExpanded = !isFileNameDescriptionExpanded },
                     descriptionContent = {
                         Column(modifier = Modifier.padding(start = 24.dp, top = 4.dp)) {
                             Text(
