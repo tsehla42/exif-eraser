@@ -387,7 +387,7 @@ fun SettingsScreen(
                     gradientEndLabel = stringResource(R.string.theme_gradient_dark),
                     gradientColors = listOf(
                         MaterialTheme.colorScheme.primary,
-                        MaterialTheme.colorScheme.onSurface,
+                        Color(0xFF111111),
                     ),
                     showPositionLabels = false,
                     onPositionChange = { position ->

@@ -83,41 +83,45 @@ fun DiscreteSliderPreference(
             endLabel = gradientEndLabel,
             colors = gradientColors,
         )
-        if (descriptionContent != null && onDescriptionToggle != null) {
-            Spacer(modifier = Modifier.height(4.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onDescriptionToggle() }
-                    .padding(vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    imageVector = if (isDescriptionExpanded) {
-                        Icons.Filled.KeyboardArrowUp
-                    } else {
-                        Icons.Filled.KeyboardArrowDown
-                    },
-                    contentDescription = if (isDescriptionExpanded) {
-                        "Collapse description"
-                    } else {
-                        "Expand description"
-                    },
-                    modifier = Modifier.size(20.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = if (isDescriptionExpanded) "Collapse" else "Expand",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            AnimatedVisibility(
-                visible = isDescriptionExpanded,
-                enter = expandVertically(),
-                exit = shrinkVertically(),
-            ) {
+        if (descriptionContent != null) {
+            if (onDescriptionToggle != null) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onDescriptionToggle() }
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = if (isDescriptionExpanded) {
+                            Icons.Filled.KeyboardArrowUp
+                        } else {
+                            Icons.Filled.KeyboardArrowDown
+                        },
+                        contentDescription = if (isDescriptionExpanded) {
+                            "Collapse description"
+                        } else {
+                            "Expand description"
+                        },
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = if (isDescriptionExpanded) "Collapse" else "Expand",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                AnimatedVisibility(
+                    visible = isDescriptionExpanded,
+                    enter = expandVertically(),
+                    exit = shrinkVertically(),
+                ) {
+                    descriptionContent()
+                }
+            } else {
                 descriptionContent()
             }
         }
