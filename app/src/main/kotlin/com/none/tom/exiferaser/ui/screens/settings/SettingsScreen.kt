@@ -270,8 +270,6 @@ fun SettingsScreen(
                                 ),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                maxLines = 5,
-                                minLines = 5,
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
@@ -291,7 +289,6 @@ fun SettingsScreen(
                                 ),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                maxLines = 5,
                                 minLines = 5,
                             )
                         }
