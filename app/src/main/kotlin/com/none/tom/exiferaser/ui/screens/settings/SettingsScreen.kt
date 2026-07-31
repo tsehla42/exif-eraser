@@ -251,14 +251,14 @@ fun SettingsScreen(
                     gradientEndLabel = stringResource(R.string.file_name_gradient_less_private),
                     gradientColors = listOf(
                         MaterialTheme.colorScheme.primary,
-                        MaterialTheme.colorScheme.onSurface,
+                        MaterialTheme.colorScheme.onSurfaceVariant,
                     ),
                     onPositionChange = { position ->
                         viewModel.storeFileNameMode(FileNameMode.entries[position])
                         refreshFileNameExamples()
                     },
                     descriptionContent = {
-                        Column(modifier = Modifier.padding(start = 24.dp, top = 4.dp)) {
+                        Column(modifier = Modifier.padding(top = 4.dp)) {
                             Text(
                                 text = stringResource(
                                     when (state.fileNameMode) {
@@ -387,7 +387,7 @@ fun SettingsScreen(
                     gradientEndLabel = stringResource(R.string.theme_gradient_dark),
                     gradientColors = listOf(
                         MaterialTheme.colorScheme.primary,
-                        Color(0xFF111111),
+                        MaterialTheme.colorScheme.onSurfaceVariant,
                     ),
                     showPositionLabels = false,
                     onPositionChange = { position ->
