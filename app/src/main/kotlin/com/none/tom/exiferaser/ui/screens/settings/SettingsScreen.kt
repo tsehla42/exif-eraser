@@ -83,6 +83,7 @@ fun SettingsScreen(
     }
 
     var cacheSize by remember { mutableStateOf(getCacheSize()) }
+    var fileNameDescriptionExpanded by remember { mutableStateOf(false) }
 
     val defaultPathOpenLauncher = rememberLauncherForActivityResult(
         contract = OpenDocumentTree()
@@ -242,15 +243,25 @@ fun SettingsScreen(
 
             item {
                 DiscreteSliderPreference(
-                    title = stringResource(R.string.settings_section_file_name),
                     position = state.fileNameMode.ordinal,
                     positionLabels = fileNameSliderLabels,
                     dynamicLabel = fileNameSliderLabels[state.fileNameMode.ordinal],
                     gradientStartLabel = stringResource(R.string.file_name_gradient_private),
                     gradientEndLabel = stringResource(R.string.file_name_gradient_less_private),
-                    description = fileNameSliderDescriptions[state.fileNameMode.ordinal],
+                    gradientStartColor = MaterialTheme.colorScheme.primary,
+                    gradientEndColor = MaterialTheme.colorScheme.tertiary,
                     onPositionChange = { position ->
                         viewModel.storeFileNameMode(FileNameMode.entries[position])
+                    },
+                    isDescriptionExpanded = fileNameDescriptionExpanded,
+                    onDescriptionToggle = { fileNameDescriptionExpanded = !fileNameDescriptionExpanded },
+                    descriptionContent = {
+                        Text(
+                            text = fileNameSliderDescriptions[state.fileNameMode.ordinal],
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                        )
                     },
                 )
             }
@@ -331,12 +342,13 @@ fun SettingsScreen(
 
             item {
                 DiscreteSliderPreference(
-                    title = stringResource(R.string.theme_section),
                     position = themeCurrentPosition,
                     positionLabels = themePositionLabels,
                     dynamicLabel = themePositionLabels[themeCurrentPosition],
                     gradientStartLabel = stringResource(R.string.theme_gradient_light),
                     gradientEndLabel = stringResource(R.string.theme_gradient_dark),
+                    gradientStartColor = MaterialTheme.colorScheme.inverseSurface,
+                    gradientEndColor = MaterialTheme.colorScheme.surfaceVariant,
                     onPositionChange = { position ->
                         viewModel.storeThemeMode(themeSliderPositions[position])
                     },
