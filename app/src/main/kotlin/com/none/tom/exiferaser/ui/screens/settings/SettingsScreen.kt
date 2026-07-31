@@ -3,6 +3,7 @@ package com.none.tom.exiferaser.ui.screens.settings
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -258,39 +259,40 @@ fun SettingsScreen(
                         refreshFileNameExamples()
                     },
                     descriptionContent = {
-                        Column(modifier = Modifier.padding(top = 4.dp)) {
-                            Text(
-                                text = stringResource(
-                                    when (state.fileNameMode) {
-                                        FileNameMode.RANDOM -> R.string.file_name_slider_description_random
-                                        FileNameMode.IMAGE_ID -> R.string.file_name_slider_description_image_id
-                                        FileNameMode.CONVERSION_DATE -> R.string.file_name_slider_description_conversion
-                                        FileNameMode.LAST_MODIFIED -> R.string.file_name_slider_description_last_modified
-                                    }
-                                ),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = stringResource(
-                                    when (state.fileNameMode) {
-                                        FileNameMode.RANDOM -> R.string.file_name_example_random
-                                        FileNameMode.IMAGE_ID -> R.string.file_name_example_image_id
-                                        FileNameMode.CONVERSION_DATE -> R.string.file_name_example_conversion
-                                        FileNameMode.LAST_MODIFIED -> R.string.file_name_example_last_modified
-                                    },
-                                    when (state.fileNameMode) {
-                                        FileNameMode.RANDOM -> fileNameExampleRandom
-                                        FileNameMode.IMAGE_ID -> fileNameExampleImageId
-                                        FileNameMode.CONVERSION_DATE -> fileNameExampleTimestamp
-                                        FileNameMode.LAST_MODIFIED -> fileNameExampleTimestamp
-                                    }
-                                ),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                minLines = 5,
-                            )
+                        Box(modifier = Modifier.height(120.dp)) {
+                            Column(modifier = Modifier.padding(top = 4.dp)) {
+                                Text(
+                                    text = stringResource(
+                                        when (state.fileNameMode) {
+                                            FileNameMode.RANDOM -> R.string.file_name_slider_description_random
+                                            FileNameMode.IMAGE_ID -> R.string.file_name_slider_description_image_id
+                                            FileNameMode.CONVERSION_DATE -> R.string.file_name_slider_description_conversion
+                                            FileNameMode.LAST_MODIFIED -> R.string.file_name_slider_description_last_modified
+                                        }
+                                    ),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = stringResource(
+                                        when (state.fileNameMode) {
+                                            FileNameMode.RANDOM -> R.string.file_name_example_random
+                                            FileNameMode.IMAGE_ID -> R.string.file_name_example_image_id
+                                            FileNameMode.CONVERSION_DATE -> R.string.file_name_example_conversion
+                                            FileNameMode.LAST_MODIFIED -> R.string.file_name_example_last_modified
+                                        },
+                                        when (state.fileNameMode) {
+                                            FileNameMode.RANDOM -> fileNameExampleRandom
+                                            FileNameMode.IMAGE_ID -> fileNameExampleImageId
+                                            FileNameMode.CONVERSION_DATE -> fileNameExampleTimestamp
+                                            FileNameMode.LAST_MODIFIED -> fileNameExampleTimestamp
+                                        }
+                                    ),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
                         }
                     },
                 )
