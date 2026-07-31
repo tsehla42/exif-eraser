@@ -27,7 +27,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -37,10 +36,10 @@ fun DiscreteSliderPreference(
     dynamicLabel: String,
     gradientStartLabel: String,
     gradientEndLabel: String,
-    gradientStartColor: Color,
-    gradientEndColor: Color,
+    gradientColors: List<Color>,
     onPositionChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    showPositionLabels: Boolean = true,
     isDescriptionExpanded: Boolean = false,
     onDescriptionToggle: (() -> Unit)? = null,
     descriptionContent: @Composable (() -> Unit)? = null,
@@ -62,25 +61,26 @@ fun DiscreteSliderPreference(
             steps = positionLabels.size - 2,
             modifier = Modifier.fillMaxWidth(),
         )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            positionLabels.forEach { label ->
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.weight(1f),
-                    maxLines = 1,
-                )
+        if (showPositionLabels) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                positionLabels.forEach { label ->
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1f),
+                        maxLines = 1,
+                    )
+                }
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
         GradientArrow(
             startLabel = gradientStartLabel,
             endLabel = gradientEndLabel,
-            startColor = gradientStartColor,
-            endColor = gradientEndColor,
+            colors = gradientColors,
         )
         if (descriptionContent != null && onDescriptionToggle != null) {
             Spacer(modifier = Modifier.height(4.dp))
@@ -127,8 +127,7 @@ fun DiscreteSliderPreference(
 private fun GradientArrow(
     startLabel: String,
     endLabel: String,
-    startColor: Color,
-    endColor: Color,
+    colors: List<Color>,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -142,7 +141,7 @@ private fun GradientArrow(
             val lineEnd = size.width - arrowHeadSize
 
             val brush = Brush.linearGradient(
-                colors = listOf(startColor, endColor),
+                colors = colors,
                 start = Offset(0f, lineHeight),
                 end = Offset(size.width, lineHeight),
             )
@@ -174,13 +173,11 @@ private fun GradientArrow(
                 text = startLabel,
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.weight(1f),
             )
             Text(
                 text = endLabel,
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.weight(1f),
             )
         }
     }

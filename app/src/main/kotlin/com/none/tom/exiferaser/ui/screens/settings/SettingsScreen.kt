@@ -250,8 +250,10 @@ fun SettingsScreen(
                     dynamicLabel = fileNameSliderLabels[state.fileNameMode.ordinal],
                     gradientStartLabel = stringResource(R.string.file_name_gradient_private),
                     gradientEndLabel = stringResource(R.string.file_name_gradient_less_private),
-                    gradientStartColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-                    gradientEndColor = MaterialTheme.colorScheme.primary,
+                    gradientColors = listOf(
+                        MaterialTheme.colorScheme.primary,
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    ),
                     onPositionChange = { position ->
                         viewModel.storeFileNameMode(FileNameMode.entries[position])
                         refreshFileNameExamples()
@@ -386,8 +388,12 @@ fun SettingsScreen(
                     dynamicLabel = themePositionLabels[themeCurrentPosition],
                     gradientStartLabel = stringResource(R.string.theme_gradient_light),
                     gradientEndLabel = stringResource(R.string.theme_gradient_dark),
-                    gradientStartColor = Color(0xFFB0B0B0),
-                    gradientEndColor = MaterialTheme.colorScheme.onSurface,
+                    gradientColors = listOf(
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                        MaterialTheme.colorScheme.onSurface,
+                        Color(0xFF222222),
+                    ),
+                    showPositionLabels = false,
                     onPositionChange = { position ->
                         viewModel.storeThemeMode(themeSliderPositions[position])
                     },
