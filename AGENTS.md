@@ -64,6 +64,17 @@ exif-eraser/
 │   │   ├── savePath/           # Save path selection (full-screen Scaffold with checkbox for skip)
 │       │   └── help/               # Help screen
 │       └── theme/                  # Color, Theme, Typography
+├── app/src/main/res/
+│   ├── drawable/
+│   │   ├── ic_launcher_foreground.xml   # Adaptive icon foreground (vector)
+│   │   └── ic_launcher_monochrome.xml   # Themed icon monochrome layer (vector)
+│   ├── mipmap-anydpi-v26/
+│   │   ├── ic_launcher.xml              # Adaptive icon definition (bg+fg+mono)
+│   │   └── ic_launcher_round.xml        # Round adaptive icon definition
+│   ├── values/colors.xml                # Icon colors (light) + app colors
+│   ├── values-v31/colors.xml            # Icon colors (Android 12+ dynamic)
+│   ├── values-night/colors.xml          # Icon colors (dark mode)
+│   └── values-night-v31/colors.xml      # Icon colors (dark + dynamic)
 ├── build.gradle.kts                # Root build (plugin declarations)
 ├── app/build.gradle.kts            # App module build config
 ├── gradle/libs.versions.toml       # Version catalog
@@ -171,6 +182,8 @@ exif-eraser/
 **Add new UI component:** Create composable in `ui/components/`, follow existing patterns (e.g., `ConfirmDialog.kt`, `ImageSourceCard.kt`).
 
 **After rebuilding the app:** Always run `adb install -r app/build/outputs/apk/debug/app-debug.apk` to deploy to connected devices. Check `adb devices` first — if no devices are connected, warn the user before proceeding with the build.
+
+**Change the app icon:** Replace the SVG paths in `app/src/main/res/drawable/ic_launcher_foreground.xml` and `ic_launcher_monochrome.xml`. Colors are in `res/values/colors.xml` (light), `values-night/colors.xml` (dark), `values-v31/colors.xml` (Android 12+ dynamic), `values-night-v31/colors.xml` (dark + dynamic). The adaptive icon uses `@color/ic_launcher_background` and `@color/ic_launcher_foreground`.
 
 ## Docs Index
 

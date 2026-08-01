@@ -113,3 +113,32 @@ Theme preferences stored in DataStore:
 val themeModeFlow = dataStore.data.map { ... ThemeMode.entries.getOrElse(...) }
 val dynamicColorFlow = dataStore.data.map { ... }
 ```
+
+## Launcher Icon
+
+Adaptive icon with Material You dynamic color support (Android 12+).
+
+### Structure
+
+| File | Purpose |
+|------|---------|
+| `drawable/ic_launcher_foreground.xml` | Foreground vector (icon shape) |
+| `drawable/ic_launcher_monochrome.xml` | Monochrome layer for themed icons |
+| `mipmap-anydpi-v26/ic_launcher.xml` | Adaptive icon definition (bg + fg + mono) |
+| `values/colors.xml` | Light mode colors |
+| `values-night/colors.xml` | Dark mode colors |
+| `values-v31/colors.xml` | Android 12+ dynamic colors |
+| `values-night-v31/colors.xml` | Android 12+ dark dynamic colors |
+
+### Color Scheme
+
+Uses `ic_launcher_background` and `ic_launcher_foreground` color resources with 4 qualifier variants:
+
+| Mode | Background | Foreground |
+|------|-----------|------------|
+| Light (pre-12) | `#ABE87C` | `#394F29` |
+| Dark (pre-12) | `#2A3025` | `#ABE87C` |
+| Light (12+) | `system_accent1_100` | `system_accent1_700` |
+| Dark (12+) | `system_accent2_800` | `system_accent1_100` |
+
+On Android 12+, the system wallpaper-derived palette automatically colors the icon. The monochrome layer enables themed icon support when enabled in device settings.

@@ -22,3 +22,4 @@
 | Clear Cache | Clear cached images with size display | `ui/screens/settings/SettingsScreen.kt` |
 | Processing Details | View list of processed files with thumbnails | `ui/screens/processingDetails/ProcessingDetailsScreen.kt` |
 | Themed Snackbar | Error messages themed for AMOLED/Dark/Light | `ui/screens/main/MainScreen.kt` |
+| Adaptive Icon | Material You dynamic color launcher icon | `res/values/colors.xml`, `res/drawable/ic_launcher_foreground.xml` |

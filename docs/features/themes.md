@@ -40,6 +40,14 @@ Theme selection uses a discrete slider with gradient arrow (primary → onSurfac
 - Togglable in Settings screen
 - Falls back to static color schemes when disabled or on older devices
 
+### Launcher Icon Dynamic Colors
+
+The app icon also supports Material You dynamic colors via resource qualifier overrides:
+- `values-v31/` references `@android:color/system_accent1_*` for wallpaper-based colors
+- `values-night-v31/` uses secondary palette for dark mode contrast
+- The `<monochrome>` layer in the adaptive icon enables themed icon support (Android 13+)
+- Pre-Android 12 falls back to static green (`#ABE87C` / `#394F29`)
+
 ### AMOLED Implementation
 
 When `ThemeMode.AMOLED`:
