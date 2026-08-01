@@ -53,10 +53,15 @@ If metadata is found (or randomize filenames is enabled):
 
 ### 5. Filename Formatting
 
-Output filenames are determined by priority order:
-1. `isUseDateTimeNameEnabled` → use processing timestamp (format: yyyyMMdd_HHmmss_SSS)
-2. `isRandomizeFileNamesEnabled` → UUID filename + suffix (if provided)
-3. Default: original name + camera suffix (if from camera) + display name suffix
+Output filenames are determined by `FileNameMode` enum:
+- `RANDOM` → UUID v4 filename + suffix (if provided)
+- `IMAGE_ID` → original file picker ID + camera suffix (if from camera) + suffix
+- `CONVERSION_DATE` → processing timestamp (format: yyyyMMdd_HHmmss_SSS)
+- `LAST_MODIFIED` → EXIF DateTimeOriginal/DateTimeDigitized with fallback chain:
+  1. EXIF `DateTimeOriginal` (when photo was taken)
+  2. EXIF `DateTimeDigitized` (when photo was digitized)
+  3. File system `lastModified` date
+  4. Current date/time (same as conversion date)
 
 ## Key Classes
 
@@ -85,10 +90,9 @@ Defined in `core/image/ImageFormat.kt`:
 |---|---|---|
 | Auto Delete | false | Delete source after processing |
 | Preserve Orientation | false | Keep EXIF orientation in output |
-| Randomize File Names | false | UUID-based output filenames |
+| File Name Mode | IMAGE_ID | Controls output filename (RANDOM, IMAGE_ID, CONVERSION_DATE, LAST_MODIFIED) |
 | Share by Default | false | Auto-share processed images |
 | Display Name Suffix | "" | Append suffix to output filenames |
-| Use Datetime as Name | false | Use processing timestamp as filename (format: yyyyMMdd_HHmmss_SSS) |
 | Skip Save Path Selection | false | Use default save path directly |
 
 ## Progress Tracking

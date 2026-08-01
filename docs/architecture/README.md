@@ -78,13 +78,18 @@ User selects images
   → MainViewModel puts selection in SelectionRepository (protobuf)
   → User navigates to SavePathScreen (or skips with default)
   → ImageProcessingViewModel reads selection
-  → ImageProcessingRepository.removeMetadata() flow:
+  → ImageProcessingRepository.removeMetadata(fileNameMode, displayNameSuffix) flow:
       For each image:
         1. Scan with ExifInterfaceExtended → ImageMetadataSnapshot
-        2. If metadata found, datetime naming, or randomize enabled:
-           a. Create new document via DocumentsContract
-           b. Write image without metadata via saveExclusive()
-           c. Optionally delete original
+        2. If metadata found or fileNameMode != IMAGE_ID:
+           a. Determine filename based on FileNameMode:
+              - RANDOM: UUID v4 + suffix
+              - IMAGE_ID: original ID + camera suffix + suffix
+              - CONVERSION_DATE: timestamp yyyyMMdd_HHmmss_SSS
+              - LAST_MODIFIED: EXIF date with fallback chain
+           b. Create new document via DocumentsContract
+           c. Write image without metadata via saveExclusive()
+           d. Optionally delete original
         3. Emit ImageProcessingStep.FinishedSingle with summary
       Finally: emit ImageProcessingStep.FinishedBulk
   → UI updates progress, shows results

@@ -30,6 +30,8 @@ Default: `ThemeMode.SYSTEM`
    - Otherwise → `DarkColorScheme` or `LightColorScheme`
 3. If AMOLED mode → overlays pure black on the base scheme
 
+Theme selection uses a discrete slider with gradient arrow (primary → onSurfaceVariant) in the Settings screen. Slider positions: Light → System default → Dark → AMOLED.
+
 ### Dynamic Colors
 
 - Enabled by default (`useDynamicColor = true`)
