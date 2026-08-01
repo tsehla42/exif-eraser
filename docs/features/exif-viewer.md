@@ -63,8 +63,9 @@ The toggle buttons show the current mode with primary color highlighting. Expand
 | Class | Location | Responsibility |
 |---|---|---|
 | `MetadataViewerRepository` | `metadataViewer/data/` | Reads metadata via metadata-extractor |
-| `MetadataViewerViewModel` | `metadataViewer/business/` | Loads metadata, manages expand/collapse state |
+| `MetadataViewerViewModel` | `metadataViewer/business/` | Loads metadata, manages expand/collapse state, handles EXIF removal |
 | `MetadataViewerState` | `metadataViewer/business/` | UI state: groups, expanded set, raw mode, loading |
+| `MetadataViewerSideEffect` | `metadataViewer/business/` | Navigation side effects: `NavigateToProcessing`, `NavigateToSavePathSelection` |
 | `MetadataGroup` | `metadataViewer/data/` | Directory with name and tags |
 | `MetadataTag` | `metadataViewer/data/` | Single metadata entry |
 
@@ -84,4 +85,10 @@ The `metadata-extractor` library can read:
 
 ## Navigation
 
-From MainScreen, user taps an image → navigates to `MetadataViewerScreen` with URI and display name. The screen also has a "Remove Metadata" button that navigates to the processing flow for that image.
+From MainScreen, user taps an image → navigates to `MetadataViewerScreen` with URI and display name. The screen has a "Remove Metadata" delete button (FAB) that:
+
+1. Stores the image URI in `SelectionRepository`
+2. Determines save path (from settings or save path picker)
+3. Navigates to `ImageProcessing` screen to process the single image
+
+The delete button is hidden when navigating from `ProcessingDetailsScreen` (via `hideDelete = true`).

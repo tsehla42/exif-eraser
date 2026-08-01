@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.none.tom.exiferaser.R
+import com.none.tom.exiferaser.metadataViewer.business.MetadataViewerSideEffect
 import com.none.tom.exiferaser.metadataViewer.business.MetadataViewerViewModel
 import com.none.tom.exiferaser.ui.components.EmptyState
 import com.none.tom.exiferaser.ui.components.ErrorState
@@ -59,7 +60,8 @@ fun MetadataViewerScreen(
     onNavigateToMain: () -> Unit,
     onNavigateToHelp: () -> Unit,
     onNavigateToSettings: () -> Unit,
-    onRemoveMetadata: (Uri) -> Unit,
+    onNavigateToProcessing: (String) -> Unit,
+    onNavigateToSavePathSelection: () -> Unit,
     uri: Uri,
     displayName: String,
     hideDeleteButton: Boolean = false,
@@ -69,6 +71,22 @@ fun MetadataViewerScreen(
 
     LaunchedEffect(uri, displayName) {
         viewModel.loadMetadata(uri = uri, displayName = displayName)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.container.sideEffectFlow.collect { sideEffect ->
+            when (sideEffect) {
+                is MetadataViewerSideEffect.Error -> {
+                    // Error handled by existing error state
+                }
+                is MetadataViewerSideEffect.NavigateToProcessing -> {
+                    onNavigateToProcessing(sideEffect.savePath.toString())
+                }
+                MetadataViewerSideEffect.NavigateToSavePathSelection -> {
+                    onNavigateToSavePathSelection()
+                }
+            }
+        }
     }
 
     Scaffold(
@@ -94,7 +112,7 @@ fun MetadataViewerScreen(
         floatingActionButton = {
             if (state.metadataGroups.isNotEmpty() && !state.isLoading && !hideDeleteButton) {
                 FloatingActionButton(
-                    onClick = { onRemoveMetadata(uri) },
+                    onClick = { viewModel.removeMetadata(uri) },
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Delete,

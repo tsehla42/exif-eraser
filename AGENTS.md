@@ -85,7 +85,7 @@ exif-eraser/
 | `imageProcessing/business` | imageProcessing/data, main/data, settings | `ImageProcessingViewModel` - orchestrates bulk EXIF removal with progress |
 | `imageProcessingDetails/business` | imageProcessing/data, settings | `ImageProcessingDetailsViewModel` - handles processed file list, copy path |
 | `metadataViewer/data` | metadata-extractor | `MetadataViewerRepository` - reads all metadata via `ImageMetadataReader` |
-| `metadataViewer/business` | metadataViewer/data | `MetadataViewerViewModel` - loads metadata, toggles expand/collapse, raw/pretty mode |
+| `metadataViewer/business` | metadataViewer/data, main/data, settings | `MetadataViewerViewModel` - loads metadata, toggles expand/collapse, raw/pretty mode, handles EXIF removal via delete button |
 | `settings/data` | DataStore | `SettingsRepository` - all preferences (paths, theme, auto-delete, etc.) |
 | `settings/business` | settings/data | `SettingsViewModel` - manages settings UI state |
 | `navigation` | all screens | `AppNavHost` - Navigation Compose graph, `Screen` sealed class |
@@ -122,6 +122,9 @@ exif-eraser/
 4. Repository uses `ImageMetadataReader.readMetadata()` (metadata-extractor library)
 5. Returns list of `MetadataGroup` (directories) with `MetadataTag` entries
 6. UI displays groups in expandable sections with bottom control bar (Pretty, Raw, Expand/Collapse buttons above navigation bar)
+7. User can tap delete button to remove EXIF from the viewed image
+8. `MetadataViewerViewModel.removeMetadata()` stores image in `SelectionRepository`, determines save path
+9. Navigates to `ImageProcessing` screen which processes the single image
 
 ### Camera Flow
 

@@ -3,7 +3,9 @@ package com.none.tom.exiferaser.metadataViewer.business
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import com.none.tom.exiferaser.main.data.SelectionRepository
 import com.none.tom.exiferaser.metadataViewer.data.MetadataViewerRepository
+import com.none.tom.exiferaser.settings.data.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import org.orbitmvi.orbit.ContainerHost
@@ -13,6 +15,8 @@ import org.orbitmvi.orbit.viewmodel.container
 class MetadataViewerViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: MetadataViewerRepository,
+    private val selectionRepository: SelectionRepository,
+    private val settingsRepository: SettingsRepository,
 ) : ViewModel(),
     ContainerHost<MetadataViewerState, MetadataViewerSideEffect> {
 
@@ -65,6 +69,24 @@ class MetadataViewerViewModel @Inject constructor(
         } else {
             val allGroups = state.metadataGroups.map { it.name }.toSet()
             reduce { state.copy(isRawMode = false, expandedGroups = allGroups) }
+        }
+    }
+
+    fun removeMetadata(uri: Uri) = intent {
+        val putResult = selectionRepository.putSelection(uri)
+        if (putResult.isFailure) {
+            postSideEffect(MetadataViewerSideEffect.Error("Failed to prepare image for processing"))
+            return@intent
+        }
+        if (settingsRepository.isSkipSavePathSelectionEnabled()) {
+            val result = settingsRepository.getPrivilegedDefaultSavePath()
+            if (result.isSuccess) {
+                postSideEffect(MetadataViewerSideEffect.NavigateToProcessing(result.getOrThrow()))
+            } else {
+                postSideEffect(MetadataViewerSideEffect.NavigateToSavePathSelection)
+            }
+        } else {
+            postSideEffect(MetadataViewerSideEffect.NavigateToSavePathSelection)
         }
     }
 }

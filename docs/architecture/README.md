@@ -106,6 +106,12 @@ User taps image on MainScreen
       → ImageMetadataReader.readMetadata(stream) [metadata-extractor]
       → Map directories to MetadataGroup with MetadataTag list
   → UI shows expandable groups with raw/pretty toggle
+  → User taps delete button
+    → MetadataViewerViewModel.removeMetadata(uri)
+      → Stores image in SelectionRepository
+      → Determines save path (from settings or save path picker)
+      → Navigates to ImageProcessing screen
+    → ImageProcessingViewModel processes the single image
 ```
 
 ### Settings

@@ -114,8 +114,11 @@ fun AppNavHost(navController: NavHostController) {
                 },
                 onNavigateToHelp = { navController.navigate(Screen.Help.route) },
                 onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
-                onRemoveMetadata = {
-                    navController.navigate(Screen.ImageProcessing.createRoute())
+                onNavigateToProcessing = { savePath ->
+                    navController.navigate(Screen.ImageProcessing.createRoute(savePath))
+                },
+                onNavigateToSavePathSelection = {
+                    navController.navigate(Screen.SavePathSelection.route)
                 },
                 uri = Uri.parse(uriString),
                 displayName = displayName,
