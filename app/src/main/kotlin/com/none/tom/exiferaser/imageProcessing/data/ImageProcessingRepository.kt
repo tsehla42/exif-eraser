@@ -121,12 +121,13 @@ class ImageProcessingRepository @Inject constructor(
                 )
                 val (exifInterfaceExtended, scanResult) = scanImage(sourceUri).getOrThrow()
                 imageMetadataSnapshot = scanResult
-                val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS")
+                val conversionDateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS")
+                val lastModifiedDateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
                 Timber.d("Processing image: $displayName, fileNameMode: $fileNameMode, hasMetadata: ${scanResult.isMetadataContained()}")
                 if (scanResult.isMetadataContained() || fileNameMode != FileNameMode.IMAGE_ID) {
                     formattedDisplayName = when (fileNameMode) {
                         FileNameMode.CONVERSION_DATE -> {
-                            LocalDateTime.now().format(dateTimeFormatter)
+                            LocalDateTime.now().format(conversionDateTimeFormatter)
                         }
                         FileNameMode.RANDOM -> {
                             val randomName = UUID.randomUUID().toString()
@@ -139,9 +140,9 @@ class ImageProcessingRepository @Inject constructor(
                         FileNameMode.LAST_MODIFIED -> {
                             val lastModified = getLastModifiedDate(exifInterfaceExtended)
                             if (lastModified != null) {
-                                lastModified.format(dateTimeFormatter)
+                                lastModified.format(lastModifiedDateTimeFormatter)
                             } else {
-                                LocalDateTime.now().format(dateTimeFormatter)
+                                LocalDateTime.now().format(lastModifiedDateTimeFormatter)
                             }
                         }
                         FileNameMode.IMAGE_ID -> {

@@ -86,7 +86,7 @@ User selects images
               - RANDOM: UUID v4 + suffix
               - IMAGE_ID: original ID + camera suffix + suffix
               - CONVERSION_DATE: timestamp yyyyMMdd_HHmmss_SSS
-              - LAST_MODIFIED: EXIF date with fallback chain
+              - LAST_MODIFIED: EXIF date yyyyMMdd_HHmmss with fallback chain
            b. Create new document via DocumentsContract
            c. Write image without metadata via saveExclusive()
            d. Optionally delete original

@@ -61,7 +61,9 @@ Output filenames are determined by `FileNameMode` enum:
   1. EXIF `DateTimeOriginal` (when photo was taken)
   2. EXIF `DateTimeDigitized` (when photo was digitized)
   3. File system `lastModified` date
-  4. Current date/time (same as conversion date)
+  4. Current date/time (same format as conversion but without milliseconds)
+
+Note: EXIF DateTimeOriginal is second-resolution (no milliseconds), so LAST_MODIFIED uses `yyyyMMdd_HHmmss` format. CONVERSION_DATE uses `yyyyMMdd_HHmmss_SSS` with real milliseconds from `LocalDateTime.now()`.
 
 ## Key Classes
 

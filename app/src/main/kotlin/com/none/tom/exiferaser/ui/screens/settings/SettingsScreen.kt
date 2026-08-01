@@ -92,14 +92,18 @@ fun SettingsScreen(
     var cacheSize by remember { mutableStateOf(getCacheSize()) }
     var fileNameExampleRandom by remember { mutableStateOf(UUID.randomUUID().toString()) }
     var fileNameExampleImageId by remember { mutableStateOf((1000..9999).random()) }
-    var fileNameExampleTimestamp by remember {
+    var fileNameExampleConversion by remember {
         mutableStateOf(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS")))
+    }
+    var fileNameExampleLastModified by remember {
+        mutableStateOf(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")))
     }
 
     fun refreshFileNameExamples() {
         fileNameExampleRandom = UUID.randomUUID().toString()
         fileNameExampleImageId = (1000..9999).random()
-        fileNameExampleTimestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS"))
+        fileNameExampleConversion = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS"))
+        fileNameExampleLastModified = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
     }
 
     val defaultPathOpenLauncher = rememberLauncherForActivityResult(
@@ -259,7 +263,7 @@ fun SettingsScreen(
                         refreshFileNameExamples()
                     },
                     descriptionContent = {
-                        Box(modifier = Modifier.height(120.dp)) {
+                        Box(modifier = Modifier.height(92.dp)) {
                             Column(modifier = Modifier.padding(top = 4.dp)) {
                                 Text(
                                     text = stringResource(
@@ -285,8 +289,8 @@ fun SettingsScreen(
                                         when (state.fileNameMode) {
                                             FileNameMode.RANDOM -> fileNameExampleRandom
                                             FileNameMode.IMAGE_ID -> fileNameExampleImageId
-                                            FileNameMode.CONVERSION_DATE -> fileNameExampleTimestamp
-                                            FileNameMode.LAST_MODIFIED -> fileNameExampleTimestamp
+                                            FileNameMode.CONVERSION_DATE -> fileNameExampleConversion
+                                            FileNameMode.LAST_MODIFIED -> fileNameExampleLastModified
                                         }
                                     ),
                                     style = MaterialTheme.typography.bodySmall,

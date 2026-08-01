@@ -86,7 +86,7 @@
     <string name="file_name_example_random">Example: %1$s.jpg</string>
     <string name="file_name_example_image_id">Example: %1$d.jpg</string>
     <string name="file_name_example_conversion">Example: %1$s.jpg</string>
-    <string name="file_name_example_last_modified">Example: %1$s</string>
+    <string name="file_name_example_last_modified">Example: %1$s.jpg</string>
     <string name="theme_gradient_light">Light</string>
     <string name="theme_gradient_dark">Dark</string>
     <string name="file_name_gradient_private">More private</string>

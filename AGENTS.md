@@ -107,7 +107,7 @@ exif-eraser/
    - `RANDOM` → UUID v4 filename + suffix
    - `IMAGE_ID` → original file picker ID + camera suffix + suffix
    - `CONVERSION_DATE` → processing timestamp (yyyyMMdd_HHmmss_SSS)
-   - `LAST_MODIFIED` → EXIF date with fallback chain (DateTimeOriginal → DateTimeDigitized → file date → current date)
+   - `LAST_MODIFIED` → EXIF date with fallback chain (DateTimeOriginal → DateTimeDigitized → file date → current date), format: yyyyMMdd_HHmmss (no milliseconds since EXIF is second-resolution)
 8. Optionally deletes original (auto-delete setting)
 9. Emits `ImageProcessingStep.FinishedSingle` per image with summary
 10. **No-EXIF handling:** When no metadata found, displays "Files already have no EXIF" (0 modified) or "Some files already had no EXIF" (partial cases)
