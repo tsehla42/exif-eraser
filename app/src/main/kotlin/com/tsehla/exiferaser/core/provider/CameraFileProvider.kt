@@ -24,20 +24,20 @@ import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
 import com.tsehla.exiferaser.R
-import com.tsehla.exiferaser.core.util.TOP_LEVEL_PACKAGE_NAME
 import java.io.File
 
 class CameraFileProvider : FileProvider(R.xml.file_paths) {
 
     companion object {
-        const val AUTHORITY = TOP_LEVEL_PACKAGE_NAME + "fileprovider"
         const val NAME = "my_images"
         const val SUFFIX = "_"
+
+        fun getAuthority(context: Context): String = context.packageName + ".fileprovider"
 
         fun getUriForFile(context: Context, displayName: String, extension: String): Uri =
             getUriForFile(
                 context,
-                AUTHORITY,
+                getAuthority(context),
                 File(getRootDirectory(context), displayName.plus('.').plus(extension))
             )
 

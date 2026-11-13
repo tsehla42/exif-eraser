@@ -152,7 +152,7 @@ class ImageProcessingRepository @Inject constructor(
                             FileUtilsKt.buildValidExtFilename(
                                 (sourceUri.extractImageId() ?: displayName)
                                     .plus(
-                                        if (sourceUri.authority == CameraFileProvider.AUTHORITY) {
+                                        if (sourceUri.authority == CameraFileProvider.getAuthority(context)) {
                                             CameraFileProvider.SUFFIX
                                         } else {
                                             ""
@@ -250,7 +250,7 @@ class ImageProcessingRepository @Inject constructor(
         mimeType: String
     ): Result<Uri> {
         return dispatcherIo.runCatchingResult {
-            if (uri.authority == CameraFileProvider.AUTHORITY) {
+            if (uri.authority == CameraFileProvider.getAuthority(context)) {
                 return@runCatchingResult getFileProviderUri(
                     displayName = displayName,
                     extension = checkNotNull(
@@ -368,7 +368,7 @@ class ImageProcessingRepository @Inject constructor(
             val mediaUris = mutableListOf<Uri>()
             uris.forEach { uri ->
                 when {
-                    uri.authority == CameraFileProvider.AUTHORITY -> {
+                    uri.authority == CameraFileProvider.getAuthority(context) -> {
                         if (deleteOwnCacheFile(uri)) {
                             Timber.d("Deleted own file %s", uri)
                         } else {
