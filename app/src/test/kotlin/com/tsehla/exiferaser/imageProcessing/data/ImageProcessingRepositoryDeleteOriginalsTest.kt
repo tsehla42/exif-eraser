@@ -121,7 +121,7 @@ class ImageProcessingRepositoryDeleteOriginalsTest {
         val file = File(directory, "shot.jpg").apply { writeText("photo") }
         val uri = FileProvider.getUriForFile(
             context,
-            com.tsehla.exiferaser.core.provider.CameraFileProvider.AUTHORITY,
+            com.tsehla.exiferaser.core.provider.CameraFileProvider.getAuthority(context),
             file,
         )
 

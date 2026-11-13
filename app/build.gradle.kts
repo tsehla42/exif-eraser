@@ -55,6 +55,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix = ".debug"
+            resValue("string", "app_name", "ExifEraser dev")
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -71,6 +75,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    // AGP 9 removed the old Variant API (applicationVariants / outputFileName), so a release
+    // APK can no longer be renamed per-variant. friendlyReleaseApk (below) writes a
+    // friendly-named copy beside the default output instead.
+
     kotlin {
         compilerOptions {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
@@ -80,6 +88,7 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+        resValues = true
     }
 
     testOptions {
@@ -105,4 +114,28 @@ wire {
     kotlin {
         android = true
     }
+}
+
+// AGP 9 removed the old Variant API (applicationVariants / outputFileName), so a release APK can
+// no longer be renamed per-variant. Write a friendly-named copy beside the default output after
+// every assembleRelease instead:
+//   app/build/outputs/apk/release/exif-eraser-<versionName>.apk
+val friendlyReleaseApk by tasks.registering {
+    group = "build"
+    description = "Copies app-release.apk to exif-eraser-<versionName>.apk"
+    doLast {
+        val dir = project.layout.buildDirectory.dir("outputs/apk/release").get().asFile
+        val src = File(dir, "app-release.apk")
+        require(src.exists()) { "Missing ${src.path} — run ./gradlew assembleRelease first." }
+        val metadata = File(dir, "output-metadata.json").takeIf { it.exists() }?.readText().orEmpty()
+        val version = Regex("\"versionName\"\\s*:\\s*\"([^\"]+)\"").find(metadata)?.groupValues?.get(1)
+            ?: "unversioned"
+        val dst = File(dir, "exif-eraser-$version.apk")
+        src.copyTo(dst, overwrite = true)
+        logger.lifecycle("Wrote ${dst.path}")
+    }
+}
+
+afterEvaluate {
+    tasks.named("assembleRelease") { finalizedBy(friendlyReleaseApk) }
 }
