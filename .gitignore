@@ -15,6 +15,7 @@ keystore.properties
 docs/*
 !docs/README.md
 !docs/architecture/
+!docs/app-stores/
 !docs/configuration/
 !docs/features/
 !docs/guides/

@@ -1,0 +1,23 @@
+Categories:
+  - Security
+  - Utilities
+License: MIT
+AuthorName: tsehla
+SourceCode: https://github.com/tsehla42/exif-eraser
+IssueTracker: https://github.com/tsehla42/exif-eraser/issues
+
+RepoType: git
+Repo: https://github.com/tsehla42/exif-eraser
+
+Builds:
+  - versionName: 1.0.0
+    versionCode: 45
+    commit: v1.0.0
+    subdir: app
+    gradle:
+      - full
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: 1.0.0
+CurrentVersionCode: 45

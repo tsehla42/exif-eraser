@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ExifEraser Icon — All Color Variants</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #111; color: #eee; padding: 40px 20px; }
+  h1 { text-align: center; font-size: 28px; margin-bottom: 8px; }
+  .subtitle { text-align: center; color: #888; margin-bottom: 40px; font-size: 14px; }
+  .grid { display: flex; flex-wrap: wrap; gap: 32px; justify-content: center; max-width: 1200px; margin: 0 auto; }
+  .card { background: #1e1e1e; border-radius: 16px; padding: 24px; width: 220px; text-align: center; border: 1px solid #333; }
+  .card h3 { font-size: 14px; margin-bottom: 4px; }
+  .card .tag { font-size: 11px; padding: 2px 8px; border-radius: 10px; display: inline-block; margin-bottom: 12px; }
+  .tag.old { background: #444; color: #aaa; }
+  .tag.new { background: #2d6a2d; color: #aaffaa; }
+  .tag.current { background: #555; color: #ddd; }
+  .icon-circle { width: 140px; height: 140px; border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .icon-circle svg { width: 140px; height: 140px; }
+  .colors { font-size: 11px; color: #888; line-height: 1.6; margin-top: 8px; }
+  .colors span { display: block; }
+  .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: middle; margin-right: 4px; border: 1px solid #555; }
+  .section { max-width: 1200px; margin: 0 auto 48px; }
+  .section-title { font-size: 20px; margin-bottom: 20px; padding-bottom: 8px; border-bottom: 1px solid #333; }
+  .note { background: #1a1a2e; border: 1px solid #334; border-radius: 8px; padding: 16px; margin: 24px auto; max-width: 800px; font-size: 13px; color: #aab; line-height: 1.6; }
+  .note strong { color: #ddf; }
+</style>
+</head>
+<body>
+
+<h1>ExifEraser Icon — All Color Variants</h1>
+<p class="subtitle">Old vs new color schemes across light, dark, and store variants</p>
+
+<div class="note">
+  <strong>What changed:</strong> The light theme (default) background was changed from green <code>#ABE87C</code> to brown <code>#36241E</code>, and foreground from dark green <code>#394F29</code> to beige <code>#D0B8B0</code>.
+  The dark theme was <strong>not modified</strong>. Android 12+ uses dynamic Material You colors from the device wallpaper (not shown here as they vary per device).
+</div>
+
+<!-- SHARED SVG DEFS -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <g id="icon-art">
+      <path d="M33.945,74.415C32.735,74.415 31.699,73.983 30.837,73.118C29.976,72.253 29.545,71.213 29.545,69.999V43.499C29.545,42.284 29.976,41.244 30.837,40.379C31.699,39.514 32.735,39.082 33.945,39.082H40.875L44.945,34.665H58.145L57.267,37.764L45.62,36.506L42.441,42.377L34.621,40.174L31.288,72.249L72.252,69.094L70.565,51.228L73.545,50.124V69.999C73.545,71.213 73.114,72.253 72.252,73.118C71.391,73.983 70.355,74.415 69.145,74.415H33.945Z"/>
+      <path d="M65.759,40.277L66.553,35.533L61.75,36.268V32.259L66.553,33.278L65.759,28.25H69.768L68.781,33.278L73.777,32.259V36.268L68.781,35.533L69.768,40.277H65.759Z"/>
+      <path d="M51.795,66.665C54.573,66.665 56.934,65.693 58.878,63.749C60.823,61.804 61.795,59.443 61.795,56.665C61.795,53.888 60.823,51.526 58.878,49.582C56.934,47.638 54.573,46.665 51.795,46.665C49.017,46.665 46.656,47.638 44.711,49.582C42.767,51.526 41.795,53.888 41.795,56.665C41.795,59.443 42.767,61.804 44.711,63.749C46.656,65.693 49.017,66.665 51.795,66.665ZM51.795,62.221L47.85,60.61L46.239,56.665L47.85,52.721L51.795,51.11L55.739,52.721L57.35,56.665L55.739,60.61L51.795,62.221Z"/>
+      <g fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M76.259,50.347C76.259,50.347 78.768,46.146 80.788,45.241C83.831,43.878 86.287,46.87 83.97,47.187"/>
+        <path d="M78.48,44.361C78.438,46.919 79.004,47.576 81.007,47.439"/>
+        <path d="M75.033,37.612C75.135,39.197 76.871,39.336 78.702,38.401C78.927,38.286 79.191,38.521 79.074,38.745C77.934,40.929 74.563,46.719 71.608,45.071C70.054,44.205 69.43,41.433 70.675,41.865"/>
+        <path d="M64.515,25.987C66.301,25.648 61.971,21.442 59.128,23.754C56.993,25.491 59.954,27.386 59.954,27.386C59.954,27.386 57.421,23.785 55.468,27.788C54.453,29.867 58.959,32.867 58.671,31.307"/>
+      </g>
+    </g>
+  </defs>
+</svg>
+
+<!-- LIGHT THEME -->
+<div class="section">
+  <h2 class="section-title">☀️ Light Theme (values/colors.xml)</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Light — Old</h3>
+      <span class="tag old">previous</span>
+      <div class="icon-circle" style="background:#ABE87C">
+        <svg viewBox="0 0 108 108"><g fill="#394F29" stroke="#394F29"><use href="#icon-art"/></g></svg>
+      </div>
+      <div class="colors">
+        <span><span class="swatch" style="background:#ABE87C"></span>bg #ABE87C</span>
+        <span><span class="swatch" style="background:#394F29"></span>fg #394F29</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Light — New</h3>
+      <span class="tag new">current</span>
+      <div class="icon-circle" style="background:#36241E">
+        <svg viewBox="0 0 108 108"><g fill="#D0B8B0" stroke="#D0B8B0"><use href="#icon-art"/></g></svg>
+      </div>
+      <div class="colors">
+        <span><span class="swatch" style="background:#36241E"></span>bg #36241E</span>
+        <span><span class="swatch" style="background:#D0B8B0"></span>fg #D0B8B0</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DARK THEME -->
+<div class="section">
+  <h2 class="section-title">🌙 Dark Theme (values-night/colors.xml)</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Dark — Unchanged</h3>
+      <span class="tag current">current (not modified)</span>
+      <div class="icon-circle" style="background:#2A3025">
+        <svg viewBox="0 0 108 108"><g fill="#ABE87C" stroke="#ABE87C"><use href="#icon-art"/></g></svg>
+      </div>
+      <div class="colors">
+        <span><span class="swatch" style="background:#2A3025"></span>bg #2A3025</span>
+        <span><span class="swatch" style="background:#ABE87C"></span>fg #ABE87C</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STORE ICON -->
+<div class="section">
+  <h2 class="section-title">🏪 Store Icon (fastlane/metadata/.../icon.png)</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Store — Old</h3>
+      <span class="tag old">previous</span>
+      <div class="icon-circle" style="background:#ABE87C">
+        <svg viewBox="0 0 108 108"><g fill="#394F29" stroke="#394F29"><use href="#icon-art"/></g></svg>
+      </div>
+      <div class="colors">
+        <span><span class="swatch" style="background:#ABE87C"></span>bg #ABE87C</span>
+        <span><span class="swatch" style="background:#394F29"></span>fg #394F29</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Store — New</h3>
+      <span class="tag new">current</span>
+      <div class="icon-circle" style="background:#36241E">
+        <svg viewBox="0 0 108 108"><g fill="#D0B8B0" stroke="#D0B8B0"><use href="#icon-art"/></g></svg>
+      </div>
+      <div class="colors">
+        <span><span class="swatch" style="background:#36241E"></span>bg #36241E</span>
+        <span><span class="swatch" style="background:#D0B8B0"></span>fg #D0B8B0</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ALL SIDE BY SIDE -->
+<div class="section">
+  <h2 class="section-title">🔍 All Variants Side by Side</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Light Old</h3>
+      <div class="icon-circle" style="background:#ABE87C">
+        <svg viewBox="0 0 108 108"><g fill="#394F29" stroke="#394F29"><use href="#icon-art"/></g></svg>
+      </div>
+      <div class="colors">#ABE87C / #394F29</div>
+    </div>
+    <div class="card">
+      <h3>Light New</h3>
+      <div class="icon-circle" style="background:#36241E">
+        <svg viewBox="0 0 108 108"><g fill="#D0B8B0" stroke="#D0B8B0"><use href="#icon-art"/></g></svg>
+      </div>
+      <div class="colors">#36241E / #D0B8B0</div>
+    </div>
+    <div class="card">
+      <h3>Dark</h3>
+      <div class="icon-circle" style="background:#2A3025">
+        <svg viewBox="0 0 108 108"><g fill="#ABE87C" stroke="#ABE87C"><use href="#icon-art"/></g></svg>
+      </div>
+      <div class="colors">#2A3025 / #ABE87C</div>
+    </div>
+    <div class="card">
+      <h3>Dynamic (example)</h3>
+      <div class="icon-circle" style="background:#1B3A4B">
+        <svg viewBox="0 0 108 108"><g fill="#A8D8EA" stroke="#A8D8EA"><use href="#icon-art"/></g></svg>
+      </div>
+      <div class="colors">system accent (varies)</div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <strong>Android 12+ (v31):</strong> Uses dynamic Material You colors from the device wallpaper
+  (<code>system_accent1_*</code> / <code>system_accent2_*</code>). These are resolved at runtime by the OS
+  and cannot be previewed statically — the example shown is an arbitrary blue wallpaper palette.
+</div>
+
+</body>
+</html>
