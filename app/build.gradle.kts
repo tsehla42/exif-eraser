@@ -91,6 +91,14 @@ android {
         resValues = true
     }
 
+    // Google's dependency-info BLOB (signing block 0x504b4453) is encrypted with Google's
+    // public key and is randomised on every build, so it breaks byte-for-byte reproducibility.
+    // It is only meaningful to the Play Store, so leave it out of the APK.
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
