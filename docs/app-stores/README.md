@@ -115,6 +115,29 @@ RookieEnough/Orion-Store#216, fix in PR #217.
 
 ---
 
+## Building a release for F-Droid (read this before tagging)
+
+F-Droid verifies our published APK against their own rebuild **byte-for-byte**
+(`Binaries:` + `AllowedAPKSigningKeys`). Two things break that comparison:
+
+1. **Build on Debian, not Fedora.** Fedora ships `zlib-ng-compat`, which compresses
+   differently from Debian's real `zlib1g` — content stays identical but the APK comes
+   out a different size, and `apksigcopier` fails with *"APK Signing Block offset <
+   central directory offset"*.
+2. **Build at the release tag.** `META-INF/version-control-info.textproto` embeds
+   `HEAD`, so an APK built from any other commit will not match.
+
+```bash
+git tag v1.x.y                       # tag first
+./scripts/build-release-in-debian.sh # builds in debian:trixie with OpenJDK 21
+gh release upload v1.x.y path/to/exif-eraser-1.x.y.apk
+```
+
+Also keep in mind: `baseline.prof`/`baseline.profm` (ArtProfile tasks) are disabled on
+purpose — they are not reproducible across machines.
+
+---
+
 ## Recommended Order
 
 1. **Orion Store** — fastest: submit from inside the app, it detects the repo metadata
