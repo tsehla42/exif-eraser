@@ -154,3 +154,13 @@ val friendlyReleaseApk by tasks.registering {
 afterEvaluate {
     tasks.named("assembleRelease") { finalizedBy(friendlyReleaseApk) }
 }
+
+// AGP merges the profile rules that AndroidX/Compose ship inside their AARs into
+// assets/dexopt/baseline.prof, and that output is not reproducible across build machines
+// (F-Droid docs: "Bug: baseline.prof not deterministic"). F-Droid compares its rebuild
+// against the published APK byte-for-byte, so ship no baseline profile instead.
+tasks.whenTaskAdded {
+    if (name.contains("ArtProfile")) {
+        enabled = false
+    }
+}
