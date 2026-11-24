@@ -130,11 +130,18 @@ wire {
 //   app/build/outputs/apk/release/exif-eraser-<versionName>.apk
 val friendlyReleaseApk by tasks.registering {
     group = "build"
-    description = "Copies app-release.apk to exif-eraser-<versionName>.apk"
+    description = "Copies the release APK to exif-eraser-<versionName>.apk"
     doLast {
         val dir = project.layout.buildDirectory.dir("outputs/apk/release").get().asFile
-        val src = File(dir, "app-release.apk")
-        require(src.exists()) { "Missing ${src.path} — run ./gradlew assembleRelease first." }
+        // fdroidserver strips signingConfigs, so the output may be app-release-unsigned.apk
+        // rather than app-release.apk. This copy is cosmetic, so never fail the build over it.
+        val src = dir.listFiles()?.firstOrNull {
+            it.isFile && it.extension == "apk" && !it.name.startsWith("exif-eraser-")
+        }
+        if (src == null) {
+            logger.lifecycle("friendlyReleaseApk: no release APK in ${dir.path}, skipping")
+            return@doLast
+        }
         val metadata = File(dir, "output-metadata.json").takeIf { it.exists() }?.readText().orEmpty()
         val version = Regex("\"versionName\"\\s*:\\s*\"([^\"]+)\"").find(metadata)?.groupValues?.get(1)
             ?: "unversioned"
