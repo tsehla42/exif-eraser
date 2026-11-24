@@ -1,17 +1,19 @@
 Categories:
-  - Security
   - Graphics
+  - Security
 License: MIT
 AuthorName: tsehla
 SourceCode: https://github.com/tsehla42/exif-eraser
 IssueTracker: https://github.com/tsehla42/exif-eraser/issues
 Changelog: https://github.com/tsehla42/exif-eraser/releases
 
+AutoName: ExifEraser
+
 RepoType: git
 Repo: https://github.com/tsehla42/exif-eraser
 
 Builds:
-  - versionName: '1.0.0'
+  - versionName: 1.0.0
     versionCode: 45
     commit: b918da55d906f04a4330fc76237b2c8b84452ac9
     subdir: app
